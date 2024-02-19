@@ -6,6 +6,14 @@ return {
     "nvim-treesitter/nvim-treesitter",
   },
   config = function()
+    local format_go_group = vim.api.nvim_create_augroup("GoFormat", {})
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      pattern = "*.go",
+      callback = function()
+        require('go.format').goimport()
+      end,
+      group = format_go_group
+    })
     require("go").setup()
     -- requres that gopls is installed
   end,

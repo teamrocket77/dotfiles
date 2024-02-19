@@ -8,6 +8,14 @@ vim.cmd [[ set mouse=a ]]
 vim.cmd [[ set nu]]
 vim.cmd [[ set rnu]]
 
+vim.keymap.set('n', '+', '<C-a>')
+vim.keymap.set('n', '-', '<C-x>')
+
+vim.opt.wildignore:append { '*/node_modules*' }
+vim.opt.hlsearch = true
+vim.opt.clipboard:append {'unnamed'}
+vim.cmd('set encoding=utf-8')
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({

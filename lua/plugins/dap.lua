@@ -18,8 +18,13 @@ return {
       -- dap.listeners.before.event_terminated.dapui_config = function()
       --   dapui.close()
       -- end
-      vim.keymap.set("n", '<leader>c', function() dap.continue() end)
+      -- vim.keymap.set("n", '<leader>c', function() dap.continue() end)
       vim.keymap.set("n", '<leader>b', function() dap.toggle_breakpoint() end)
+      vim.keymap.set("n", '<leader><Right>', function() dap.continue() end)
+      vim.keymap.set("n", '<leader><Up>', function() dap.step_over() end)
+      vim.keymap.set("n", '<leader><Down>', function() dap.step_into() end)
+      vim.keymap.set("n", '<leader><Left>', function() dap.step_out() end)
+
       local getpythonpath = function()
         local cwd = vim.fn.getcwd()
         local env = os.getenv("VIRTUAL_ENV")
@@ -43,9 +48,9 @@ return {
       dap.adapters.python = function(cb, configuration)
         if configuration.request == 'attach' then
           ---@diagnostic disable-next-line: undefined-field
-          local port = (configuration.connect or config).port
+          local port = (configuration.connect or configuration).port
           ---@diagnostic disable-next-line: undefined-field
-          local host = (configuration.connect or config).host or '127.0.0.1'
+          local host = (configuration.connect or configuration).host or '127.0.0.1'
           cb({
             type = 'server',
             port = assert(port, '`connect.port` is required for a python `attach` configuration'),
@@ -99,5 +104,18 @@ return {
       }
     })
   end
+  },
+  {
+    "leoluz/nvim-dap-go", ft = { 'go', 'golang'},
+    config = function()
+      require('dap-go').setup()
+    end
+  },
+  {
+  -- configure C/C++/Rust when I get better internet
+  -- "vadimcn/codelldb", version = "v1.10.0", ft = { "Rust", "C", "C++", },
+  -- config = function()
+  --   local dap = require("dap")
+  -- end
   }
 }
