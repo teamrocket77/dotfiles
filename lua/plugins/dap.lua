@@ -109,6 +109,7 @@ return {
     "leoluz/nvim-dap-go", ft = { 'go', 'golang'},
     config = function()
       require('dap-go').setup()
+      vim.keymap.set("n", "<leader>ctest", function() require('dap-go').debug_test() end)
     end
   },
   {

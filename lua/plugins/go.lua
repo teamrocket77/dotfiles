@@ -14,8 +14,10 @@ return {
       end,
       group = format_go_group
     })
+    vim.keymap.set("n", '<leader>ru', ':GoRun<CR>', {noremap = true, silent = true})
+    vim.keymap.set("n", '<leader>tes', ':GoTest<CR>', {noremap = true, silent = true})
     require("go").setup()
-    -- requres that gopls is installed
+    -- requres that gopls is installed enables <space>ru<enter> for running files
   end,
   event = {"CmdlineEnter"},
   ft = {"go", 'gomod'},
