@@ -14,7 +14,7 @@ return {
         local client_info = vim.inspect(clients)
         local lines = vim.split(client_info, "\n")
         vim.cmd("new")
-        vim.api.nvim_buf_set_lines(0, 0, -1, lines)
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
         vim.bo.buftype = "nofile"
         vim.bo.bufhidden = "wipe"
         vim.bo.swapfile = false
@@ -85,6 +85,11 @@ return {
         ensure_installed = servers,
         handlers = handlers
       })
+      vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+      vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+      vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
+      vim.keymap.set('n', '<leader>flt', vim.diagnostic.open_float)
+      vim.keymap.set('n', '<leader>buf', get_lsp)
     end
   },
 }
