@@ -24,10 +24,12 @@ return {
       vim.keymap.set("n", '<leader><Up>', function() dap.step_over() end)
       vim.keymap.set("n", '<leader><Down>', function() dap.step_into() end)
       vim.keymap.set("n", '<leader><Left>', function() dap.step_out() end)
+      vim.keymap.set("n", '<leader>dr', function() dap.repl.open() end)
 
       local getpythonpath = function()
         local cwd = vim.fn.getcwd()
         local env = os.getenv("VIRTUAL_ENV")
+        local py_env = os.getenv("PYTHON_ENV")
         if vim.fn.executable(cwd .. '/venv/bin/python') == 1 then
           print("running first option now")
           return cwd .. '/venv/bin/python'
@@ -36,6 +38,8 @@ return {
           return cwd .. '/.venv/bin/python'
         elseif env then
           return env .. '/venv/bin/python'
+        elseif py_env then
+          return env
         elseif vim.fn.executable('/usr/bin/python') == 1 then
           return '/usr/bin/python'
         else
@@ -45,6 +49,8 @@ return {
         end
       end
       local pythonpath = getpythonpath()
+      print(pythonpath)
+      print("If this fails check that pythonpath contains the appropriate debugpy package")
       dap.adapters.python = function(cb, configuration)
         if configuration.request == 'attach' then
           ---@diagnostic disable-next-line: undefined-field
@@ -72,11 +78,11 @@ return {
       end
       dap.configurations.python = {
         {
-          type = 'python';
-          request = 'launch';
           name = "launch file";
           program = "${file}";
           pythonpath = pythonpath;
+          request = 'launch';
+          type = 'python';
         },
       }
 
