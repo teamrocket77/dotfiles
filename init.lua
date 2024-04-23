@@ -11,6 +11,7 @@ vim.cmd [[ set smartcase ]]
 
 vim.keymap.set('n', '+', '<C-a>')
 vim.keymap.set('n', '-', '<C-x>')
+vim.keymap.set('n', '<leader>tn', ':tabnew<CR>')
 
 vim.opt.wildignore:append { '*/node_modules*' }
 vim.opt.hlsearch = true
