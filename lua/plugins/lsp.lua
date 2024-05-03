@@ -64,6 +64,25 @@ return {
             }
           }
         end,
+        ["graphql"] = function ()
+          lspconfig.graphql.setup {
+            capabilities = capabilities,
+            filetypes = {
+              "graphql",
+              "*.graphqls",
+            }
+          }
+        end,
+        ["docker_compose_language_service"] = function ()
+          lspconfig.docker_compose_language_service.setup {
+            capabilities = capabilities,
+          }
+        end,
+        ["yamlls"] = function ()
+          lspconfig.yamlls.setup {
+            capabilities = capabilities,
+          }
+        end,
         ["tsserver"] = function ()
           lspconfig.tsserver.setup {
             capabilities = capabilities,

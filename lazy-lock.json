@@ -8,6 +8,8 @@
   "cmp-path": { "branch": "main", "commit": "91ff86cd9c29299a64f968ebb45846c485725f23" },
   "cmp_luasnip": { "branch": "master", "commit": "05a9ab28b53f71d1aece421ef32fee2cb857a843" },
   "friendly-snippets": { "branch": "main", "commit": "b8fae73a479ae0a1c54f5c98fa687ae8a0addc53" },
+  "fzf": { "branch": "master", "commit": "ee9d88b637e5a1210bb8727da87df5c5bc5cfa70" },
+  "fzf.vim": { "branch": "master", "commit": "269c08641ed5a842a19c03ca14e3eac3ac7ea74b" },
   "go.nvim": { "branch": "master", "commit": "d748e79011437d5b080006b896b3c296656641d7" },
   "guihua.lua": { "branch": "master", "commit": "9fb6795474918b492d9ab01b1ebaf85e8bf6fe0b" },
   "kanagawa.nvim": { "branch": "master", "commit": "c19b9023842697ec92caf72cd3599f7dd7be4456" },
