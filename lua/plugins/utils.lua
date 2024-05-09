@@ -45,4 +45,7 @@ return {
     end,
     build = function() vim.fn["mkdp#util#install"]() end,
   },
+  {
+    'jrop/jq.nvim'
+  },
 }
