@@ -65,13 +65,10 @@ return {
           }
         end,
         ["graphql"] = function ()
-          lspconfig.graphql.setup {
+          lspconfig.graphql.setup({
             capabilities = capabilities,
-            filetypes = {
-              "graphql",
-              "*.graphqls",
-            }
-          }
+            root_dir = lspconfig.util.root_pattern(".graphqlconfig", ".graphqlrc", "package.json"),
+          })
         end,
         ["docker_compose_language_service"] = function ()
           lspconfig.docker_compose_language_service.setup {
@@ -110,11 +107,14 @@ return {
         "lua_ls",
         "dockerls",
         "pyright",
+        "graphql",
+        "tsserver",
       }
       local mason = require("mason")
       local mason_lsp = require("mason-lspconfig")
       mason.setup()
       mason_lsp.setup({
+        automatic_installation = true,
         ensure_installed = servers,
         handlers = handlers
       })
