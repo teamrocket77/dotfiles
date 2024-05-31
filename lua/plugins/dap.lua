@@ -65,7 +65,6 @@ exit(1)]]
 
         local getpythonpath = function()
           local cwd = vim.fn.getcwd()
-          local env = os.getenv("VIRTUAL_ENV")
           local py_env = os.getenv("PYTHON_ENV")
 
           if vim.fn.executable(cwd .. '/venv/bin/python') == 1 then
@@ -73,15 +72,15 @@ exit(1)]]
 
           elseif vim.fn.executable(cwd .. '/.venv/bin/python') == 1 then
             return cwd .. '/.venv/bin/python'
-          elseif vim.fn.executable(env) == 1 then
-            return env
+
           elseif vim.fn.executable(py_env) == 1 then
             return py_env
+
           elseif vim.fn.executable('/usr/bin/python') == 1 then
             return '/usr/bin/python'
           else
             print("please install a python version")
-            return ''
+            return false
           end
         end
         local python_path = getpythonpath()
