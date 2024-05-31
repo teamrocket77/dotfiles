@@ -21,7 +21,7 @@ vim.g.doge_enable_mappings = 0
 -- :h option-list
 -- :h E355
 local home = os.getenv("HOME")
-vim.o.directory = home .. './.config/nvim/swapfiles/'
+vim.o.directory = home .. '/.config/nvim/swapfiles/'
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
