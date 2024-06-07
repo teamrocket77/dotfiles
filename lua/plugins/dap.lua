@@ -55,7 +55,9 @@ exit(1)]]
                 end
             end,
             on_exit = function(_, code)
+              if tostring(code) == '1' then
                 print("Script exited with code", code, " Which means that debugpy isn't installed")
+                end
                 -- Clean up the temporary file
                 os.remove(temp_file)
             end,
@@ -83,14 +85,14 @@ exit(1)]]
             return false
           end
         end
-        local python_path = getpythonpath()
+        Python_path = getpythonpath()
         local run_python_check_flag = false
 
         Run_python_check = function()
           if not run_python_check_flag then
             run_python_check_flag = true
-            if python_path ~= '' then
-              check_package(python_path)
+            if Python_path ~= '' then
+              check_package(Python_path)
             end
           end
         end
@@ -118,7 +120,7 @@ exit(1)]]
           else
             cb({
               type = 'executable',
-              command = pythonpath,
+              command = Python_path,
               args = { '-m', 'debugpy.adapter' },
               options = {
                 source_filetype = 'python',
@@ -130,7 +132,7 @@ exit(1)]]
           {
             name = "launch file";
             program = "${file}";
-            pythonpath = pythonpath;
+            pythonpath = Python_path;
             request = 'launch';
             type = 'python';
           },
