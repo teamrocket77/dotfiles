@@ -26,7 +26,7 @@ return {
       vim.keymap.set("n", '<leader><Left>', function() dap.step_out() end)
       vim.keymap.set("n", '<leader>dr', function() dap.repl.open() end)
 
-        local check_package = function(executable)
+        check_package = function(executable)
         local python_script = [[ 
 import importlib.util
 if importlib.util.find_spec('debugpy'):
@@ -96,12 +96,6 @@ exit(1)]]
             end
           end
         end
-        vim.cmd([[
-            augroup CheckPythonPackage
-              autocmd FileType python lua Run_python_check()
-            augroup END
-        ]])
-
 
         dap.adapters.python = function(cb, configuration)
           if configuration.request == 'attach' then
