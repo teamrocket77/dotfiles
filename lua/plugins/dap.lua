@@ -25,6 +25,7 @@ return {
       vim.keymap.set("n", '<leader><Down>', function() dap.step_into() end)
       vim.keymap.set("n", '<leader><Left>', function() dap.step_out() end)
       vim.keymap.set("n", '<leader>dr', function() dap.repl.open() end)
+      vim.keymap.set("n", '<leader>s<Left>', function() dap.repl.open() end)
 
         check_package = function(executable)
         local python_script = [[ 

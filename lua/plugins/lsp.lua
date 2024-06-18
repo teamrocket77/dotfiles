@@ -35,9 +35,9 @@ return {
           vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
           vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
           vim.keymap.set('n', '<leader>sh', vim.lsp.buf.signature_help, opts)
-          vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+          vim.keymap.set('n', '<leader>gr', vim.lsp.buf.references, opts)
           vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
-          vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
+          vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
         end
       })
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
