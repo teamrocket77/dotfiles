@@ -47,6 +47,9 @@ return {
     end, ft = {'Python'}
   },
   {
+    "tpope/vim-obsession",
+  },
+  {
     "iamcco/markdown-preview.nvim",
     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
     ft = { "markdown" }, config = function()
