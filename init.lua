@@ -4,11 +4,10 @@ vim.g.mapleader = " "
 vim.o.relativenumber = true
 vim.o.number = true
 vim.o.shiftwidth = 4
-vim.o.softtabstop = 0
+vim.o.softtabstop = 2
 vim.o.tabstop = 4
 vim.o.ignorecase = true
 vim.o.wildmenu = 'full'
-vim.o.expandtab = false
 vim.o.smarttab = true
 vim.o.autoindent = true
 vim.o.smartindent = true
@@ -65,7 +64,20 @@ nvim_create_autocmd("InsertLeave", {
 	end
 })
 
+local function toggle_zoom()
+	local zoom_status = vim.g.zoom_status or 0
+	if zoom_status == 0 then
+		vim.cmd('wincmd _')
+		vim.cmd('wincmd |')
+		vim.g.zoom_status = 1
+	else
+		vim.cmd('wincmd =')
+		vim.g.zoom_status = 0
+	end
+end
+vim.keymap.set('n', '<leader>0', ':ToggleZoom<CR>')
 
+vim.api.nvim_create_user_command('ToggleZoom', toggle_zoom, {})
 -- :h option-list
 -- :h E355
 vim.o.directory = home .. '/.config/nvim/swapfiles/'

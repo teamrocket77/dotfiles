@@ -48,6 +48,7 @@ return {
         "asm-lsp",
         "yamllint",
       }
+
       local handlers = {
         function(server)
           lspconfig[server].setup{
@@ -75,11 +76,30 @@ return {
             capabilities = capabilities,
           }
         end,
-        ["yamlls"] = function ()
-          lspconfig.yamlls.setup {
-            capabilities = capabilities,
-          }
-        end,
+        ["pyright"] = function ()
+			lspconfig.pyright.setup {
+				settings = {
+					analysis  = {
+						python  = {
+							autoSearchPaths = true,
+						}
+					}
+				}
+			}
+		end,
+        ["ruff_lsp"] = function ()
+			lspconfig.ruff_lsp.setup {
+				on_attach = function(client, bufnr)
+					client.server_capabilities.documentFormattingProvider = true
+					vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>fmt', '<cmd>lua vim.lsp.buf.format({ async = true })<CR>', {noremap=true, silent=true})
+				end,
+				init_options = {
+					settings = {
+						capabilities = capabilities,
+					}
+				}
+			}
+		end,
         ["tsserver"] = function ()
           lspconfig.tsserver.setup {
             capabilities = capabilities,
@@ -107,6 +127,7 @@ return {
         "lua_ls",
         "dockerls",
         "pyright",
+        "ruff_lsp",
         "graphql",
         "tsserver",
       }
