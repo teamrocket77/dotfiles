@@ -14,7 +14,6 @@ set shiftwidth=4
 set smartcase
 set softtabstop=4
 set tabstop=4
-set noexpandtab
 set path+=**
 
 syntax on

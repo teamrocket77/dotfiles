@@ -50,6 +50,9 @@ return {
     "tpope/vim-obsession",
   },
   {
+	  "sindrets/diffview.nvim"
+  },
+  {
     "iamcco/markdown-preview.nvim",
     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
     ft = { "markdown" }, config = function()

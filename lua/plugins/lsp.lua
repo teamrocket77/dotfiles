@@ -100,6 +100,16 @@ return {
 				}
 			}
 		end,
+        ["terraformls"] = function ()
+          lspconfig.terraformls.setup {
+            capabilities = capabilities,
+            filetypes = {
+				"terraform",
+				"tf",
+				"tfvars",
+			},
+          }
+        end,
         ["tsserver"] = function ()
           lspconfig.tsserver.setup {
             capabilities = capabilities,
@@ -130,6 +140,7 @@ return {
         "ruff_lsp",
         "graphql",
         "tsserver",
+        "terraformls",
       }
       local mason = require("mason")
       local mason_lsp = require("mason-lspconfig")
