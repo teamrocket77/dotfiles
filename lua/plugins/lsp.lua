@@ -48,21 +48,11 @@ return {
         "asm-lsp",
         "yamllint",
       }
-
+      local cfg = require('yaml-companion').setup({})
       local handlers = {
         function(server)
           lspconfig[server].setup{
             capabilities = capabilities
-          }
-        end,
-        ["yamlls"] = function ()
-          lspconfig.yamlls.setup {
-            capabilities = capabilities,
-            settings = {
-              yaml = {
-                keyordering = false
-              }
-            }
           }
         end,
         ["graphql"] = function ()
@@ -109,6 +99,8 @@ return {
 				"tfvars",
 			},
           }
+        ["yamlls"] = function ()
+          lspconfig.yamlls.setup(cfg)
         end,
         ["tsserver"] = function ()
           lspconfig.tsserver.setup {
@@ -141,6 +133,7 @@ return {
         "graphql",
         "tsserver",
         "terraformls",
+        "yamlls",
       }
       local mason = require("mason")
       local mason_lsp = require("mason-lspconfig")
