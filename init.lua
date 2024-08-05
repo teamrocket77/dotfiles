@@ -19,6 +19,9 @@ vim.cmd [[ set mouse=a ]]
 vim.opt.wildignore:append { '*/node_modules*' }
 vim.opt.hlsearch = true
 vim.opt.clipboard:append {'unnamed'}
+vim.opt.path:append("**")
+vim.opt.wildignore:append("__pycache__")
+vim.opt.wildignore:append("*pyc")
 vim.g.doge_enable_mappings = 0
 vim.g.session_dir = home .. '/.config/nvim/sessions/'
 
