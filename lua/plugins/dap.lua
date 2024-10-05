@@ -5,6 +5,7 @@ return {
       {
         "rcarriga/nvim-dap-ui",
       },
+	{"nvim-neotest/nvim-nio"},
     },
     config = function(cb, configuration)
       local dap = require("dap")

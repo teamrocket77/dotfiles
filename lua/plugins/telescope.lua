@@ -9,22 +9,11 @@ return {
   }, config = function()
     require("telescope").load_extension("live_grep_args")
     local actions = require("telescope.actions")
-    local trouble = require("trouble.providers.telescope")
+    local trouble = require("trouble.sources.telescope")
 
     local telescope = require("telescope")
 
     telescope.setup {
-      defaults = {
-        mappings = {
-          i = {
-            ["<C-t>"] = trouble.open_with_trouble,
-            ["<C-f>"] = trouble.open_with_trouble,
-          },
-          n = {
-            ["<C-t>"] = trouble.open_with_trouble,
-          },
-        },
-      },
     }
   end,
   },

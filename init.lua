@@ -14,6 +14,7 @@ vim.o.smartindent = true
 
 
 
+
 vim.cmd [[ set mouse=a ]]
 
 vim.opt.wildignore:append { '*/node_modules*' }
@@ -27,7 +28,15 @@ vim.g.session_dir = home .. '/.config/nvim/sessions/'
 
 vim.keymap.set('n', '+', '<C-a>')
 vim.keymap.set('n', '-', '<C-x>')
-vim.keymap.set('n', '<F3>', ':set list!<CR>')
+-- vim.keymap.set('n', '<F3>', ':set list!<CR>')
+vim.keymap.set('n', '<leader>tb', function()
+		if vim.o.background=="light" then
+			vim.o.background="dark"
+		else
+			vim.o.background="light"
+		end
+	end,{}
+)
 vim.keymap.set('n', '<leader>tn', ':tabnew<CR>')
 vim.keymap.set('n', '<leader>ss', ':mks ' .. vim.g.session_dir .. vim.fn.expand('%:r') .. '.vim')
 vim.keymap.set('n', '<leader>sr', ':so ' .. vim.g.session_dir)

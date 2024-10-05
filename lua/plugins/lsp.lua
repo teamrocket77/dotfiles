@@ -26,6 +26,12 @@ return {
       local lspconfig = require("lspconfig")
       lspconfig.gopls.setup{
       }
+
+      vim.api.nvim_create_autocmd({ "BufRead","BufNewFile"},{
+		pattern = {"*slint"},
+		command = "set filetype=slint"
+      })
+
       vim.api.nvim_create_autocmd('LspAttach', {
       group = vim.api.nvim_create_augroup('UserLspConfig', {}),
         callback = function(ev)
@@ -40,6 +46,7 @@ return {
           vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
         end
       })
+
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
       -- currently managed by ASDF
 
@@ -99,8 +106,22 @@ return {
 				"tfvars",
 			},
           }
+	end,
+        ["rust_analyzer"] = function ()
+          lspconfig.rust_analyzer.setup{
+			  ['rust-analyzer'] = {
+				  diagnostics = {
+					  enable = true;
+					  warningsAsHint = true;
+				  }
+			  }
+		  }
+        end,
         ["yamlls"] = function ()
           lspconfig.yamlls.setup(cfg)
+        end,
+        ["slint_lsp"] = function ()
+          lspconfig.slint_lsp.setup{}
         end,
         ["tsserver"] = function ()
           lspconfig.tsserver.setup {
@@ -125,6 +146,8 @@ return {
       }
 
       local servers = {
+        "slint_lsp",
+        "rust_analyzer",
         "cmake",
         "lua_ls",
         "dockerls",
