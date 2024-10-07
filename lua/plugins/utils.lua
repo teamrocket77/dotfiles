@@ -8,6 +8,16 @@ local have_jq = function()
 end
 
 return {
+	{ "stevearc/oil.nvim", dependencies = {
+    "echasnovski/mini.nvim",
+    "nvim-tree/nvim-web-devicons",
+
+	},
+	config = function()
+    require("oil").setup()
+    vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+end,
+	},
   {"kwkarlwang/bufresize.nvim", config = function()
     local opts = { noremap=true, silent=true}
     require("bufresize").setup({
