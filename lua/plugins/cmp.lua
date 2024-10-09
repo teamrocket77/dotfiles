@@ -3,13 +3,7 @@ return {
     "hrsh7th/nvim-cmp",
     version = "v0.0.1",
     dependencies = {
-      {
-        "L3MON4D3/LuaSnip",
-        config = function(opts)
-          require("luasnip").setup(opts)
-          require("luasnip.loaders.from_snipmate").load({ paths = "./snippets" })
-        end,
-      },
+      { "L3MON4D3/LuaSnip" },
       { "saadparwaiz1/cmp_luasnip" },
       { "rafamadriz/friendly-snippets" },
       { "hrsh7th/cmp-path" },
@@ -19,6 +13,7 @@ return {
     },
     config = function()
       local cmp = require("cmp")
+
       cmp.setup({
         snippet = {
           expand = function(args)

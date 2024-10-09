@@ -32,7 +32,6 @@ return {
 
       local formatters = {
         lua = "stylua",
-        -- c = "clang-format-18",
       }
 
       local function get_formatter(filetype)

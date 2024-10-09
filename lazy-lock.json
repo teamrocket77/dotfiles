@@ -44,5 +44,6 @@
   "vim-doge": { "branch": "master", "commit": "188351964c8b2540a69c1d2648b3c6e7877a016f" },
   "vim-obsession": { "branch": "master", "commit": "fe9d3e1a9a50171e7d316a52e1e56d868e4c1fe5" },
   "vim-slint": { "branch": "main", "commit": "9badce3860297562bb5e80ba1666628f9e0ac632" },
+  "vim-snippets": { "branch": "master", "commit": "f0a3184d9f90b96b044d5914625a25c554d7f301" },
   "yaml-companion.nvim": { "branch": "main", "commit": "131b0d67bd2e0f1a02e0daf2f3460482221ce3c0" }
 }
