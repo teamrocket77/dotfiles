@@ -1,5 +1,6 @@
 local ls = require("luasnip")
 local s = ls.snippet
+local d = ls.dynamic_node
 local i = ls.insert_node
 local t = ls.text_node
 local c = ls.choice_node
@@ -7,110 +8,86 @@ local sn = ls.snippet_node
 local f = ls.function_node
 local isn = ls.indent_snippet_node
 local fmt = require("luasnip.extras.fmt").fmt
-local types = require("luasnip.util.types")
+local rep = require("luasnip.extras").rep
 
-local function node_with_virtual_text(pos, node, text)
-  local nodes
-  if node.type == types.textNode then
-    node.pos = 2
-    nodes = { i(1), node }
+local function to_init_assign(args)
+  local tab = {}
+  local a = args[1][1]
+  local count = 1
+  local ret_node = t("")
+  local ret_obj = args[2][1]
+  if #a == 0 then
   else
-    node.pos = 1
-    nodes = { node }
-  end
-  return sn(pos, nodes, {
-    node_ext_opts = {
-      active = {
-        -- override highlight here ("GruvboxOrange").
-        virt_text = { { text, "GruvboxOrange" } },
-      },
-    },
-  })
-end
-
-local function nodes_with_virtual_text(nodes, opts)
-  if opts == nil then
-    opts = {}
-  end
-  local new_nodes = {}
-  for pos, node in ipairs(nodes) do
-    if opts.texts[pos] ~= nil then
-      node = node_with_virtual_text(pos, node, opts.texts[pos])
+    table.insert(tab, isn(nil, { t({ "", "" }) }, "$PARENT_INDENT"))
+    table.insert(tab, isn(nil, { t("\tArgs:") }, "$PARENT_INDENT"))
+    for e in string.gmatch(a, " ?([^,]*) ?") do
+      if #e > 0 then
+        table.insert(tab, isn(nil, { t({ "", "" }) }, "$PARENT_INDENT"))
+        table.insert(tab, isn(nil, { t("\t\t" .. e) }, "$PARENT_INDENT"))
+        count = count + 1
+      end
     end
-    table.insert(new_nodes, node)
   end
-  return new_nodes
+
+  table.insert(tab, isn(nil, { t({ "", "" }) }, "$PARENT_INDENT"))
+  if ret_obj ~= "" then
+    ret_obj = string.gsub(ret_obj, "-> ", "")
+    ret_node = t("Returns:" .. ret_obj)
+  end
+  return isn(
+    nil,
+    fmt(
+      [[{}{}
+    {}
+    {}]],
+      { t('"""'), isn(nil, sn(nil, tab), "$PARENT_INDENT"), ret_node, t('"""') }
+    ),
+    "$PARENT_INDENT"
+  )
 end
 
-local function choice_text_node(pos, choices, opts)
-  choices = nodes_with_virtual_text(choices, opts)
-  return c(pos, choices, opts)
+local function choose_doc_string(args)
+  if args[1][1] ~= "" or args[2][1] ~= "" then
+    return to_init_assign(args)
+  end
+  return isn(nil, t("pass"), "$PARENT_INDENT")
 end
-
-local ct = choice_text_node
 
 ls.add_snippets("python", {
   s(
     "d",
     fmt(
-      [[
-		def {func}({args}){ret}:
-			{doc}{body}
-	]],
+      [[def {}({}){}:
+    {}]],
       {
-        func = i(1),
-        args = i(2),
-        ret = c(3, {
-          t(""),
-          sn(nil, {
-            t(" -> "),
-            i(1),
-          }),
-        }),
-        doc = isn(4, {
-          ct(1, {
-            sn(
-              2,
-              fmt(
-                [[
-			"""{desc}
-
-			Args:
-			{args}
-
-			Returns:
-			{returns}
-			"""
-
-			]],
-                {
-                  desc = i(1),
-                  args = i(2), -- TODO should read from the args in the function
-                  returns = i(3),
-                }
-              )
-            ),
-            t(""),
-            sn(
-              1,
-              fmt(
-                [[
-			"""{desc}"""
-
-			]],
-                { desc = i(1) }
-              )
-            ),
-          }, {
-            texts = {
-              "(full docstring)",
-              "(no docstring)",
-              "(single line docstring)",
-            },
-          }),
-        }, "$PARENT_INDENT\t"),
-        body = i(0),
+        i(1),
+        i(2),
+        c(3, { t(""), fmt([[-> {}]], i(1)) }),
+        d(4, choose_doc_string, { 2, 3 }),
       }
     )
+  ),
+  s(
+    "lc",
+    fmt([[{} = {}{} for {} in {}{}]], {
+      i(1),
+      t("["),
+      i(2),
+      rep(2),
+      i(3),
+      t("]"),
+    })
+  ),
+  s(
+    "dc",
+    fmt([[{} = {}{}:{} for {} in {}{}]], {
+      i(1),
+      t("["),
+      i(2),
+      i(3),
+      rep(2),
+      i(4),
+      t("]"),
+    })
   ),
 })

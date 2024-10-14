@@ -22,10 +22,10 @@ vim.opt.wildignore:append("__pycache__")
 vim.opt.wildignore:append("*pyc")
 vim.g.doge_enable_mappings = 0
 vim.g.session_dir = home .. "/.config/nvim/sessions/"
+vim.g.python3_host_prog = home .. "/.pyenv/versions/pynvim/bin/python"
 
 vim.keymap.set("n", "+", "<C-a>")
 vim.keymap.set("n", "-", "<C-x>")
--- vim.keymap.set('n', '<F3>', ':set list!<CR>')
 vim.keymap.set("n", "<leader>tb", function()
   if vim.o.background == "light" then
     vim.o.background = "dark"

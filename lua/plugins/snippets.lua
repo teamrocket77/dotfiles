@@ -18,15 +18,16 @@ return {
         },
       },
     })
+
     require("luasnip.loaders.from_snipmate").load({
       paths = {
-        -- home .. "/.config/nvim/lua/snippets",
-        --  home .. "/.local/share/nvim/lazy/vim-snippets/snippets",
+        home .. "/.config/nvim/lua/snippets",
       },
     })
+
     require("luasnip.loaders.from_lua").load({
       paths = {
-        home .. "/.config/nvim/lua/luasnippets",
+        home .. "/.config/nvim/lua/luasnippets/",
       },
     })
 
@@ -36,6 +37,26 @@ return {
       '<cmd>lua require("luasnip.extras.select_choice")()<CR>',
       { noremap = true, silent = true }
     )
+
+    vim.keymap.set("n", "<leader><leader>rs", function()
+      local current_ft = vim.bo.filetype
+      local snips = luasnip.get_snippets(current_ft)
+      for _, snip in ipairs(snips) do
+        snip:invalidate()
+        print(snip.name .. " invalidated in ft: " .. current_ft)
+      end
+      -- because refresh_notify did not work
+      require("luasnip.loaders.from_lua").load({
+        paths = {
+          home .. "/.config/nvim/lua/luasnippets/",
+        },
+      })
+      require("luasnip.loaders.from_snipmate").load({
+        paths = {
+          home .. "/.config/nvim/lua/snippets",
+        },
+      })
+    end, { noremap = true, silent = true })
 
     vim.keymap.set({ "s", "i" }, "<c-j>", function()
       if luasnip.expand_or_jumpable(1) then

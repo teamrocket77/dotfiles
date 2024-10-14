@@ -1,10 +1,11 @@
 return {
   {
-    'nvim-treesitter/nvim-treesitter', build = ':TSUpdate',
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
     version = "v0.9.2",
     config = function()
-      local treesitter = require('nvim-treesitter.configs')
-      treesitter.setup{
+      local treesitter = require("nvim-treesitter.configs")
+      treesitter.setup({
         ensure_installed = {
           "bash",
           "dockerfile",
@@ -20,33 +21,51 @@ return {
         textobjects = {
           enable = true,
         },
-      }
-    end
+      })
+    end,
   },
   {
-    'nvim-treesitter/nvim-treesitter-context',
+    "nvim-treesitter/nvim-treesitter-context",
     version = "",
-    config = function()
-    end
+    config = function() end,
   },
   {
-    'nvim-treesitter/nvim-treesitter-textobjects',
+    "nvim-treesitter/nvim-treesitter-textobjects",
     version = "",
     config = function()
-    end
+      require("nvim-treesitter.configs").setup({
+        textobjects = {
+          select = {
+            enable = true,
+            keymaps = {
+              ["af"] = "@function.outer",
+              ["if"] = "@function.inner",
+              ["ac"] = "@class.outer",
+              ["ic"] = "@class.inner",
+            },
+          },
+        },
+      })
+    end,
   },
   -- vim.keymap.set('n', '<leader>cf', ':GetCurrentFunctions<CR>', {noremap = true, silent = true})
   {
-    'stevearc/aerial.nvim',
+    "stevearc/aerial.nvim",
     opts = {},
     -- Optional dependencies
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
-      "nvim-tree/nvim-web-devicons"
-    }, config = function()
-      require('aerial').setup()
-      vim.keymap.set('n', '<leader>at', ':AerialToggle<CR>', {noremap = true, silent = true})
+      "nvim-tree/nvim-web-devicons",
+    },
+    config = function()
+      require("aerial").setup()
+      vim.keymap.set(
+        "n",
+        "<leader>at",
+        ":AerialToggle<CR>",
+        { noremap = true, silent = true }
+      )
       -- vim.keymap.set('n', '<leader>ac', ':AerialClose<CR>', {noremap = true, silent = true})
     end,
-  }
+  },
 }

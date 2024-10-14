@@ -216,6 +216,7 @@ return {
         "tsserver",
         "terraformls",
         "yamlls",
+        "bashls",
       }
       local mason = require("mason")
       local mason_lsp = require("mason-lspconfig")

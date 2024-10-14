@@ -11,8 +11,10 @@ local types = require("luasnip.util.types")
 
 local same = function(index)
   return f(function(arg)
-    return arg[1]
+    return arg[1][1]
   end, { index })
 end
 
-return { s("sametest", fmt([[example: {}, function: {}]], { i(1), same(1) })) }
+return {
+  s("sametest", fmt([[example: {}, function: {}]], { i(1), same(1) })),
+}
