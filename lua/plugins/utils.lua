@@ -80,7 +80,10 @@ return {
     "tpope/vim-obsession",
   },
   {
-    "sindrets/diffview.nvim",
+	  "sindrets/diffview.nvim", config = function()
+		  require('diffview').setup({
+		  })
+	  end
   },
   {
     "iamcco/markdown-preview.nvim",
@@ -92,6 +95,12 @@ return {
     build = function()
       vim.fn["mkdp#util#install"]()
     end,
+  },
+  {
+	'mbbill/undotree', config = function()
+		vim.keymap.set('n', '<leader>utog', vim.cmd.UndotreeToggle)
+		vim.keymap.set('n', '<leader>ushow', vim.cmd.UndotreeToggle)
+	end
   },
   have_jq(),
 }

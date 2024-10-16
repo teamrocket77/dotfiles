@@ -1,8 +1,7 @@
 local home = os.getenv("HOME")
 vim.g.mapleader = " "
-
-vim.o.relativenumber = true
 vim.o.number = true
+vim.o.relativenumber = true
 vim.o.shiftwidth = 4
 vim.o.softtabstop = 2
 vim.o.tabstop = 4
@@ -24,8 +23,6 @@ vim.g.doge_enable_mappings = 0
 vim.g.session_dir = home .. "/.config/nvim/sessions/"
 vim.g.python3_host_prog = home .. "/.pyenv/versions/pynvim/bin/python"
 
-vim.keymap.set("n", "+", "<C-a>")
-vim.keymap.set("n", "-", "<C-x>")
 vim.keymap.set("n", "<leader>tb", function()
   if vim.o.background == "light" then
     vim.o.background = "dark"
@@ -40,6 +37,13 @@ vim.keymap.set(
   ":mks " .. vim.g.session_dir .. vim.fn.expand("%:r") .. ".vim"
 )
 vim.keymap.set("n", "<leader>sr", ":so " .. vim.g.session_dir)
+
+vim.keymap.set('n', '+', '<C-a>')
+vim.keymap.set('n', '-', '<C-x>')
+vim.keymap.set('n', '<leader>tn', ':tabnew<CR>')
+vim.keymap.set('n', '<leader>ss', ':mks ' .. vim.g.session_dir .. vim.fn.expand('%:r') .. '.vim')
+vim.keymap.set('n', '<leader>sr', ':so ' .. vim.g.session_dir)
+vim.keymap.set("n", "<F3>", ':exec &bg=="light"? "set bg=dark" : "set bg=light"<CR>', {noremap = true, silent = true})
 
 local opt = vim.opt
 local cmd = vim.cmd
@@ -75,6 +79,29 @@ nvim_create_autocmd("InsertLeave", {
     nvim_set_hl(0, "TrailingWhitespace", { link = "Error" })
   end,
 })
+
+-- Function to diff the current buffer with the last saved version
+local function diff_with_saved()
+  local filetype = vim.bo.filetype
+  vim.cmd('diffthis')
+  vim.cmd('vnew | r # | normal! 1Gdd')
+  vim.cmd('diffthis')
+  vim.cmd('setlocal bt=nofile bh=wipe nobl noswf ro ft=' .. filetype)
+end
+
+-- Command to call the diff_with_saved function
+vim.api.nvim_create_user_command('DiffSaved', diff_with_saved, {})
+
+-- Function to turn off diff mode and close the buffer
+local function diff_off_func()
+  vim.cmd('diffoff')
+  vim.cmd('q')
+  vim.cmd('diffoff')
+end
+
+-- Command to call the diff_off_func function
+vim.api.nvim_create_user_command('DiffoffComplex', diff_off_func, {})
+
 
 local function toggle_zoom()
   local zoom_status = vim.g.zoom_status or 0

@@ -59,7 +59,6 @@ return {
         command = "/opt/homebrew/opt/llvm/bin/lldb-dap", -- required to be absolute path
         name = "lldb",
       }
-
       -- https://github.com/llvm/llvm-project/blob/main/lldb/tools/lldb-dap/README.md
       local current_dir = "Path to executable: " .. vim.fn.getcwd() .. "/"
       local c_cpp_dap_config = {

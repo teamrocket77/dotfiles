@@ -1,3 +1,4 @@
+-- fmt
 return {
   { "neovim/nvim-lspconfig" },
   {
@@ -60,10 +61,16 @@ return {
 
       vim.api.nvim_create_autocmd("BufWritePre", {
         group = vim.api.nvim_create_augroup("FormatOnSave", {}),
+        -- will check if the fmt is there before formatting file
+        -- TODO make check for files if so then we apply that
         callback = function(ev)
           local opts = { buffer = ev.buf }
           local cursor_position = vim.api.nvim_win_get_cursor(0)
-          format_buffer()
+          for _, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, 5, true)) do
+            if string.find(line, "fmt") then
+              format_buffer()
+            end
+          end
           vim.api.nvim_win_set_cursor(0, cursor_position)
         end,
       })
@@ -114,11 +121,7 @@ return {
         ["graphql"] = function()
           lspconfig.graphql.setup({
             capabilities = capabilities,
-            root_dir = lspconfig.util.root_pattern(
-              ".graphqlconfig",
-              ".graphqlrc",
-              "package.json"
-            ),
+            root_dir = lspconfig.util.root_pattern(".graphqlconfig", ".graphqlrc", "package.json"),
           })
         end,
         ["docker_compose_language_service"] = function()
