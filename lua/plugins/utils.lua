@@ -15,19 +15,20 @@ return {
     end,
   },
   {
-    "stevearc/oil.nvim",
+    "echasnovski/mini.nvim",
+    version = "*",
     dependencies = {
       "echasnovski/mini.icons",
       "nvim-tree/nvim-web-devicons",
     },
     config = function()
-      require("oil").setup()
-      vim.keymap.set(
-        "n",
-        "-",
-        "<CMD>Oil<CR>",
-        { desc = "Open parent directory" }
-      )
+      local minifiles = require("mini.files")
+      vim.keymap.set("n", "<leader>mif", function()
+        if not minifiles.close() then
+          minifiles.open()
+        end
+      end)
+      minifiles.setup({})
     end,
   },
   {
