@@ -68,7 +68,7 @@ local getpythonpath = function()
 end
 Python_path = getpythonpath()
 
-if Python_path ~= "" then
+if Python_path then
   check_package(Python_path)
   dap.setup(Python_path)
 end

@@ -1,3 +1,4 @@
+-- fmt
 return {
   {
     "nvim-treesitter/nvim-treesitter",
@@ -30,6 +31,7 @@ return {
     config = function() end,
   },
   {
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
     "nvim-treesitter/nvim-treesitter-textobjects",
     version = "",
     config = function()
@@ -42,6 +44,11 @@ return {
               ["if"] = "@function.inner",
               ["ac"] = "@class.outer",
               ["ic"] = "@class.inner",
+            },
+            selection_modes = {
+              ["@parameter.outer"] = "v",
+              ["@function.outer"] = "V",
+              ["@class.outer"] = "<c-v>",
             },
           },
         },
@@ -59,12 +66,7 @@ return {
     },
     config = function()
       require("aerial").setup()
-      vim.keymap.set(
-        "n",
-        "<leader>at",
-        ":AerialToggle<CR>",
-        { noremap = true, silent = true }
-      )
+      vim.keymap.set("n", "<leader>at", ":AerialToggle<CR>", { noremap = true, silent = true })
       -- vim.keymap.set('n', '<leader>ac', ':AerialClose<CR>', {noremap = true, silent = true})
     end,
   },

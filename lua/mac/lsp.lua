@@ -66,7 +66,12 @@ return {
         callback = function(ev)
           local opts = { buffer = ev.buf }
           local cursor_position = vim.api.nvim_win_get_cursor(0)
-          for _, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, 5, true)) do
+          local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
+		  local line_cutoff = 5
+		  if #lines <= line_cutoff then
+			  line_cutoff = #lines
+		  end
+          for _, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, line_cutoff, true)) do
             if string.find(line, "fmt") then
               format_buffer()
             end
