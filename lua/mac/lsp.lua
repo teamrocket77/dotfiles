@@ -67,11 +67,14 @@ return {
           local opts = { buffer = ev.buf }
           local cursor_position = vim.api.nvim_win_get_cursor(0)
           local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
-		  local line_cutoff = 5
-		  if #lines <= line_cutoff then
-			  line_cutoff = #lines
-		  end
-          for _, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, line_cutoff, true)) do
+          local line_cutoff = 5
+          print(get_formatter(vim.bo.filetype))
+          if #lines <= line_cutoff then
+            line_cutoff = #lines
+          end
+          for _, line in
+            ipairs(vim.api.nvim_buf_get_lines(0, 0, line_cutoff, true))
+          do
             if string.find(line, "fmt") then
               format_buffer()
             end
@@ -100,6 +103,8 @@ return {
 
       local lspconfig = require("lspconfig")
       lspconfig.gopls.setup({})
+      lspconfig.ts_ls.setup({})
+      lspconfig.svelte.setup({})
       lspconfig.clangd.setup({})
       lspconfig.sourcekit.setup({
         capabilities = {
@@ -126,7 +131,11 @@ return {
         ["graphql"] = function()
           lspconfig.graphql.setup({
             capabilities = capabilities,
-            root_dir = lspconfig.util.root_pattern(".graphqlconfig", ".graphqlrc", "package.json"),
+            root_dir = lspconfig.util.root_pattern(
+              ".graphqlconfig",
+              ".graphqlrc",
+              "package.json"
+            ),
           })
         end,
         ["docker_compose_language_service"] = function()
@@ -134,36 +143,36 @@ return {
             capabilities = capabilities,
           })
         end,
-        ["pyright"] = function()
-          lspconfig.pyright.setup({
+        ["pylsp"] = function()
+          lspconfig.pylsp.setup({
             settings = {
-              analysis = {
-                python = {
-                  autoSearchPaths = true,
+              pylsp = {
+                pycodestyle = {
+                  ignore = {},
                 },
               },
             },
           })
         end,
-        ["ruff_lsp"] = function()
-          lspconfig.ruff_lsp.setup({
-            on_attach = function(client, bufnr)
-              client.server_capabilities.documentFormattingProvider = true
-              vim.api.nvim_buf_set_keymap(
-                bufnr,
-                "n",
-                "<leader>fmt",
-                "<cmd>lua vim.lsp.buf.format({ async = true })<CR>",
-                { noremap = true, silent = true }
-              )
-            end,
-            init_options = {
-              settings = {
-                capabilities = capabilities,
-              },
-            },
-          })
-        end,
+        -- ["ruff"] = function()
+        --   lspconfig.ruff.setup({
+        --     on_attach = function(client, bufnr)
+        --       client.server_capabilities.documentFormattingProvider = true
+        --       vim.api.nvim_buf_set_keymap(
+        --         bufnr,
+        --         "n",
+        --         "<leader>fmt",
+        --         "<cmd>lua vim.lsp.buf.format({ async = true })<CR>",
+        --         { noremap = true, silent = true }
+        --       )
+        --     end,
+        --     init_options = {
+        --       settings = {
+        --         capabilities = capabilities,
+        --       },
+        --     },
+        --   })
+        -- end,
         ["terraformls"] = function()
           lspconfig.terraformls.setup({
             capabilities = capabilities,
@@ -190,11 +199,6 @@ return {
         ["slint_lsp"] = function()
           lspconfig.slint_lsp.setup({})
         end,
-        ["tsserver"] = function()
-          lspconfig.tsserver.setup({
-            capabilities = capabilities,
-          })
-        end,
         ["lua_ls"] = function()
           lspconfig.lua_ls.setup({
             capabilities = capabilities,
@@ -218,12 +222,11 @@ return {
         "cmake",
         "lua_ls",
         "dockerls",
-        "pyright",
-        "ruff_lsp",
         "graphql",
-        "tsserver",
+        --"tsserver",
         "terraformls",
         "yamlls",
+        -- "python-lsp-server",
         "bashls",
       }
       local mason = require("mason")

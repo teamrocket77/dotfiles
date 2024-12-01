@@ -5,8 +5,7 @@ return {
     local home = os.getenv("HOME")
     local types = require("luasnip.util.types")
     local luasnip = require("luasnip")
-    luasnip.setup({
-      update_events = { "TextChanged", "TextChangedI" },
+    luasnip.config.setup({
       link_roots = true,
       keep_roots = true,
       link_children = true,
@@ -25,11 +24,14 @@ return {
       },
     })
 
-    require("luasnip.loaders.from_lua").load({
-      paths = {
-        home .. "/.config/nvim/lua/luasnippets/",
-      },
-    })
+	for _, ft_path in ipairs(vim.api.nvim_get_runtime_file("lua/luasnippets/*lua", true)) do
+		loadfile(ft_path)()
+	end
+    -- require("luasnip.loaders.from_lua").load({
+    --   paths = {
+    --     home .. "/.config/nvim/lua/luasnippets/",
+    --   },
+    -- })
 
     vim.api.nvim_set_keymap(
       "i",
@@ -38,32 +40,12 @@ return {
       { noremap = true, silent = true }
     )
 
-    vim.keymap.set("n", "<leader><leader>rs", function()
-      local current_ft = vim.bo.filetype
-      local snips = luasnip.get_snippets(current_ft)
-      for _, snip in ipairs(snips) do
-        snip:invalidate()
-        print(snip.name .. " invalidated in ft: " .. current_ft)
-      end
-      -- because refresh_notify did not work
-      require("luasnip.loaders.from_lua").load({
-        paths = {
-          home .. "/.config/nvim/lua/luasnippets/",
-        },
-      })
-      require("luasnip.loaders.from_snipmate").load({
-        paths = {
-          home .. "/.config/nvim/lua/snippets",
-        },
-      })
-    end, { noremap = true, silent = true })
-
     vim.keymap.set({ "s", "i" }, "<c-j>", function()
       if luasnip.expand_or_jumpable(1) then
         if luasnip.jumpable(1) then
           luasnip.jump(1)
         else
-          luasnip.expand()
+          luasnip.expand(1)
         end
       end
     end, { silent = true })
@@ -81,6 +63,8 @@ return {
     vim.keymap.set({ "s", "i" }, "<c-l>", function()
       if luasnip.choice_active() then
         luasnip.change_choice(1)
+		elseif luasnip.in_snippet() then
+			luasnip.activate_node()
       end
     end, { silent = true })
 
