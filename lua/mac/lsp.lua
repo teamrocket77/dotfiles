@@ -17,6 +17,7 @@ return {
         local clients = vim.lsp.buf_get_clients()
         local client_info = vim.inspect(clients)
         local lines = vim.split(client_info, "\n")
+
         vim.cmd("new")
         vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
         vim.bo.buftype = "nofile"
@@ -157,11 +158,7 @@ return {
         ["graphql"] = function()
           lspconfig.graphql.setup({
             capabilities = capabilities,
-            root_dir = lspconfig.util.root_pattern(
-              ".graphqlconfig",
-              ".graphqlrc",
-              "package.json"
-            ),
+            root_dir = lspconfig.util.root_pattern(".graphqlconfig", ".graphqlrc", "package.json"),
           })
         end,
         ["docker_compose_language_service"] = function()
