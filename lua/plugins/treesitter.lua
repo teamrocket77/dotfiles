@@ -19,6 +19,13 @@ return {
           "python",
         },
         auto_install = true,
+        disable = function(lang, buf)
+          local kb = 1024
+          local ok, stats = pcall(vim.look.fs_stat, vim.api.nvim_buf_get_name(buf))
+          if ok and stats.size > (kb * 15) then
+            return true
+          end
+        end,
         textobjects = {
           enable = true,
         },

@@ -8,6 +8,9 @@ local have_jq = function()
 end
 
 return {
+	{
+		-- "github/copilot.vim"
+	},
   {
     "mbbill/undotree",
     config = function()

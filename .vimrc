@@ -1,5 +1,6 @@
 filetype indent on
 
+set expandtab
 set background=dark
 set belloff=all
 set hlsearch

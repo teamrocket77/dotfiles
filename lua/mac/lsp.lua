@@ -1,11 +1,12 @@
 -- fmt
 return {
+  { "armyers/Vim-Jinja2-Syntax" },
   { "neovim/nvim-lspconfig" },
   {
     "williamboman/mason.nvim",
-    version = "v1.10.0",
+    version = "v1.11.0",
     dependencies = {
-      { "williamboman/mason-lspconfig.nvim", version = "1.26.0" },
+      { "williamboman/mason-lspconfig.nvim", version = "1.32.0" },
       { "neovim/nvim-lspconfig" },
       { "hrsh7th/cmp-nvim-lsp" },
       { "wesleimp/stylua.nvim" },
@@ -41,6 +42,11 @@ return {
 
       local function format_buffer()
         local filetype = vim.bo.filetype
+        local FoundRuff = false
+        local cur_buf = vim.api.nvim_get_current_buf()
+        local clients = vim.lsp.get_active_clients({ bufnr = cur_buf })
+        -- for updated neovim v.11
+        -- local clients = vim.lsp.get_clients({ bufnr = cur_buf })
         local formatter = get_formatter(filetype)
         if formatter then
           if formatter == "stylua" then
@@ -53,8 +59,18 @@ return {
               async = false,
             })
           end
+        elseif filetype == "python" then
+          for _, client in ipairs(clients) do
+            if "ruff" == client.name then
+              FoundRuff = true
+              break
+            end
+          end
+          if FoundRuff then
+            vim.lsp.buf.format({ { lineLength = 1 }, async = false })
+          end
         else
-          -- Fallback to default LSP formatting
+          -- call some unspecified formatter
           vim.lsp.buf.format({ async = false })
         end
       end
@@ -68,13 +84,10 @@ return {
           local cursor_position = vim.api.nvim_win_get_cursor(0)
           local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
           local line_cutoff = 5
-          print(get_formatter(vim.bo.filetype))
           if #lines <= line_cutoff then
             line_cutoff = #lines
           end
-          for _, line in
-            ipairs(vim.api.nvim_buf_get_lines(0, 0, line_cutoff, true))
-          do
+          for _, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, line_cutoff, true)) do
             if string.find(line, "fmt") then
               format_buffer()
             end
@@ -102,9 +115,8 @@ return {
       -- currently managed by ASDF
 
       local lspconfig = require("lspconfig")
-      lspconfig.gopls.setup({})
-      lspconfig.ts_ls.setup({})
-      lspconfig.svelte.setup({})
+      local configs = require("lspconfig.configs")
+      -- lspconfig.gopls.setup({})
       lspconfig.clangd.setup({})
       lspconfig.sourcekit.setup({
         capabilities = {
@@ -116,18 +128,32 @@ return {
         },
       })
 
+      local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
+      lspconfig.jinja_lsp.setup({
+        capabilities = capabilities,
+      })
+      -- lspconfig.jinja_lsp.setup({})
+
       local linters = {
         "pylint",
         "asm-lsp",
         "yamllint",
       }
+      local get_root_dir = function(fname)
+        local root_files = {
+          "pyproject.toml",
+          "setup.py",
+          "setup.cfg",
+          "requirements.txt",
+          "Pipfile",
+          ".git",
+        }
+        return lspconfig.util.root_pattern(unpack(root_files))(fname)
+          or lspconfig.util.find_git_ancestor(fname)
+          or lspconfig.util.path.dirname(fname)
+      end
       local cfg = require("yaml-companion").setup({})
       local handlers = {
-        function(server)
-          lspconfig[server].setup({
-            capabilities = capabilities,
-          })
-        end,
         ["graphql"] = function()
           lspconfig.graphql.setup({
             capabilities = capabilities,
@@ -143,36 +169,68 @@ return {
             capabilities = capabilities,
           })
         end,
-        ["pylsp"] = function()
-          lspconfig.pylsp.setup({
+
+        ["basedpyright"] = function()
+          lspconfig.basedpyright.setup({
             settings = {
-              pylsp = {
-                pycodestyle = {
-                  ignore = {},
+              basedpyright = {
+                analysis = {
+                  venvPath = ".",
+                  venv = ".venv",
+                  autoSearchPaths = true,
+                  typeCheckingMode = "standard",
+                  diagnosticMode = "openFilesOnly",
+                  useLibraryCodeForTypes = true,
+                },
+              },
+            },
+            capabilities = capabilities,
+          })
+        end,
+        ["ruff"] = function()
+          -- https://docs.astral.sh/ruff/rules/
+          lspconfig.ruff.setup({
+            init_options = {
+              settings = {
+                capabilities = capabilities,
+                configuration = {
+                  lint = {
+                    select = { "ALL" },
+                    ignore = {
+                      "ANN", -- flake8-annotations
+                      "COM", -- flake8-commas
+                      "C90", -- mccabe complexity
+                      "DJ", -- django
+                      "EXE", -- flake8-executable
+                      "T10", -- debugger
+                      "TID", -- flake8-tidy-imports
+                      "D100", -- ignore missing docs
+                      "D101",
+                      "D102",
+                      "D103",
+                      "D104",
+                      "D105",
+                      "D106",
+                      "D107",
+                      "D200",
+                      "D205",
+                      "D212",
+                      "D400",
+                      "D401",
+                      "D415",
+                      "E402", -- false positives for local imports
+                      "E501", -- line too long
+                      "TRY003", -- external messages in exceptions are too verbose
+                      "TD002",
+                      "TD003",
+                      "FIX002", -- too verbose descriptions of todos
+                    },
+                  },
                 },
               },
             },
           })
         end,
-        -- ["ruff"] = function()
-        --   lspconfig.ruff.setup({
-        --     on_attach = function(client, bufnr)
-        --       client.server_capabilities.documentFormattingProvider = true
-        --       vim.api.nvim_buf_set_keymap(
-        --         bufnr,
-        --         "n",
-        --         "<leader>fmt",
-        --         "<cmd>lua vim.lsp.buf.format({ async = true })<CR>",
-        --         { noremap = true, silent = true }
-        --       )
-        --     end,
-        --     init_options = {
-        --       settings = {
-        --         capabilities = capabilities,
-        --       },
-        --     },
-        --   })
-        -- end,
         ["terraformls"] = function()
           lspconfig.terraformls.setup({
             capabilities = capabilities,
@@ -222,8 +280,9 @@ return {
         "cmake",
         "lua_ls",
         "dockerls",
+        "basedpyright",
+        "ruff",
         "graphql",
-        --"tsserver",
         "terraformls",
         "yamlls",
         -- "python-lsp-server",
