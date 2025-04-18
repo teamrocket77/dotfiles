@@ -1,6 +1,6 @@
 -- fmt
 return {
-  { "armyers/Vim-Jinja2-Syntax" },
+  -- { "armyers/Vim-Jinja2-Syntax" },
   { "neovim/nvim-lspconfig" },
   {
     "williamboman/mason.nvim",
@@ -130,9 +130,9 @@ return {
       })
 
       local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
-      lspconfig.jinja_lsp.setup({
-        capabilities = capabilities,
-      })
+      -- lspconfig.jinja_lsp.setup({
+      --   capabilities = capabilities,
+      -- })
       -- lspconfig.jinja_lsp.setup({})
 
       local linters = {
@@ -255,19 +255,7 @@ return {
           lspconfig.slint_lsp.setup({})
         end,
         ["lua_ls"] = function()
-          lspconfig.lua_ls.setup({
-            capabilities = capabilities,
-            settings = {
-              Lua = {
-                completion = {
-                  callSnippet = "Replace",
-                },
-                diagnostics = {
-                  globals = { "vim" },
-                },
-              },
-            },
-          })
+          lspconfig.lua_ls.setup({})
         end,
       }
 

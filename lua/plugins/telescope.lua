@@ -35,6 +35,7 @@ return {
   {
     "junegunn/fzf",
     build = function()
+      vim.cmd[[Lazy load fzf.vim]]
       vim.fn["fzf#install"]()
     end,
     dependencies = { "junegunn/fzf.vim" },

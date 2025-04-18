@@ -37,12 +37,19 @@ local isLinux = function()
     return { import = "mac" }
   end
 end
+-- Setup ai
+local useAI = function()
+  if os.getenv('OPEN_WEBUI_API_KEY') then 
+    return { import = "ai" }
+  end
+end
 
 require("lazy").setup({
   spec = {
     -- import your plugins
     { import = "plugins" },
     isLinux(),
+	useAI(),
   },
   -- Configure any other settings here. See the documentation for more details.
   -- colorscheme that will be used when installing plugins.

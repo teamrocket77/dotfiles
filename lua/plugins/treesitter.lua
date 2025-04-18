@@ -34,7 +34,7 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter-context",
-    version = "",
+    version = "compat/0.7",
     config = function() end,
   },
   {

@@ -1,3 +1,4 @@
+-- fmt
 -- do we have jq installed?
 local have_jq = function()
   if os.execute("jq --help > /dev/null 2>&1") == 0 then
@@ -8,9 +9,6 @@ local have_jq = function()
 end
 
 return {
-	{
-		-- "github/copilot.vim"
-	},
   {
     "mbbill/undotree",
     config = function()
@@ -18,7 +16,7 @@ return {
     end,
   },
   {
-    "echasnovski/mini.nvim",
+    "echasnovski/mini.files",
     version = "*",
     dependencies = {
       "echasnovski/mini.icons",
@@ -26,7 +24,31 @@ return {
     },
     config = function()
       local minifiles = require("mini.files")
-      vim.keymap.set("n", "<leader>mif", function()
+      vim.keymap.set("n", "<leader>mi", function()
+        if not minifiles.close() then
+          minifiles.open()
+        end
+      end)
+
+      vim.keymap.set("n", "<leader>mf", function()
+        local _ = minifiles.open(vim.api.nvim_buf_get_name(0), false)
+        vim.defer_fn(function()
+          minifiles.reveal_cwd()
+        end, 30)
+      end)
+
+      vim.keymap.set("n", "<leader>mo", function()
+        if minifiles.get_explorer_state() then
+          local fs_data = minifiles.get_fs_entry(0)
+          local path = fs_data["path"]
+          minifiles.close()
+          vim.schedule_wrap(vim.cmd.edit(path))
+        else
+          print("Must open Minifiles Explorer first")
+        end
+      end)
+
+      vim.keymap.set("n", "<leader>mt", function()
         if not minifiles.close() then
           minifiles.open()
         end
@@ -83,10 +105,10 @@ return {
     "tpope/vim-obsession",
   },
   {
-	  "sindrets/diffview.nvim", config = function()
-		  require('diffview').setup({
-		  })
-	  end
+    "sindrets/diffview.nvim",
+    config = function()
+      require("diffview").setup({})
+    end,
   },
   {
     "iamcco/markdown-preview.nvim",
@@ -96,14 +118,16 @@ return {
       vim.keymap.set("n", "<leader>md", ":MarkdownPreviewToggle<CR>")
     end,
     build = function()
+      vim.fn["Lazy load markdown-preview.nvim"]()
       vim.fn["mkdp#util#install"]()
     end,
   },
   {
-	'mbbill/undotree', config = function()
-		vim.keymap.set('n', '<leader>utog', vim.cmd.UndotreeToggle)
-		vim.keymap.set('n', '<leader>ushow', vim.cmd.UndotreeToggle)
-	end
+    "mbbill/undotree",
+    config = function()
+      vim.keymap.set("n", "<leader>utog", vim.cmd.UndotreeToggle)
+      vim.keymap.set("n", "<leader>ushow", vim.cmd.UndotreeToggle)
+    end,
   },
   have_jq(),
 }
