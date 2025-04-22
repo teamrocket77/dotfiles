@@ -80,20 +80,6 @@ return {
     end,
   },
   {
-    "folke/neodev.nvim",
-    version = "v1.9.0",
-    config = function()
-      require("neodev").setup({
-        library = {
-          plugins = {
-            "nvim-dap-ui",
-          },
-          types = true,
-        },
-      })
-    end,
-  },
-  {
     "leoluz/nvim-dap-go",
     ft = { "go", "golang" },
     config = function()

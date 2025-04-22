@@ -1,3 +1,4 @@
+-- fmt
 return {
   {
     "hrsh7th/nvim-cmp",
@@ -10,15 +11,12 @@ return {
       { "hrsh7th/cmp-buffer" },
       { "hrsh7th/cmp-nvim-lua" },
       { "hrsh7th/cmp-nvim-lsp" },
-	  {"FelipeLema/cmp-async-path"}
+      { "FelipeLema/cmp-async-path" },
     },
     config = function()
       local cmp = require("cmp")
 
       cmp.setup({
-		  sources = {
-			  {name = "async_path"}
-		  },
         snippet = {
           expand = function(args)
             require("luasnip").lsp_expand(args.body)
@@ -53,5 +51,14 @@ return {
         },
       })
     end,
+  },
+  {
+    "folke/lazydev.nvim",
+    ft = "lua",
+    dependencies = { { "justinsgithub/wezterm-types" } },
+    opts = { library = {
+      "lazy.nvim",
+      { path = "wezterm-types", mods = { "wezterm" } },
+    } },
   },
 }
