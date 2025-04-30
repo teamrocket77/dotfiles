@@ -20,7 +20,7 @@ local ignore_list = {
   "*pyc",
 }
 for _, path in ipairs(ignore_list) do
-  vim.ope.wildignore:append(path)
+  vim.opt.wildignore:append(path)
 end
 
 vim.opt.path:append("**")
@@ -31,5 +31,7 @@ vim.g.python3_host_prog = home .. "/.pyenv/versions/pynvim/bin/python"
 
 vim.opt.list = true
 
+-- :h option-list
+-- :h E355
 vim.o.directory = home .. "/.config/nvim/swapfiles/"
 require("config.lazy")
