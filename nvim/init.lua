@@ -15,7 +15,6 @@ vim.cmd([[ set mouse=a ]])
 
 local ignore_list = {
   "node_modules*",
-  "unnamed/",
   "__pycache__/",
   "*pyc",
 }
@@ -24,6 +23,7 @@ for _, path in ipairs(ignore_list) do
 end
 
 vim.opt.path:append("**")
+vim.opt.clipboard:append({ "unnamed"})
 
 vim.opt.hlsearch = true
 vim.g.doge_enable_mappings = 0
