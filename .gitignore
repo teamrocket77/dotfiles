@@ -1,3 +1,5 @@
-/sessions/*
-/swapfiles/*
+**/sessions/*
+**/swapfiles/*
 *.swp
+**/github-copilot/*
+**/uv/*

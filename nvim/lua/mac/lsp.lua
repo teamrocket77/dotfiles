@@ -167,6 +167,24 @@ return {
           })
         end,
 
+        -- ["pyright"] = function()
+        --   lspconfig.pyright.setup({
+        --     settings = {
+        --       pyright = {
+        --         analysis = {
+        --           venvPath = ".",
+        --           venv = ".venv",
+        --           autoSearchPaths = true,
+        --           typeCheckingMode = "standard",
+        --           diagnosticMode = "openFilesOnly",
+        --           useLibraryCodeForTypes = true,
+        --         },
+        --       },
+        --     },
+        --     capabilities = capabilities,
+        --   })
+        -- end,
+
         ["basedpyright"] = function()
           lspconfig.basedpyright.setup({
             settings = {
@@ -183,7 +201,11 @@ return {
             },
             capabilities = capabilities,
           })
+          vim.keymap.set("n", "<leader>i", function()
+            vim.lsp.inlay_hint.enable(not vim.inlay_hint.is_enabled({ 0 }), { 0 })
+          end)
         end,
+
         ["ruff"] = function()
           -- https://docs.astral.sh/ruff/rules/
           lspconfig.ruff.setup({
@@ -266,6 +288,7 @@ return {
         "lua_ls",
         "dockerls",
         "basedpyright",
+        "pyright",
         "ruff",
         "graphql",
         "terraformls",

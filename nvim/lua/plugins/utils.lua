@@ -127,7 +127,83 @@ return {
     config = function()
       vim.keymap.set("n", "<leader>utog", vim.cmd.UndotreeToggle)
       vim.keymap.set("n", "<leader>ushow", vim.cmd.UndotreeToggle)
+      function exists(fd)
+        local f = io.open(fd, "r")
+        if f then
+          f:close()
+          return true
+        end
+        return false
+      end
+      local undo_dir = os.getenv("HOME") .. "/.undodir"
+      local e = exists(undo_dir)
+      if not e then
+        vim.fn.mkdir(undo_dir, "p")
+      end
+      if e then
+        vim.opt.undodir = undo_dir
+        vim.opt.undofile = true
+      end
     end,
   },
   have_jq(),
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      local harpoon = require("harpoon")
+      harpoon:setup()
+
+      vim.keymap.set("n", "<leader>hadd", function()
+        harpoon:list():add()
+      end)
+      vim.keymap.set("n", "<leader>ht", function()
+        harpoon.ui:toggle_quick_menu(harpoon:list())
+      end)
+
+      vim.keymap.set("n", "<leader>ha", function()
+        harpoon:list():select(1)
+      end)
+      vim.keymap.set("n", "<leader>hs", function()
+        harpoon:list():select(2)
+      end)
+      vim.keymap.set("n", "<leader>hd", function()
+        harpoon:list():select(3)
+      end)
+      vim.keymap.set("n", "<leader>hf", function()
+        harpoon:list():select(4)
+      end)
+    end,
+  },
+  {
+    "OXY2DEV/markview.nvim",
+    lazy = false,
+    opts = {
+      preview = {
+        filetypes = { "markdown", "codecompanion" },
+        ignore_buftypes = {},
+      },
+    },
+  },
+  {
+    {
+      "rmagatti/auto-session",
+      lazy = false,
+
+      ---enables autocomplete for opts
+      ---@module "auto-session"
+      ---@type AutoSession.Config
+      opts = {
+        suppressed_dirs = { "~/", "~/Projects", "~/Downloads", "/" },
+        -- log_level = 'debug',
+      },
+      config = function()
+        require("auto-session").setup({
+          lazy_support = true,
+        })
+        vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+      end,
+    },
+  },
 }

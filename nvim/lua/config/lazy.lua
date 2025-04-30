@@ -39,7 +39,7 @@ local isLinux = function()
 end
 -- Setup ai
 local useAI = function()
-  if os.getenv('OPEN_WEBUI_API_KEY') then 
+  if os.getenv('OPENAI_API_KEY') then
     return { import = "ai" }
   end
 end
