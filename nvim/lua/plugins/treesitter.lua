@@ -2,8 +2,11 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter-textobjects",
+    },
     build = ":TSUpdate",
-    version = "v0.9.2",
+    version = "v0.25.3",
     config = function()
       local treesitter = require("nvim-treesitter.configs")
       treesitter.setup({
@@ -27,23 +30,13 @@ return {
           end
         end,
         textobjects = {
-          enable = true,
-        },
-      })
-    end,
-  },
-  {
-    "nvim-treesitter/nvim-treesitter-context",
-    version = "compat/0.7",
-    config = function() end,
-  },
-  {
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-    "nvim-treesitter/nvim-treesitter-textobjects",
-    version = "",
-    config = function()
-      require("nvim-treesitter.configs").setup({
-        textobjects = {
+          move = {
+            enable = true,
+            goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer", ["]a"] = "@parameter.inner" },
+            goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer", ["]A"] = "@parameter.inner" },
+            goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer", ["[a"] = "@parameter.inner" },
+            goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer", ["[A"] = "@parameter.inner" },
+          },
           select = {
             enable = true,
             keymaps = {
@@ -61,6 +54,11 @@ return {
         },
       })
     end,
+  },
+  {
+    "nvim-treesitter/nvim-treesitter-context",
+    version = "compat/0.7",
+    config = function() end,
   },
   -- vim.keymap.set('n', '<leader>cf', ':GetCurrentFunctions<CR>', {noremap = true, silent = true})
   {
