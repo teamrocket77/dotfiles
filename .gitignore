@@ -2,4 +2,5 @@
 **/swapfiles/*
 *.swp
 **/github-copilot/*
+uv.lock
 **/uv/*
