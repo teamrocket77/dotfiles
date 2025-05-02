@@ -10,7 +10,24 @@ return {
     },
     config = function()
       require("telescope").load_extension("live_grep_args")
-      local actions = require("telescope.actions")
+      local single_or_multi = function(bufnr)
+        local actions = require("telescope.actions")
+        local actions_state = require("telescope.actions.state")
+        local single_selection = actions_state.get_selected_entry()
+        local multi_selection = actions_state.get_current_picker(bufnr):get_multi_selection()
+        if not vim.tbl_isempty(multi_selection) then
+          actions.close(bufnr)
+          for _, file in pairs(multi_selection) do
+            if file.path ~= nil then
+              vim.cmd(string.format("edit %s", file.path))
+            end
+          end
+          vim.cmd(string.format("edit %s", single_selection.path))
+        else
+          actions.select_default(bufnr)
+        end
+      end
+
       local open_with_trouble = require("trouble.sources.telescope").open
       local add_to_trouble = require("trouble.sources.telescope").add
 
@@ -18,8 +35,15 @@ return {
 
       telescope.setup({
         defaults = {
+          file_ignore_patterns = {
+            "output/python",
+            "output/layer",
+          },
           mappings = {
-            i = { ["c-t"] = open_with_trouble },
+            i = {
+              ["c-t"] = open_with_trouble,
+              ["<CR>"] = single_or_multi,
+            },
             n = { ["c-t"] = open_with_trouble },
           },
         },

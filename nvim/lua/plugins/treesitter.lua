@@ -14,6 +14,9 @@ return {
           "bash",
           "dockerfile",
           "rust",
+          "terraform",
+          "hcl",
+          "rust",
           "markdown",
           "yaml",
           "json",
@@ -44,6 +47,7 @@ return {
               ["if"] = "@function.inner",
               ["ac"] = "@class.outer",
               ["ic"] = "@class.inner",
+              ["bf"] = "@block.outer",
             },
             selection_modes = {
               ["@parameter.outer"] = "v",

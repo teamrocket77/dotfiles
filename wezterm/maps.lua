@@ -25,7 +25,7 @@ keys = {
   { key = "j", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Down") },
   { key = "k", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Up") },
   { key = "l", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Right") },
-  { key = "l", mods = "CTRL", action = wezterm.action.ShowLauncher },
+  { key = "l", mods = "LEADER|CTRL", action = wezterm.action.ShowLauncher },
   { key = "h", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Left") },
   {
     key = ",",
@@ -52,6 +52,18 @@ keys = {
     action = wezterm.action.EmitEvent("trigger-vim-with-scrollback"),
   },
 
+  {
+    key = "r",
+    mods = "LEADER",
+    action = wezterm.action.PromptInputLine({
+      description = "Enter new name for workspace",
+      action = wezterm.action_callback(function(window, pane, line)
+        if line then
+          wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), line)
+        end
+      end),
+    }),
+  },
   {
     key = "r",
     mods = "LEADER",

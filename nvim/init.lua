@@ -15,8 +15,11 @@ vim.cmd([[ set mouse=a ]])
 
 local ignore_list = {
   "node_modules*",
-  "__pycache__/",
-  "*pyc",
+  "*__pycache__/",
+  "*pyc*",
+  "*venv*",
+  "*old_json*",
+  "*old_csv*",
 }
 for _, path in ipairs(ignore_list) do
   vim.opt.wildignore:append(path)
