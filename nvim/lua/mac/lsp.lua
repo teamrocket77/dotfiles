@@ -196,14 +196,17 @@ return {
                   typeCheckingMode = "standard",
                   diagnosticMode = "openFilesOnly",
                   useLibraryCodeForTypes = true,
+                  inlayHints = {
+                    variableTypes = true,
+                    callArgumentNames = true,
+                    functionReturnTypes = true,
+                    genericTypes = true,
+                  },
                 },
               },
             },
             capabilities = capabilities,
           })
-          vim.keymap.set("n", "<leader>i", function()
-            vim.lsp.inlay_hint.enable(not vim.inlay_hint.is_enabled({ 0 }), { 0 })
-          end)
         end,
 
         ["ruff"] = function()

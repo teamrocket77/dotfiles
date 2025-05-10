@@ -6,9 +6,10 @@ local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/s
 local colors = require("colors")
 local os = require("os")
 local io = require("io")
+local home = os.getenv("HOME")
 
+resurrect.state_manager.change_state_save_dir(home .. "/.config/states/")
 resurrect.state_manager.periodic_save({
-  interval_seconds = 15 * 60,
   save_workspaces = true,
   save_windows = true,
   save_tabs = true,
@@ -76,7 +77,6 @@ wezterm.on("smart_workspace_switcher.workspace_switcher.selected", function(wind
   wezterm.log_info(window)
   local workspace_state = resurrect.workspace_state
   resurrect.state_manager.save_state(workspace_state.get_workspace_state())
-  resurrect.state_manager.write_current_state(label, "workspace")
 end)
 
 wezterm.on("smart_workspace_switcher.workspace_switcher.start", function(window, _)
@@ -86,6 +86,29 @@ end)
 wezterm.on("smart_workspace_switcher.workspace_switcher.canceled", function(window, _)
   wezterm.log_info(window)
 end)
+
+local resurrect_event_listeners = {
+  "ressurect.error",
+  "resurrect.state_manager.save_state.finished",
+}
+local is_periodic_save = false
+wezterm.on("ressurect.periodic_save", function()
+  is_periodic_save = true
+end)
+for _, event in ipairs(resurrect_event_listeners) do
+  wezterm.on(event, function(...)
+    if event == "resurrect.state_manager.save_state.finished" and is_periodic_save then
+      is_periodic_save = false
+      return
+    end
+    local args = { ... }
+    local msg = event
+    for _, v in ipairs(args) do
+      msg = msg .. " " .. tostring(v)
+    end
+    wezterm.gui.gui_windows()[1]:toast_notification("Wezterm - resurrect", msg, nil, 4000)
+  end)
+end
 
 return {
   resurrect = resurrect,

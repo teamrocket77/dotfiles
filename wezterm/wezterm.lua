@@ -17,7 +17,7 @@ local domains = wezterm.plugin.require("https://github.com/DavidRR-F/quick_domai
 config = {
   default_workspace = "~",
   audible_bell = "Disabled",
-  color_scheme = "AdventureTime",
+  -- color_scheme = "AdventureTime",
   font_size = 16,
   scrollback_lines = 20000,
   leader = { key = "a", mods = "CTRL", timeout_milliseconds = 2000 },

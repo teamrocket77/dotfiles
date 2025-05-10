@@ -1,6 +1,8 @@
 -- fmt
 local wezterm = require("wezterm") --[[@as Wezterm]]
-local resurrect = require("resurrect")
+local res = require("resurrect")
+local resurrect = res.resurrect
+local workspace_switcher = res.workspace_switcher
 
 keys = {
   {
@@ -26,6 +28,8 @@ keys = {
   { key = "k", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Up") },
   { key = "l", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Right") },
   { key = "l", mods = "LEADER|CTRL", action = wezterm.action.ShowLauncher },
+  { key = "]", mods = "LEADER|CTRL", action = wezterm.action.SwitchWorkspaceRelative(1) },
+  { key = "[", mods = "LEADER|CTRL", action = wezterm.action.SwitchWorkspaceRelative(-1) },
   { key = "h", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Left") },
   {
     key = ",",
@@ -44,6 +48,14 @@ keys = {
     mods = "LEADER",
     action = wezterm.action_callback(function(win, pane)
       workspace_switcher.switch_workspace()
+    end),
+  },
+  {
+    key = "s",
+    mods = "LEADER|CTRL",
+    action = wezterm.action_callback(function(win, pane)
+      resurrect.state_manager.save_state(resurrect.workspace_state.get_workspace_state())
+      resurrect.window_state.save_window_action()
     end),
   },
   {
@@ -80,7 +92,7 @@ keys = {
     key = "r",
     mods = "LEADER|CTRL",
     action = wezterm.action_callback(function(win, pane)
-      resurrect.resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id, label)
+      resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id, label)
         local type = string.match(id, "^([^/]+)") -- match before '/'
         id = string.match(id, "([^/]+)$") -- match after '/'
         id = string.match(id, "(.+)%..+$") -- remove file extention

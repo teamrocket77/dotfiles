@@ -51,9 +51,10 @@ return {
           }),
         },
       })
-      vim.keymap.set("n", "<Leader>chat", function()
+      vim.keymap.set("n", "<Leader>cc", function()
         codecompanion.toggle()
       end, { noremap = true, silent = true })
+      require("ai.custom.util"):init()
     end,
   },
 }
