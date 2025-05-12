@@ -13,7 +13,8 @@ return {
     },
 
     config = function()
-      function get_lsp()
+      local lsp_functions = require("mac.functions.f")
+      local function get_lsp()
         local clients = vim.lsp.buf_get_clients()
         local client_info = vim.inspect(clients)
         local lines = vim.split(client_info, "\n")
@@ -116,8 +117,8 @@ return {
       -- currently managed by ASDF
 
       local lspconfig = require("lspconfig")
+
       local configs = require("lspconfig.configs")
-      -- lspconfig.gopls.setup({})
       lspconfig.clangd.setup({})
       lspconfig.sourcekit.setup({
         capabilities = {
@@ -166,24 +167,6 @@ return {
             capabilities = capabilities,
           })
         end,
-
-        -- ["pyright"] = function()
-        --   lspconfig.pyright.setup({
-        --     settings = {
-        --       pyright = {
-        --         analysis = {
-        --           venvPath = ".",
-        --           venv = ".venv",
-        --           autoSearchPaths = true,
-        --           typeCheckingMode = "standard",
-        --           diagnosticMode = "openFilesOnly",
-        --           useLibraryCodeForTypes = true,
-        --         },
-        --       },
-        --     },
-        --     capabilities = capabilities,
-        --   })
-        -- end,
 
         ["basedpyright"] = function()
           lspconfig.basedpyright.setup({
@@ -283,7 +266,7 @@ return {
           lspconfig.lua_ls.setup({})
         end,
       }
-
+      lsp_functions.have_ghcup_ls(handlers)
       local servers = {
         "slint_lsp",
         "rust_analyzer",
@@ -296,8 +279,9 @@ return {
         "graphql",
         "terraformls",
         "yamlls",
-        -- "python-lsp-server",
         "bashls",
+        lsp_functions.have_go_ls_install(),
+        lsp_functions.have_ghcup_ls_install(),
       }
       local mason = require("mason")
       local mason_lsp = require("mason-lspconfig")
