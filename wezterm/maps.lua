@@ -1,8 +1,8 @@
 -- fmt
 local wezterm = require("wezterm") --[[@as Wezterm]]
-local res = require("resurrect")
-local resurrect = res.resurrect
-local workspace_switcher = res.workspace_switcher
+local resurrect = wezterm.plugin.require("https://github.com/MLFlexer/resurrect.wezterm")
+local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
+require("resurrect-events")
 
 keys = {
   {
@@ -24,13 +24,18 @@ keys = {
   { key = "p", mods = "LEADER", action = wezterm.action.ActivateTabRelative(-1) },
   { key = "z", mods = "LEADER", action = wezterm.action.TogglePaneZoomState },
   { key = "[", mods = "LEADER", action = wezterm.action.ActivateCopyMode },
+  { key = "h", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Left") },
   { key = "j", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Down") },
   { key = "k", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Up") },
   { key = "l", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Right") },
+  { key = "LeftArrow", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Left") },
+  { key = "DownArrow", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Down") },
+  { key = "UpArrow", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Up") },
+  { key = "RightArrow", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Right") },
   { key = "l", mods = "LEADER|CTRL", action = wezterm.action.ShowLauncher },
+  { key = "e", mods = "LEADER", action = wezterm.action.EmitEvent("trigger-vim-with-scrollback") },
   { key = "]", mods = "LEADER|CTRL", action = wezterm.action.SwitchWorkspaceRelative(1) },
   { key = "[", mods = "LEADER|CTRL", action = wezterm.action.SwitchWorkspaceRelative(-1) },
-  { key = "h", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Left") },
   {
     key = ",",
     mods = "LEADER",
@@ -45,73 +50,70 @@ keys = {
   },
   {
     key = "s",
-    mods = "LEADER",
-    action = wezterm.action_callback(function(win, pane)
-      workspace_switcher.switch_workspace()
-    end),
+    mods = "LEADER|CTRL",
+    action = workspace_switcher.switch_workspace(),
   },
   {
-    key = "s",
-    mods = "LEADER|CTRL",
+    key = "w",
+    mods = "LEADER",
     action = wezterm.action_callback(function(win, pane)
       resurrect.state_manager.save_state(resurrect.workspace_state.get_workspace_state())
-      resurrect.window_state.save_window_action()
     end),
   },
   {
-    key = "s",
-    mods = "LEADER|CTRL",
-    action = wezterm.action.EmitEvent("trigger-vim-with-scrollback"),
-  },
-
-  {
-    key = "r",
-    mods = "LEADER",
-    action = wezterm.action.PromptInputLine({
-      description = "Enter new name for workspace",
-      action = wezterm.action_callback(function(window, pane, line)
-        if line then
-          wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), line)
-        end
-      end),
-    }),
-  },
-  {
-    key = "r",
-    mods = "LEADER",
-    action = wezterm.action.PromptInputLine({
-      description = "Enter new name for workspace",
-      action = wezterm.action_callback(function(window, pane, line)
-        if line then
-          wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), line)
-        end
-      end),
-    }),
-  },
-  {
     key = "r",
     mods = "LEADER|CTRL",
-    action = wezterm.action_callback(function(win, pane)
-      resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id, label)
+    action = wezterm.action_callback(function(win, old_pane)
+      resurrect.fuzzy_loader.fuzzy_load(win, old_pane, function(id, label)
         local type = string.match(id, "^([^/]+)") -- match before '/'
         id = string.match(id, "([^/]+)$") -- match after '/'
         id = string.match(id, "(.+)%..+$") -- remove file extention
+        local old_w = old_pane:window()
+        local tab, pane, window = wezterm.mux.spawn_window({})
+        local name = id
         local opts = {
+          window = pane:window(),
+          on_pane_restore = resurrect.tab_state.default_on_pane_restore,
           relative = true,
           restore_text = true,
-          on_pane_restore = resurrect.tab_state.default_on_pane_restore,
         }
         if type == "workspace" then
           local state = resurrect.state_manager.load_state(id, "workspace")
           resurrect.workspace_state.restore_workspace(state, opts)
         elseif type == "window" then
           local state = resurrect.state_manager.load_state(id, "window")
-          resurrect.window_state.restore_window(pane:window(), state, opts)
+          resurrect.window_state.restore_window(old_pane:window(), state, opts)
         elseif type == "tab" then
           local state = resurrect.state_manager.load_state(id, "tab")
-          resurrect.tab_state.restore_tab(pane:tab(), state, opts)
+          resurrect.tab_state.restore_tab(old_pane:tab(), state, opts)
         end
       end)
+    end),
+  },
+  {
+    key = "$",
+    mods = "LEADER|SHIFT",
+    action = wezterm.action.PromptInputLine({
+      description = "Enter new name for workspace",
+      action = wezterm.action_callback(function(window, pane, line)
+        if line then
+          wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), line)
+        end
+      end),
+    }),
+  },
+  {
+    key = "d",
+    mods = "LEADER|SHIFT",
+    action = wezterm.action_callback(function(win, pane)
+      resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id)
+        resurrect.state_manager.delete_state(id)
+      end, {
+        title = "Delete State",
+        description = "Select session to delete and press enter",
+        fuzzy_description = "Search session to delete: ",
+        is_fuzzy = true,
+      })
     end),
   },
 }
