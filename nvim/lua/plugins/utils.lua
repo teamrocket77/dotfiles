@@ -208,8 +208,18 @@ return {
   },
   {
     "sphamba/smear-cursor.nvim",
-    version = "Version 0.4.6",
     opts = {},
+    config = function()
+      local smear = require("smear_cursor")
+      smear.setup({
+        stiffness = 0.8,
+        trailing_stiffness = 0.3,
+        cursor_color = "#ff8800",
+        trailing_exponent = 7,
+        hide_target_hack = true,
+        gamma = 1,
+      })
+    end,
   },
   {
     "folke/flash.nvim",
@@ -220,7 +230,7 @@ return {
   -- stylua: ignore
   keys = {
     { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
-    { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+    -- { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
     { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
     { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
     { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
