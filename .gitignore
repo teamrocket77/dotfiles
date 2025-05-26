@@ -4,3 +4,4 @@
 **/github-copilot/*
 uv.lock
 **/uv/*
+.states/
