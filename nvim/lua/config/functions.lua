@@ -77,7 +77,7 @@ local function add_matching_buffers_to_args(pattern)
     vim.cmd("args add " .. table.concat(buflist, " "))
     vim.api.nvim_command("buffer " .. current_bufnr) -- Switch back to the original buffer
   else
-    vim.notify("No buffers matched the pattern.") -- Requires a notification plugin
+    vim.notify("No buffers matched the pattern.")    -- Requires a notification plugin
     -- Or use: vim.cmd("echo 'No buffers matched the pattern.'")
   end
 end
@@ -129,56 +129,163 @@ nvim_create_user_command("RemoveQFItem", remove_qf_item, {})
 
 
 vim.api.nvim_create_autocmd({ "BufReadPre", "FileReadPre" }, {
-	pattern = "*.gpg",
-	group = gpgGroup,
-	callback = function()
-		-- Make sure nothing is written to shada file while editing an encrypted file.
-		vim.opt_local.shada = nil
-		-- We don't want a swap file, as it writes unencrypted data to disk
-		vim.opt_local.swapfile = false
-		-- Switch to binary mode to read the encrypted file
-		vim.opt_local.bin = true
-		-- Save the current 'ch' value to a buffer-local variable
-		vim.b.ch_save = vim.opt_local.ch:get()
-		vim.cmd "set ch=2"
-	end,
+  pattern = "*.gpg",
+  group = gpgGroup,
+  callback = function()
+    -- Make sure nothing is written to shada file while editing an encrypted file.
+    vim.opt_local.shada = nil
+    -- We don't want a swap file, as it writes unencrypted data to disk
+    vim.opt_local.swapfile = false
+    -- Switch to binary mode to read the encrypted file
+    vim.opt_local.bin = true
+    -- Save the current 'ch' value to a buffer-local variable
+    vim.b.ch_save = vim.opt_local.ch:get()
+    vim.cmd "set ch=2"
+  end,
 })
 
 nvim_create_autocmd({ "BufReadPost", "FileReadPost" }, {
-	pattern = "*.gpg",
-	group = gpgGroup,
-	callback = function()
-		vim.cmd "'[,']!gpg -d 2> /dev/null"
-		-- Switch to normal mode for editing
-		vim.opt_local.bin = false
-		-- Restore the 'ch' value from the buffer-local variable
-		vim.opt_local.ch = vim.b.ch_save
-		vim.cmd "unlet b:ch_save"
-		vim.cmd(":doautocmd BufReadPost " .. vim.fn.expand "%:r")
-	end,
+  pattern = "*.gpg",
+  group = gpgGroup,
+  callback = function()
+    vim.cmd "'[,']!gpg -d 2> /dev/null"
+    -- Switch to normal mode for editing
+    vim.opt_local.bin = false
+    -- Restore the 'ch' value from the buffer-local variable
+    vim.opt_local.ch = vim.b.ch_save
+    vim.cmd "unlet b:ch_save"
+    vim.cmd(":doautocmd BufReadPost " .. vim.fn.expand "%:r")
+  end,
 })
 
 -- Convert all text to encrypted text before writing
 nvim_create_autocmd({ "BufWritePre", "FileWritePre" }, {
-	pattern = "*.gpg",
-	group = gpgGroup,
-	callback = function()
-		-- Switch to binary mode to write the encrypted file
-		vim.opt_local.bin = true
-		-- So we can avoid the armor option
-		vim.cmd("'[,']!gpg -e 2>/dev/null")
-	end,
+  pattern = "*.gpg",
+  group = gpgGroup,
+  callback = function()
+    -- Switch to binary mode to write the encrypted file
+    vim.opt_local.bin = true
+    -- So we can avoid the armor option
+    vim.cmd("'[,']!gpg -e 2>/dev/null")
+  end,
 })
 -- Undo the encryption so we are back in the normal text, directly after the file has been written.
 nvim_create_autocmd({ "BufWritePost", "FileWritePost" }, {
-	pattern = "*.gpg",
-	group = gpgGroup,
-	callback = function()
-		vim.cmd("u")
-		-- Switch to normal mode for editing
-		vim.opt_local.bin = false
-	end,
+  pattern = "*.gpg",
+  group = gpgGroup,
+  callback = function()
+    vim.cmd("u")
+    -- Switch to normal mode for editing
+    vim.opt_local.bin = false
+  end,
 })
 vim.api.nvim_command("autocmd FileType qf nnoremap <buffer> dd :RemoveQFItem<cr>")
 -- Return an empty table to satisfy plugin loader requirements
-return {}
+local lsp_functions = {}
+
+lsp_functions.formatting_options = {
+  python = "ruff"
+}
+
+---@param ev table
+---@param settings table
+lsp_functions.conditional_formatting = function(ev, settings)
+  local ft           = vim.bo.filetype
+  local final_client = nil
+  local clients      = vim.lsp.get_clients({ bufnr = 0, method = "textDocument/formatting" })
+  if lsp_functions.formatting_options[ft] ~= nil then
+    for _, client_v in pairs(clients) do
+      if client_v.name == lsp_functions.formatting_options[ft] then
+        final_client = client_v
+      end
+    end
+  else
+    -- take any server that supports formatting if it's not defined
+    local final_client = clients[1].name
+  end
+  if final_client == nil then
+    return
+  end
+
+  local cursor_position = vim.api.nvim_win_get_cursor(0)
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
+  local line_cutoff = 5
+  settings = vim.tbl_deep_extend('force', settings, {
+    filter = function(client)
+      return client.name == lsp_functions.formatting_options[ft]
+    end,
+    id = final_client.id
+  })
+  if #lines <= line_cutoff then
+    line_cutoff = #lines
+  end
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, line_cutoff, true)) do
+    if string.find(line, "fmt") then
+      vim.lsp.buf.format(settings)
+      return
+    end
+  end
+  vim.api.nvim_win_set_cursor(0, cursor_position)
+end
+
+lsp_functions.have_go_ls_installed = function()
+  if os.execute("go version > /dev/null 2>&1") == 0 then
+    return "gopls"
+  else
+    return nil
+  end
+end
+
+lsp_functions.have_ghcup_ls_installed = function()
+  if os.execute("ghcup -h > /dev/null 2>&1") == 0 then
+    return "hls"
+  else
+    return ""
+  end
+end
+
+lsp_functions.inlay_hint_servers = {
+  lua_ls = true,
+  basedpyright = true,
+}
+
+
+lsp_functions.get_lsp = function()
+  local clients     = vim.lsp.get_clients({ bufnr = 0 })
+  local client_info = vim.inspect(clients)
+  local lines       = vim.split(client_info, "\n")
+
+  vim.cmd("new")
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+  vim.bo.buftype = "nofile"
+  vim.bo.bufhidden = "wipe"
+  vim.bo.swapfile = false
+  vim.bo.readonly = true
+
+  vim.api.nvim_win_set_cursor(0, { 1, 0 })
+end
+
+
+lsp_functions.toggle_hints = function()
+  vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(), { 0 })
+end
+
+lsp_functions.servers = {
+  "slint_lsp",
+  "rust_analyzer",
+  "cmake",
+  "lua_ls",
+  "dockerls",
+  "basedpyright",
+  "pyright",
+  "ruff",
+  "graphql",
+  "terraformls",
+  "yamlls",
+  "bashls",
+  "ruby_lsp",
+  lsp_functions.have_ghcup_ls_installed(),
+  lsp_functions.have_go_ls_installed(),
+}
+
+return lsp_functions

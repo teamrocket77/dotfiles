@@ -1,0 +1,5 @@
+require("mac.lsp")
+require("mac.python")
+require("mac.lua")
+require("mac.rust")
+require("mac.terraform")
