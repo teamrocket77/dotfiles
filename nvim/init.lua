@@ -26,7 +26,7 @@ for _, path in ipairs(ignore_list) do
 end
 
 vim.opt.path:append("**")
-vim.opt.clipboard:append({ "unnamed"})
+vim.opt.clipboard:append({ "unnamed" })
 
 vim.opt.hlsearch = true
 vim.g.doge_enable_mappings = 0
@@ -38,4 +38,7 @@ vim.opt.list = true
 -- :h option-list
 -- :h E355
 vim.o.directory = home .. "/.config/nvim/swapfiles/"
+require("mac.init")
 require("config.lazy")
+require("config.functions")
+require("config.maps")
