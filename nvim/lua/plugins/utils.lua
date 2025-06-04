@@ -102,9 +102,6 @@ return {
     ft = { "Python" },
   },
   {
-    "tpope/vim-obsession",
-  },
-  {
     "sindrets/diffview.nvim",
     config = function()
       require("diffview").setup({})
@@ -172,24 +169,47 @@ return {
     },
   },
   {
-    {
-      "rmagatti/auto-session",
-      lazy = false,
-
-      ---enables autocomplete for opts
-      ---@module "auto-session"
-      ---@type AutoSession.Config
-      opts = {
-        suppressed_dirs = { "~/", "~/Projects", "~/Downloads", "/" },
-        -- log_level = 'debug',
-      },
-      config = function()
-        require("auto-session").setup({
-          lazy_support = true,
-        })
-        vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
-      end,
-    },
+    'nvim-lualine/lualine.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      local lualine = require('lualine')
+      local function session_name()
+        return require('possession.session').get_session_name() or ''
+      end
+      lualine.setup({
+        sections = {
+          lualine_a = { 'filename' },
+          lualine_c = {},
+          lualine_x = { 'encoding', 'searchcount', 'filetype' },
+          lualine_y = { session_name }
+        },
+      })
+    end
+  },
+  {
+    'goolord/alpha-nvim',
+    config = function()
+      require 'alpha'.setup(require 'alpha.themes.dashboard'.config)
+    end
+  },
+  {
+    'jedrzejboczar/possession.nvim',
+    requires = { 'nvim-lua/plenary.nvim' },
+    config = function()
+      require('possession').setup({
+        autosave = {
+          current = true,
+          cwd = true
+        },
+        autoload = 'auto_cwd',
+        commands = {
+          save = "SSave",
+          load = "SLoad",
+          delete = "SDelete",
+          list = "SList",
+        },
+      })
+    end
   },
   {
     "sphamba/smear-cursor.nvim",

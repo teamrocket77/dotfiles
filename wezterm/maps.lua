@@ -68,31 +68,19 @@ keys = {
         local type = string.match(id, "^([^/]+)") -- match before '/'
         id = string.match(id, "([^/]+)$")         -- match after '/'
         id = string.match(id, "(.+)%..+$")        -- remove file extention
+
         win:perform_action(
           wezterm.action.SwitchToWorkspace({ name = id }), pane
         )
-        local mux_window = pane:window()
-        wezterm.sleep_ms(100)
-
-        local opts = {
-          window = mux_window,
-          on_pane_restore = resurrect.tab_state.default_on_pane_restore,
-          spawn_in_workspace = true,
-          relative = true,
-          restore_text = true,
-        }
-        if type == "workspace" then
-          local state = resurrect.state_manager.load_state(id, "workspace")
-          resurrect.workspace_state.restore_workspace(state, opts)
-        elseif type == "window" then
-          local state = resurrect.state_manager.load_state(id, "window")
-          resurrect.window_state.restore_window(pane:window(), state, opts)
-        elseif type == "tab" then
-          local state = resurrect.state_manager.load_state(id, "tab")
-          resurrect.tab_state.restore_tab(pane:tab(), state, opts)
-        end
+        win:perform_action({
+          EmitEvent = {
+            event = 'restore-workspace',
+            id = id,
+            type = type
+          }
+        })
       end)
-    end),
+    end)
   },
   {
     key = "$",
@@ -121,4 +109,26 @@ keys = {
     end),
   },
 }
+wezterm.on("restore-workspace", function(window, pane, event)
+  window:toast_notification("wezterm", "Workspace restored", nil, 4000)
+  local opts = {
+    close_open_tabs = true,
+    window = pane:window(),
+    on_pane_restore = resurrect.tab_state.default_on_pane_restore,
+    spawn_in_workspace = true,
+    restore_text = true,
+    relative = true,
+  }
+  if type == "workspace" then
+    local state = resurrect.state_manager.load_state(id, "workspace")
+    resurrect.workspace_state.restore_workspace(state, opts)
+  elseif type == "window" then
+    local state = resurrect.state_manager.load_state(id, "window")
+    resurrect.window_state.restore_window(pane:window(), state, opts)
+  elseif type == "tab" then
+    local state = resurrect.state_manager.load_state(id, "tab")
+    resurrect.tab_state.restore_tab(pane:tab(), state, opts)
+  end
+end)
+
 return keys

@@ -270,6 +270,13 @@ lsp_functions.toggle_hints = function()
   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(), { 0 })
 end
 
+local have_ruby = function()
+  if os.execute('rbenv 2>&1') == 0 then
+    return "ruby_lsp"
+  end
+  return ""
+end
+
 lsp_functions.servers = {
   "slint_lsp",
   "rust_analyzer",
@@ -283,7 +290,7 @@ lsp_functions.servers = {
   "terraformls",
   "yamlls",
   "bashls",
-  "ruby_lsp",
+  have_ruby(),
   lsp_functions.have_ghcup_ls_installed(),
   lsp_functions.have_go_ls_installed(),
 }
