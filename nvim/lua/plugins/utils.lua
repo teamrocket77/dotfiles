@@ -63,13 +63,13 @@ return {
       require("bufresize").setup({
         register = {
           keys = {
-            { "n", "<leader>w<", "30<C-w><", opts },
-            { "n", "<leader>w>", "30<C-w>>", opts },
-            { "n", "<leader>w+", "10<C-w>+", opts },
-            { "n", "<leader>w-", "10<C-w>-", opts },
-            { "n", "<leader>w_", "<C-w>_", opts },
-            { "n", "<leader>w=", "<C-w>=", opts },
-            { "n", "<leader>w|", "<C-w>|", opts },
+            { "n", "<leader>w<", "30<C-w><",     opts },
+            { "n", "<leader>w>", "30<C-w>>",     opts },
+            { "n", "<leader>w+", "10<C-w>+",     opts },
+            { "n", "<leader>w-", "10<C-w>-",     opts },
+            { "n", "<leader>w_", "<C-w>_",       opts },
+            { "n", "<leader>w=", "<C-w>=",       opts },
+            { "n", "<leader>w|", "<C-w>|",       opts },
             { "n", "<leader>wo", "<C-w>|<C-w>_", opts },
           },
           trigger_events = { "BufWinEnter", "WinEnter" },
@@ -111,23 +111,11 @@ return {
     end,
   },
   {
-    "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    ft = { "markdown" },
-    config = function()
-      vim.keymap.set("n", "<leader>md", ":MarkdownPreviewToggle<CR>")
-    end,
-    build = function()
-      vim.fn["Lazy load markdown-preview.nvim"]()
-      vim.fn["mkdp#util#install"]()
-    end,
-  },
-  {
     "mbbill/undotree",
     config = function()
       vim.keymap.set("n", "<leader>utog", vim.cmd.UndotreeToggle)
       vim.keymap.set("n", "<leader>ushow", vim.cmd.UndotreeToggle)
-      function exists(fd)
+      local exists = function(fd)
         local f = io.open(fd, "r")
         if f then
           f:close()
@@ -135,6 +123,7 @@ return {
         end
         return false
       end
+
       local undo_dir = os.getenv("HOME") .. "/.undodir"
       local e = exists(undo_dir)
       if not e then
@@ -158,10 +147,6 @@ return {
       vim.keymap.set("n", "<leader>hadd", function()
         harpoon:list():add()
       end)
-      vim.keymap.set("n", "<leader>ht", function()
-        harpoon.ui:toggle_quick_menu(harpoon:list())
-      end)
-
       vim.keymap.set("n", "<leader>ha", function()
         harpoon:list():select(1)
       end)
@@ -227,13 +212,13 @@ return {
     version = "v2.1.0",
     ---@type Flash.Config
     opts = {},
-  -- stylua: ignore
-  keys = {
-    { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
-    -- { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
-    { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
-    { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
-    { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
-  },
+    -- stylua: ignore
+    keys = {
+      { "s",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
+      -- { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+      { "r",     mode = "o",               function() require("flash").remote() end,            desc = "Remote Flash" },
+      { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+      { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,            desc = "Toggle Flash Search" },
+    },
   },
 }

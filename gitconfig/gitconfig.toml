@@ -1,0 +1,29 @@
+# This is Git's per-user configuration file.
+[gpg]
+	program = /opt/homebrew/bin/gpg
+[user]
+# Please adapt and uncomment the following lines:
+    name = Vincent Cradler
+    email = vincentcradler@gmail.com
+    
+    signingkey = E0B121B0C8365104
+    
+[difftool]
+	prompt = false
+[diff]
+	tool = vimdiff
+[alias]
+	a = a
+	au = add -u
+	s = status
+	d = diff
+	df = difftool
+	br = branch
+	lo = log --oneline -n 10
+	p = pull
+	c = commit
+	alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ /
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
