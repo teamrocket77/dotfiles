@@ -169,39 +169,126 @@ return {
     },
   },
   {
-    'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    "nvim-lualine/lualine.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
-      local lualine = require('lualine')
+      local lualine = require("lualine")
       local function session_name()
-        return require('possession.session').get_session_name() or ''
+        return require("possession.session").get_session_name() or ""
       end
       lualine.setup({
         sections = {
-          lualine_a = { 'filename' },
+          lualine_a = { "filename" },
           lualine_c = {},
-          lualine_x = { 'encoding', 'searchcount', 'filetype' },
+          lualine_x = { "encoding", "searchcount", "filetype" },
           lualine_y = { session_name }
         },
       })
     end
   },
   {
-    'goolord/alpha-nvim',
+    "goolord/alpha-nvim",
     config = function()
-      require 'alpha'.setup(require 'alpha.themes.dashboard'.config)
+      local alpha = require "alpha"
+      local output_table = {}
+      local session_dir = os.getenv("HOME") .. "/.config/nvim/sessions/"
+      local most_recent_session = session_dir .. "recent-session.txt"
+      local file_lines = {}
+
+      local file = io.open(most_recent_session, "r+")
+      for line in file:lines() do
+        table.insert(file_lines, line)
+      end
+
+      local dashboard = require "alpha.themes.dashboard"
+      dashboard.section.buttons.val = {
+        dashboard.button("e", "New file", ":ene<BAR> startinsert <CR>"),
+        dashboard.button("g", " " .. " Find Text", ":Telescope live_grep <CR>"),
+        dashboard.button("c", " " .. " Nvim Config", [[<cmd>PossessionLoad ~/.config<CR>]]),
+        dashboard.button("l", "Lazy" .. " Lazy", ":Lazy<CR>"),
+        (function()
+          local group = { type = "group", opts = { spacing = 1 } }
+          group.val = {
+            { type = "text", val = "Previous Sessions", opts = { position = "center" } }
+          }
+          for i, session in pairs(require("possession.query").as_list()) do
+            local button = dashboard.button(tostring(i), "勒 " .. session.name,
+              "<cmd>PossessionLoad " .. session.name .. "<cr>")
+            table.insert(group.val, button)
+          end
+          return group
+        end)(),
+        dashboard.button("q", " " .. " Quit", ":qa<CR>"),
+      }
+      alpha.setup(dashboard.config)
     end
   },
   {
-    'jedrzejboczar/possession.nvim',
-    requires = { 'nvim-lua/plenary.nvim' },
+    "jedrzejboczar/possession.nvim",
+    requires = { "nvim-lua/plenary.nvim" },
     config = function()
-      require('possession').setup({
+      local session_dir = os.getenv("HOME") .. "/.config/nvim/sessions/"
+      local most_recent_session = session_dir .. "recent-session.txt"
+      local max_line_length = 5
+      require("possession").setup({
+        session_dir = session_dir,
         autosave = {
-          current = true,
-          cwd = true
+          current = function(name)
+            if name == "~" then
+              return false
+            end
+            return true
+          end,
+          cwd = true,
+          on_quit = true
         },
-        autoload = 'auto_cwd',
+        hooks = {
+          after_save = function(name)
+            local line_count = 0
+            local file_lines = {}
+            local current_obj_val = -1
+            local file = io.open(most_recent_session, "r+")
+            -- file isn't there and we can't make it
+            if file == nil then
+              file = io.open(most_recent_session, "w")
+              if file == nil then
+                return
+              end
+            end
+
+            for line in file:lines() do
+              table.insert(file_lines, line)
+              line_count = line_count + 1
+              if line == name then
+                current_obj_val = line_count
+              end
+            end
+
+            if current_obj_val > 0 then
+              table.remove(file_lines, current_obj_val)
+            else
+              if line_count >= max_line_length then
+                table.remove(file_lines, max_line_length)
+              end
+              table.insert(file_lines, 1, name)
+
+              local file_seek = file:seek("set")
+              if file_seek ~= 0 then
+                vim.schedule_wrap(vim.print("Unable to restore seek position to byte 0, got " .. tostring(file_seek)))
+              end
+
+              for i, line in ipairs(file_lines) do
+                if i >= max_line_length then
+                  break
+                end
+                vim.schedule_wrap(vim.print(line))
+                file:write(line .. "\n")
+              end
+              file:close()
+            end
+          end
+        },
+        autoload = "auto_cwd",
         commands = {
           save = "SSave",
           load = "SLoad",
