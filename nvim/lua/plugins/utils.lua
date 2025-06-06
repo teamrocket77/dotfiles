@@ -8,6 +8,34 @@ local have_jq = function()
   end
 end
 
+local has_png_paste = function()
+  return {
+    "epwalsh/obsidian.nvim",
+    dependencies = "nvim-lua/plenary.nvim",
+    version = "v3.9.0",
+    config = function()
+      local home = os.getenv("HOME") .. "/vaults/"
+      local workspaces = {
+        {
+          name = "personal",
+          path = home .. "personal",
+        },
+        {
+          name = "work",
+          path = home .. "work"
+        },
+      }
+      require("obsidian").setup({
+        workspaces = workspaces,
+        templates = {
+          folder = home .. "templates"
+        },
+      })
+      vim.keymap.set("n", "<leader>oct, ", ":ObsidianTEmplate basic-note<CR>")
+    end
+  }
+end
+
 return {
   {
     "mbbill/undotree",
@@ -132,7 +160,7 @@ return {
       end
     end,
   },
-  have_jq(),
+  have_jq(), has_png_paste(),
   {
     "ThePrimeagen/harpoon",
     branch = "harpoon2",
@@ -195,24 +223,50 @@ return {
       local most_recent_session = session_dir .. "recent-session.txt"
       local file_lines = {}
 
-      local file = io.open(most_recent_session, "r+")
-      for line in file:lines() do
-        table.insert(file_lines, line)
-      end
+      local file = io.open(most_recent_session, "r")
 
+      local last_five_sessions = function()
+        if file ~= nil then
+          for line in io.lines(most_recent_session) do
+            table.insert(file_lines, line)
+          end
+        end
+        -- Once read all lines to file_lines, you can close the file
+        file:close()
+        -- Return the last 5 records (sessions), you should reverse file_lines if your file write new session at the end of file
+        return { unpack(file_lines, math.max(#file_lines - 4, 1), #file_lines) }
+      end
+      vim.schedule_wrap(vim.print(file_lines))
+      local start_val = 0
       local dashboard = require "alpha.themes.dashboard"
       dashboard.section.buttons.val = {
         dashboard.button("e", "New file", ":ene<BAR> startinsert <CR>"),
         dashboard.button("g", " " .. " Find Text", ":Telescope live_grep <CR>"),
+        dashboard.button("f", " " .. " Find Files", ":Telescope find_files <CR>"),
+        dashboard.button("z", " " .. " Find Files FZF", ":FZF <CR>"),
         dashboard.button("c", " " .. " Nvim Config", [[<cmd>PossessionLoad ~/.config<CR>]]),
-        dashboard.button("l", "Lazy" .. " Lazy", ":Lazy<CR>"),
+        dashboard.button("l", "" .. " Lazy", ":Lazy<CR>"),
+        (function()
+          local group = { type = "group", opts = { spacing = 1 } }
+          group.val = {
+            { type = "text", val = "Last 5 Sessions", opts = { position = "center" } }
+          }
+          local last_sessions = last_five_sessions()
+          for i, session in pairs(last_sessions) do
+            local button = dashboard.button(tostring(i), "勒 " .. session,
+              "<cmd>PossessionLoad " .. session .. "<cr>")
+            table.insert(group.val, button)
+          end
+          start_val = start_val + #last_sessions
+          return group
+        end)(),
         (function()
           local group = { type = "group", opts = { spacing = 1 } }
           group.val = {
             { type = "text", val = "Previous Sessions", opts = { position = "center" } }
           }
           for i, session in pairs(require("possession.query").as_list()) do
-            local button = dashboard.button(tostring(i), "勒 " .. session.name,
+            local button = dashboard.button(tostring(i + start_val), "勒 " .. session.name,
               "<cmd>PossessionLoad " .. session.name .. "<cr>")
             table.insert(group.val, button)
           end
@@ -288,7 +342,6 @@ return {
             end
           end
         },
-        autoload = "auto_cwd",
         commands = {
           save = "SSave",
           load = "SLoad",

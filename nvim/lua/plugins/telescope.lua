@@ -11,7 +11,10 @@ return {
     config = function()
       local telescope = require("telescope")
       telescope.load_extension("live_grep_args")
-      telescope.load_extension('possession')
+      telescope.load_extension("possession")
+      local builtin = require("telescope.builtin")
+      vim.keymap.set("n", "<leader>tff", builtin.find_files, { desc = "Telescope find files" })
+      vim.keymap.set("n", "<leader>tlg", builtin.live_grep, { desc = "Telescope live grep" })
       local single_or_multi = function(bufnr)
         local actions = require("telescope.actions")
         local actions_state = require("telescope.actions.state")
@@ -40,6 +43,7 @@ return {
           file_ignore_patterns = {
             "output/python",
             "output/layer",
+            ".venv",
           },
           mappings = {
             i = {
