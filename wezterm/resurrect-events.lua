@@ -19,9 +19,9 @@ wezterm.on("resurrect.workspace_state.restore_workspace.finished", function(...)
   wezterm.gui.gui_windows()[1]:toast_notification("Wezterm - resurrect", msg, nil, 4000)
 end)
 
-wezterm.on("resurrect.state_manager.save_state.finished", function(...)
-  wezterm.log_info("Saved")
-  wezterm.gui.gui_windows()[1]:toast_notification("Wezterm - save", msg, nil, 4000)
+wezterm.on("resurrect.state_manager.save_state.finished", function(window, pane)
+  local msg = "Saved"
+  window:toast_notification("Wezterm - save", msg, nil, 4000)
 end)
 
 wezterm.on("window-config-reloaded", function(window, pane)

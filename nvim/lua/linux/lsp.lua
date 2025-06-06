@@ -133,61 +133,6 @@ return {
       }
       local cfg = require("yaml-companion").setup({})
       local lspconfig = require("lspconfig")
-      local handlers = {
-        function(server)
-          lspconfig[server].setup({
-            capabilities = capabilities,
-          })
-        end,
-        ["graphql"] = function()
-          lspconfig.graphql.setup({
-            capabilities = capabilities,
-            root_dir = lspconfig.util.root_pattern(
-              ".graphqlconfig",
-              ".graphqlrc",
-              "package.json"
-            ),
-          })
-        end,
-        ["docker_compose_language_service"] = function()
-          lspconfig.docker_compose_language_service.setup({
-            capabilities = capabilities,
-          })
-        end,
-        ["pyright"] = function() end,
-        ["terraformls"] = function()
-          lspconfig.terraformls.setup({
-            capabilities = capabilities,
-            filetypes = {
-              "terraform",
-              "tf",
-              "tfvars",
-            },
-          })
-        end,
-        ["yamlls"] = function()
-          lspconfig.yamlls.setup(cfg)
-        end,
-        ["cmake"] = function()
-          lspconfig.cmake.setup({})
-        end,
-        ["lua_ls"] = function()
-          lspconfig.lua_ls.setup({
-            capabilities = capabilities,
-            settings = {
-              Lua = {
-                completion = {
-                  callSnippet = "Replace",
-                },
-                diagnostics = {
-                  globals = { "vim" },
-                },
-              },
-            },
-          })
-        end,
-      }
-
       local servers = {
         -- "cmake",
         "lua_ls",
@@ -205,7 +150,7 @@ return {
       mason_lsp.setup({
         automatic_installation = true,
         ensure_installed = servers,
-        handlers = handlers,
+        -- handlers = handlers,
       })
       vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
       vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
