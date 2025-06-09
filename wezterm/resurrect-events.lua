@@ -1,5 +1,6 @@
 -- fmt
 local wezterm = require("wezterm")
+local action = wezterm.action
 
 local colors = require("colors")
 local os = require("os")
@@ -45,7 +46,7 @@ wezterm.on("trigger-vim-with-scrollback", function(window, pane)
   f:flush()
   f:close()
   window:perform_action(
-    wezterm.action.SpawnCommandInNewWindow({
+    action.SpawnCommandInNewWindow({
       args = { "vim", name },
     }),
     pane

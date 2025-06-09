@@ -1,10 +1,11 @@
 -- fmt
 local wezterm = require("wezterm") --[[@as Wezterm]]
+local action = wezterm.action
 local resurrect = wezterm.plugin.require("https://github.com/MLFlexer/resurrect.wezterm")
 local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
 require("resurrect-events")
 
-keys = {
+local keys = {
   {
     key = "!",
     mods = "LEADER|SHIFT",
@@ -12,30 +13,32 @@ keys = {
       pane:move_to_new_tab()
     end),
   },
-  { key = "c",          mods = "LEADER",      action = wezterm.action.SpawnTab("CurrentPaneDomain") },
-  { key = "|",          mods = "LEADER",      action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-  { key = "-",          mods = "LEADER",      action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }) },
-  { key = "LeftArrow",  mods = "OPT",         action = wezterm.action({ SendString = "\x1bb" }) },
   -- Make Option-Right equivalent to Alt-f; forward-word
-  { key = "RightArrow", mods = "OPT",         action = wezterm.action({ SendString = "\x1bf" }) },
-  { key = "LeftArrow",  mods = "CMD|SHIFT",   action = wezterm.action.ActivateTabRelative(-1) },
-  { key = "RightArrow", mods = "CMD|SHIFT",   action = wezterm.action.ActivateTabRelative(1) },
-  { key = "n",          mods = "LEADER",      action = wezterm.action.ActivateTabRelative(1) },
-  { key = "p",          mods = "LEADER",      action = wezterm.action.ActivateTabRelative(-1) },
-  { key = "z",          mods = "LEADER",      action = wezterm.action.TogglePaneZoomState },
-  { key = "[",          mods = "LEADER",      action = wezterm.action.ActivateCopyMode },
-  { key = "h",          mods = "LEADER",      action = wezterm.action.ActivatePaneDirection("Left") },
-  { key = "j",          mods = "LEADER",      action = wezterm.action.ActivatePaneDirection("Down") },
-  { key = "k",          mods = "LEADER",      action = wezterm.action.ActivatePaneDirection("Up") },
-  { key = "l",          mods = "LEADER",      action = wezterm.action.ActivatePaneDirection("Right") },
-  { key = "LeftArrow",  mods = "LEADER",      action = wezterm.action.ActivatePaneDirection("Left") },
-  { key = "DownArrow",  mods = "LEADER",      action = wezterm.action.ActivatePaneDirection("Down") },
-  { key = "UpArrow",    mods = "LEADER",      action = wezterm.action.ActivatePaneDirection("Up") },
-  { key = "RightArrow", mods = "LEADER",      action = wezterm.action.ActivatePaneDirection("Right") },
-  { key = "l",          mods = "LEADER|CTRL", action = wezterm.action.ShowLauncher },
-  { key = "e",          mods = "LEADER",      action = wezterm.action.EmitEvent("trigger-vim-with-scrollback") },
-  { key = "]",          mods = "LEADER|CTRL", action = wezterm.action.SwitchWorkspaceRelative(1) },
-  { key = "[",          mods = "LEADER|CTRL", action = wezterm.action.SwitchWorkspaceRelative(-1) },
+  { key = "-",          mods = "LEADER",      action = action.SplitVertical({ domain = "CurrentPaneDomain" }) },
+  { key = "DownArrow",  mods = "LEADER",      action = action.ActivatePaneDirection("Down") },
+  { key = "LeftArrow",  mods = "CMD|SHIFT",   action = action.ActivateTabRelative(-1) },
+  { key = "LeftArrow",  mods = "LEADER",      action = action.ActivatePaneDirection("Left") },
+  { key = "LeftArrow",  mods = "OPT",         action = action({ SendString = "\x1bb" }) },
+  { key = "RightArrow", mods = "CMD|SHIFT",   action = action.ActivateTabRelative(1) },
+  { key = "RightArrow", mods = "LEADER",      action = action.ActivatePaneDirection("Right") },
+  { key = "RightArrow", mods = "OPT",         action = action({ SendString = "\x1bf" }) },
+  { key = "UpArrow",    mods = "LEADER",      action = action.ActivatePaneDirection("Up") },
+  { key = "[",          mods = "LEADER",      action = action.ActivateCopyMode },
+  { key = "[",          mods = "LEADER|CTRL", action = action.SwitchWorkspaceRelative(-1) },
+  { key = "]",          mods = "LEADER|CTRL", action = action.SwitchWorkspaceRelative(1) },
+  { key = "c",          mods = "LEADER",      action = action.SpawnTab("CurrentPaneDomain") },
+  { key = "e",          mods = "LEADER",      action = action.EmitEvent("trigger-vim-with-scrollback") },
+  { key = "h",          mods = "LEADER",      action = action.ActivatePaneDirection("Left") },
+  { key = "j",          mods = "LEADER",      action = action.ActivatePaneDirection("Down") },
+  { key = "k",          mods = "LEADER",      action = action.ActivatePaneDirection("Up") },
+  { key = "l",          mods = "LEADER",      action = action.ActivatePaneDirection("Right") },
+  { key = "l",          mods = "LEADER|CTRL", action = action.ShowLauncher },
+  { key = "n",          mods = "LEADER",      action = action.ActivateTabRelative(1) },
+  { key = "p",          mods = "CMD",         action = action.CloseCurrentPane({ confirm = true }) },
+  { key = "p",          mods = "LEADER",      action = action.ActivateTabRelative(-1) },
+  { key = "t",          mods = "LEADER",      action = action.CloseCurrentTab({ confirm = true }) },
+  { key = "z",          mods = "LEADER",      action = action.TogglePaneZoomState },
+  { key = "|",          mods = "LEADER",      action = action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
   {
     key = ",",
     mods = "LEADER",
@@ -69,23 +72,30 @@ keys = {
         id = string.match(id, "([^/]+)$")         -- match after '/'
         id = string.match(id, "(.+)%..+$")        -- remove file extention
 
-        win:perform_action(
-          wezterm.action.SwitchToWorkspace({ name = id }), pane
-        )
-        win:perform_action({
-          EmitEvent = {
-            event = 'restore-workspace',
-            id = id,
-            type = type
-          }
-        })
+        local opts = {
+          on_pane_restore = resurrect.tab_state.default_on_pane_restore,
+          spawn_in_workspace = true,
+          relative = true,
+          restore_text = true,
+        }
+
+        if type == "workspace" then
+          local state = resurrect.state_manager.load_state(id, "workspace")
+          resurrect.workspace_state.restore_workspace(state, opts)
+        elseif type == "window" then
+          local state = resurrect.state_manager.load_state(id, "window")
+          resurrect.window_state.restore_window(pane:window(), state, opts)
+        elseif type == "tab" then
+          local state = resurrect.state_manager.load_state(id, "tab")
+          resurrect.tab_state.restore_tab(pane:tab(), state, opts)
+        end
       end)
-    end)
+    end),
   },
   {
     key = "$",
     mods = "LEADER|SHIFT",
-    action = wezterm.action.PromptInputLine({
+    action = action.PromptInputLine({
       description = "Enter new name for workspace",
       action = wezterm.action_callback(function(window, pane, line)
         if line then
@@ -109,26 +119,4 @@ keys = {
     end),
   },
 }
-wezterm.on("restore-workspace", function(window, pane, event)
-  window:toast_notification("wezterm", "Workspace restored", nil, 4000)
-  local opts = {
-    close_open_tabs = true,
-    window = pane:window(),
-    on_pane_restore = resurrect.tab_state.default_on_pane_restore,
-    spawn_in_workspace = true,
-    restore_text = true,
-    relative = true,
-  }
-  if type == "workspace" then
-    local state = resurrect.state_manager.load_state(id, "workspace")
-    resurrect.workspace_state.restore_workspace(state, opts)
-  elseif type == "window" then
-    local state = resurrect.state_manager.load_state(id, "window")
-    resurrect.window_state.restore_window(pane:window(), state, opts)
-  elseif type == "tab" then
-    local state = resurrect.state_manager.load_state(id, "tab")
-    resurrect.tab_state.restore_tab(pane:tab(), state, opts)
-  end
-end)
-
 return keys
