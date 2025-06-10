@@ -4,22 +4,20 @@ return {
     "nvim-treesitter/nvim-treesitter",
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
+      commit = "0f051e9",
     },
     build = ":TSUpdate",
-    version = "v0.25.3",
+    commit = "42fc28b",
     config = function()
       local treesitter = require("nvim-treesitter.configs")
       treesitter.setup({
         ensure_installed = {
           "bash",
           "dockerfile",
-          "rust",
           "terraform",
-          "hcl",
           "rust",
           "markdown",
           "yaml",
-          "json",
           "c",
           "lua",
           "python",
@@ -33,6 +31,15 @@ return {
           end
         end,
         textobjects = {
+          swap = {
+            enable = true,
+            swap_next = {
+              ["<leader>ap"] = "@parameter.inner",
+            },
+            swap_previous = {
+              ["<leader>Ap"] = "@parameter.inner",
+            },
+          },
           move = {
             enable = true,
             goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer", ["]a"] = "@parameter.inner" },
@@ -53,6 +60,7 @@ return {
               ["@parameter.outer"] = "v",
               ["@function.outer"] = "V",
               ["@class.outer"] = "<c-v>",
+              ["@loop.*"] = "l",
             },
           },
         },
@@ -76,7 +84,6 @@ return {
     config = function()
       require("aerial").setup()
       vim.keymap.set("n", "<leader>at", ":AerialToggle<CR>", { noremap = true, silent = true })
-      -- vim.keymap.set('n', '<leader>ac', ':AerialClose<CR>', {noremap = true, silent = true})
     end,
   },
 }

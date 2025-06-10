@@ -4,18 +4,18 @@ return {
     "hrsh7th/nvim-cmp",
     commit = "8c82d0b",
     dependencies = {
-      {
-        "L3MON4D3/LuaSnip", tag = "v2.*",
-      },
-      { "saadparwaiz1/cmp_luasnip",     commit = "98d9cb5" },
-      { "rafamadriz/friendly-snippets", commit = "572f566" },
-      { "hrsh7th/cmp-path",             commit = "c6635aa" },
-      { "hrsh7th/cmp-buffer",           commit = "b74fab3" },
-      { "hrsh7th/cmp-nvim-lua",         commit = "f12408b" },
-      { "hrsh7th/cmp-nvim-lsp",         commit = "a8912b8" },
+      { "saadparwaiz1/cmp_luasnip",            commit = "98d9cb5", build = "make install_jsregexp" },
+      { "L3MON4D3/LuaSnip",                    commit = "4585605" },
+      { "rafamadriz/friendly-snippets",        commit = "572f566" },
+      { "hrsh7th/cmp-path",                    commit = "c6635aa" },
+      { "hrsh7th/cmp-buffer",                  commit = "b74fab3" },
+      { "hrsh7th/cmp-nvim-lua",                commit = "f12408b" },
+      { "hrsh7th/cmp-nvim-lsp",                commit = "a8912b8" },
+      { "hrsh7th/cmp-nvim-lsp-signature-help", commit = "031e6ba" },
     },
     config = function()
       local cmp = require("cmp")
+      require("luasnip.loaders.from_vscode").lazy_load()
 
       cmp.setup({
         snippet = {
