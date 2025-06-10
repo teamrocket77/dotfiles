@@ -44,10 +44,10 @@ return {
     end,
   },
   {
-    "williamboman/mason.nvim",
-    version = "v1.10.0",
+    "mason-org/mason.nvim",
+    commit = "7f265cd",
     dependencies = {
-      { "williamboman/mason-lspconfig.nvim", version = "1.26.0" },
+      { "mason-org/mason-lspconfig.nvim", commit = "5477d67" },
       { "neovim/nvim-lspconfig" },
       { "hrsh7th/cmp-nvim-lsp" },
       { "wesleimp/stylua.nvim" },
@@ -123,7 +123,6 @@ return {
         end,
       })
 
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
       -- currently managed by ASDF
 
       local linters = {
@@ -131,8 +130,6 @@ return {
         "asm-lsp",
         "yamllint",
       }
-      local cfg = require("yaml-companion").setup({})
-      local lspconfig = require("lspconfig")
       local servers = {
         -- "cmake",
         "lua_ls",

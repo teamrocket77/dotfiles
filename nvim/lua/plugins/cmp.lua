@@ -4,14 +4,15 @@ return {
     "hrsh7th/nvim-cmp",
     commit = "8c82d0b",
     dependencies = {
-      { "L3MON4D3/LuaSnip" },
-      { "saadparwaiz1/cmp_luasnip" },
-      { "rafamadriz/friendly-snippets" },
-      { "hrsh7th/cmp-path" },
-      { "hrsh7th/cmp-buffer" },
-      { "hrsh7th/cmp-nvim-lua" },
-      { "hrsh7th/cmp-nvim-lsp" },
-      { "FelipeLema/cmp-async-path" },
+      {
+        "L3MON4D3/LuaSnip", tag = "v2.*",
+      },
+      { "saadparwaiz1/cmp_luasnip",     commit = "98d9cb5" },
+      { "rafamadriz/friendly-snippets", commit = "572f566" },
+      { "hrsh7th/cmp-path",             commit = "c6635aa" },
+      { "hrsh7th/cmp-buffer",           commit = "b74fab3" },
+      { "hrsh7th/cmp-nvim-lua",         commit = "f12408b" },
+      { "hrsh7th/cmp-nvim-lsp",         commit = "a8912b8" },
     },
     config = function()
       local cmp = require("cmp")
