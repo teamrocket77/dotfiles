@@ -83,17 +83,17 @@ local function add_matching_buffers_to_args(pattern)
 end
 
 local function diff_off_func()
-  cmd('diffoff')
-  cmd('q')
-  cmd('diffoff')
+  cmd("diffoff")
+  cmd("q")
+  cmd("diffoff")
 end
 
 local function diff_with_saved()
   local filetype = vim.bo.filetype
-  cmd('diffthis')
-  cmd('vnew | r # | normal! 1Gdd')
-  cmd('diffthis')
-  cmd('setlocal bt=nofile bh=wipe nobl noswf ro ft=' .. filetype)
+  cmd("diffthis")
+  cmd("vnew | r # | normal! 1Gdd")
+  cmd("diffthis")
+  cmd("setlocal bt=nofile bh=wipe nobl noswf ro ft=" .. filetype)
 end
 
 cmd([[match TrailingWhitespace /\s\+$/]])
@@ -115,8 +115,8 @@ nvim_create_autocmd("InsertLeave", {
 })
 
 
-nvim_create_user_command('DiffSaved', diff_with_saved, {})
-nvim_create_user_command('DiffoffComplex', diff_off_func, {})
+nvim_create_user_command("DiffSaved", diff_with_saved, {})
+nvim_create_user_command("DiffoffComplex", diff_off_func, {})
 nvim_create_user_command("ToggleZoom", toggle_zoom, {})
 nvim_create_user_command(
   "AddBuffersToArgs",
@@ -210,7 +210,7 @@ lsp_functions.conditional_formatting = function(ev, settings)
   local cursor_position = vim.api.nvim_win_get_cursor(0)
   local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
   local line_cutoff = 5
-  settings = vim.tbl_deep_extend('force', settings, {
+  settings = vim.tbl_deep_extend("force", settings, {
     filter = function(client)
       return client.name == lsp_functions.formatting_options[ft]
     end,
@@ -228,21 +228,6 @@ lsp_functions.conditional_formatting = function(ev, settings)
   vim.api.nvim_win_set_cursor(0, cursor_position)
 end
 
-lsp_functions.have_go_ls_installed = function()
-  if os.execute("go version > /dev/null 2>&1") == 0 then
-    return "gopls"
-  else
-    return nil
-  end
-end
-
-lsp_functions.have_ghcup_ls_installed = function()
-  if os.execute("ghcup -h > /dev/null 2>&1") == 0 then
-    return "hls"
-  else
-    return ""
-  end
-end
 
 lsp_functions.inlay_hint_servers = {
   lua_ls = true,
@@ -270,11 +255,51 @@ lsp_functions.toggle_hints = function()
   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(), { 0 })
 end
 
-local have_ruby = function()
-  if os.execute('rbenv 2>&1') == 0 then
-    return "ruby_lsp"
+---@param t table
+local have_ruby = function(t)
+  if os.execute("rbenv 2>&1") == 0 then
+    table.insert(t, "ruby_lsp")
   end
-  return ""
+end
+
+---@param t table
+local have_ghcup_ls_installed = function(t)
+  if os.execute("ghcup -h > /dev/null 2>&1") == 0 then
+    table.insert(t, "hls")
+  end
+end
+
+---@param t table
+local have_go_ls_installed = function(t)
+  if os.execute("go version > /dev/null 2>&1") == 0 then
+    table.insert(t, "gopls")
+  end
+end
+
+---@param t table
+local add_servers = function(t)
+  have_ruby(t)
+  have_ghcup_ls_installed(t)
+  have_go_ls_installed(t)
+end
+
+---@return boolean
+lsp_functions.does_session_file_exist = function()
+  local session_dir = os.getenv("HOME") .. "/.config/nvim/sessions/"
+  local most_recent_session = session_dir .. "recent-session.txt"
+  local file = io.open(most_recent_session, "r")
+  if file == nil then
+    file = io.open(most_recent_session, "w")
+    if file == nil then
+      vim.schedule_wrap(vim.print("File doesn't exist and unable to create it"))
+      return false
+    else
+      file:close()
+      return true
+    end
+  end
+  file:close()
+  return true
 end
 
 lsp_functions.servers = {
@@ -290,9 +315,8 @@ lsp_functions.servers = {
   "terraformls",
   "yamlls",
   "bashls",
-  have_ruby(),
-  lsp_functions.have_ghcup_ls_installed(),
-  lsp_functions.have_go_ls_installed(),
 }
+
+add_servers(lsp_functions.servers)
 
 return lsp_functions

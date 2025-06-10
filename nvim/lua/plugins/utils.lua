@@ -31,7 +31,15 @@ local has_png_paste = function()
           folder = home .. "templates"
         },
       })
-      vim.keymap.set("n", "<leader>oct, ", ":ObsidianTEmplate basic-note<CR>")
+      vim.keymap.set("n", "<leader>oct", ":enew | ObsidianTemplate basic-note<CR>")
+      vim.opt.conceallevel = 1
+      vim.keymap.set("n", "gf", function()
+        if require("obsidian").util.cursor_on_markdown_link() then
+          return "<cmd>ObsidianFollowLink<CR>"
+        else
+          return "gf"
+        end
+      end, { noremap = false, expr = true })
     end
   }
 end
@@ -222,19 +230,22 @@ return {
       local session_dir = os.getenv("HOME") .. "/.config/nvim/sessions/"
       local most_recent_session = session_dir .. "recent-session.txt"
       local file_lines = {}
+      local lsp_functions = require("config.functions")
 
       local file = io.open(most_recent_session, "r")
 
       local last_five_sessions = function()
-        if file ~= nil then
-          for line in io.lines(most_recent_session) do
+        local exists = lsp_functions.does_session_file_exist()
+        if exists == true then
+          file = io.open(most_recent_session, "r")
+          for line in file:lines() do
             table.insert(file_lines, line)
           end
+          file:close()
+          return { unpack(file_lines, math.max(#file_lines - 4, 1), #file_lines) }
+        else
+          return {}
         end
-        -- Once read all lines to file_lines, you can close the file
-        file:close()
-        -- Return the last 5 records (sessions), you should reverse file_lines if your file write new session at the end of file
-        return { unpack(file_lines, math.max(#file_lines - 4, 1), #file_lines) }
       end
       vim.schedule_wrap(vim.print(file_lines))
       local start_val = 0
