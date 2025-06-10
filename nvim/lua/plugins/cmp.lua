@@ -2,7 +2,7 @@
 return {
   {
     "hrsh7th/nvim-cmp",
-    version = "v0.0.2",
+    commit = "8c82d0b",
     dependencies = {
       { "L3MON4D3/LuaSnip" },
       { "saadparwaiz1/cmp_luasnip" },
@@ -30,7 +30,7 @@ return {
           ["<C-b>"] = cmp.mapping.scroll_docs(-4),
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ["<C-e>"] = cmp.mapping.abort(),
-          ["<CR>"] = cmp.mapping.confirm({ select = true }),
+          ["<Tab>"] = cmp.mapping.confirm({ select = true }),
         }),
         sources = cmp.config.sources({
           { name = "nvim_lsp" },
@@ -52,13 +52,17 @@ return {
       })
     end,
   },
+  { "justinsgithub/wezterm-types", commit = "1518752", lazy = true, ft = { "lua" } },
   {
     "folke/lazydev.nvim",
     ft = "lua",
+    commit = "f59bd14",
     dependencies = { { "justinsgithub/wezterm-types" } },
-    opts = { library = {
-      "lazy.nvim",
-      { path = "wezterm-types", mods = { "wezterm" } },
-    } },
+    opts = {
+      library = {
+        "lazy.nvim",
+        { path = "wezterm-types", mods = { "wezterm" } },
+      }
+    },
   },
 }

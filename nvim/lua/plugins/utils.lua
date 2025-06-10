@@ -46,54 +46,44 @@ end
 
 return {
   {
-    "mbbill/undotree",
-    config = function()
-      vim.keymap.set("n", "<leader><F5>", vim.cmd.UndoTreeToggle)
-    end,
-  },
-  {
     "echasnovski/mini.files",
-    version = "*",
-    dependencies = {
-      "echasnovski/mini.icons",
-      "nvim-tree/nvim-web-devicons",
+    commit = "49c8559",
+    keys = {
+      {
+        "<leader>mt",
+        function()
+          local mini = require("mini.files")
+          if not mini.close() then
+            mini.open()
+          end
+        end,
+        mode = "n",
+        desc = "Mini Files Toggle"
+      },
+      {
+        "<leader>mf",
+        function()
+          local mini = require("mini.files")
+          if not mini.close() then
+            mini.open()
+            vim.defer_fn(function()
+              mini.reveal_cwd()
+            end, 30)
+          end
+        end,
+        mode = "n",
+        desc = "Mini Files Toggle"
+      }
     },
     config = function()
       local minifiles = require("mini.files")
-      vim.keymap.set("n", "<leader>mi", function()
-        if not minifiles.close() then
-          minifiles.open()
-        end
-      end)
-
-      vim.keymap.set("n", "<leader>mf", function()
-        local _ = minifiles.open(vim.api.nvim_buf_get_name(0), false)
-        vim.defer_fn(function()
-          minifiles.reveal_cwd()
-        end, 30)
-      end)
-
-      vim.keymap.set("n", "<leader>mo", function()
-        if minifiles.get_explorer_state() then
-          local fs_data = minifiles.get_fs_entry(0)
-          local path = fs_data["path"]
-          minifiles.close()
-          vim.schedule_wrap(vim.cmd.edit(path))
-        else
-          print("Must open Minifiles Explorer first")
-        end
-      end)
-
-      vim.keymap.set("n", "<leader>mt", function()
-        if not minifiles.close() then
-          minifiles.open()
-        end
-      end)
       minifiles.setup({})
     end,
   },
   {
     "kwkarlwang/bufresize.nvim",
+    commit = "3b19527",
+    lazy = true,
     config = function()
       local opts = { noremap = true, silent = true }
       require("bufresize").setup({
@@ -120,9 +110,10 @@ return {
   },
   {
     "levouh/tint.nvim",
+    commit = "586e87f",
     config = function()
       require("tint").setup({
-        -- tint = -70,
+        tint = -20,
       })
     end,
   },
@@ -139,12 +130,22 @@ return {
   },
   {
     "sindrets/diffview.nvim",
+    commit = "4516612",
     config = function()
-      require("diffview").setup({})
+      require("diffview").setup({
+        hooks = {
+          diff_read_buf = function(bufnr)
+            vim.opt_local.wrap = false
+            vim.opt_local.list = false
+            vim.opt_local.colorcolumn = false
+          end,
+        }
+      })
     end,
   },
   {
     "mbbill/undotree",
+    commit = "b951b87",
     config = function()
       vim.keymap.set("n", "<leader>utog", vim.cmd.UndotreeToggle)
       vim.keymap.set("n", "<leader>ushow", vim.cmd.UndotreeToggle)
@@ -173,6 +174,7 @@ return {
     "ThePrimeagen/harpoon",
     branch = "harpoon2",
     dependencies = { "nvim-lua/plenary.nvim" },
+    commit = "ed1f853",
     config = function()
       local harpoon = require("harpoon")
       harpoon:setup()
@@ -197,6 +199,7 @@ return {
   {
     "OXY2DEV/markview.nvim",
     lazy = false,
+    commit = "1edad11",
     opts = {
       preview = {
         filetypes = { "markdown", "codecompanion" },
@@ -207,6 +210,7 @@ return {
   {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
+    commit = "a94fc68",
     config = function()
       local lualine = require("lualine")
       local function session_name()
@@ -224,9 +228,9 @@ return {
   },
   {
     "goolord/alpha-nvim",
+    commit = "a35468c",
     config = function()
       local alpha = require "alpha"
-      local output_table = {}
       local session_dir = os.getenv("HOME") .. "/.config/nvim/sessions/"
       local most_recent_session = session_dir .. "recent-session.txt"
       local file_lines = {}
@@ -291,6 +295,7 @@ return {
   {
     "jedrzejboczar/possession.nvim",
     requires = { "nvim-lua/plenary.nvim" },
+    commit = "8fb21fa",
     config = function()
       local session_dir = os.getenv("HOME") .. "/.config/nvim/sessions/"
       local most_recent_session = session_dir .. "recent-session.txt"
@@ -364,23 +369,20 @@ return {
   },
   {
     "sphamba/smear-cursor.nvim",
-    opts = {},
-    config = function()
-      local smear = require("smear_cursor")
-      smear.setup({
-        stiffness = 0.8,
-        trailing_stiffness = 0.3,
-        cursor_color = "#ff8800",
-        trailing_exponent = 7,
-        hide_target_hack = true,
-        gamma = 1,
-      })
-    end,
+    opts = {
+      stiffness = 0.8,
+      trailing_stiffness = 0.3,
+      cursor_color = "#ff8800",
+      trailing_exponent = 7,
+      hide_target_hack = true,
+      gamma = 1,
+    },
   },
   {
     "folke/flash.nvim",
     event = "VeryLazy",
     version = "v2.1.0",
+    commit = "3c94266",
     ---@type Flash.Config
     opts = {},
     -- stylua: ignore
