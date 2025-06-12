@@ -309,7 +309,6 @@ lsp_functions.servers = {
   "lua_ls",
   "dockerls",
   "basedpyright",
-  "pyright",
   "ruff",
   "graphql",
   "terraformls",
