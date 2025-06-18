@@ -105,6 +105,7 @@ return {
     lazy = false,
     opts = {
       lazygit = { enabled = true },
+      rename = { enabled = true },
       bigfile = { enabled = true },
       dashboard = {
         enabled = true,
@@ -115,15 +116,14 @@ return {
           { icon = " ", title = "Projects", section = "projects", indent = 2, padding = 2, pane = 2, limit = 5 },
           { section = "startup" },
         },
-        config = {
+        preset = {
           keys = {
-            { "e", "New file", ":ene<BAR> startinsert <CR>" },
-            { "g", " " .. "Find Text", ":Telescope live_grep <CR>" },
-            { "f", " " .. "Find Files", ":Telescope find_files <CR>" },
-            { "z", " " .. "Find Files FZF", ":FZF <CR>" },
-            { "c", " " .. "Edit NVIM Config", [[<cmd>PossessionLoad ~/.config<CR>]] },
-            { "r", " " .. "Edit Zsh file", ":e ~/.zshrc<CR>" },
-            { "l", "" .. " Lazy", ":Lazy<CR>" },
+            { key = "e", icon = "", desc = "New file", action = ":ene<BAR> startinsert" },
+            { key = "g", icon = " ", desc = "Find Text", action = function() require("snacks").picker.grep() end },
+            { key = "f", icon = " ", desc = "Find Files", action = function() require("snacks").picker.files() end },
+            { key = "c", icon = " ", desc = "Edit NVIM Config", action = [[<cmd>PossessionLoad ~/.config]] },
+            { key = "r", icon = " ", desc = "Edit Zsh file", action = ":e ~/.zshrc" },
+            { key = "l", icon = "󰒲", desc = "Lazy", action = ":Lazy<CR>" },
           },
         }
       },
@@ -161,6 +161,12 @@ return {
           vim.print = _G.dd
           Snacks.toggle.treesitter():map("<leader>uT")
         end
+      })
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MiniFilesActionRename",
+        callback = function(event)
+          Snacks.rename.on_rename_file(event.data.from, event.data.to)
+        end,
       })
       Snacks.setup({})
     end
