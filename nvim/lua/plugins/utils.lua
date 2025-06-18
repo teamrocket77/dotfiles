@@ -54,7 +54,7 @@ return {
         function()
           local mini = require("mini.files")
           if not mini.close() then
-            mini.open()
+            mini.open(nil, true)
           end
         end,
         mode = "n",
@@ -65,20 +65,105 @@ return {
         function()
           local mini = require("mini.files")
           if not mini.close() then
-            mini.open()
-            vim.defer_fn(function()
-              mini.reveal_cwd()
-            end, 30)
+            mini.open(vim.api.nvim_buf_get_name(0))
           end
         end,
         mode = "n",
         desc = "Mini Files Toggle"
+      },
+      {
+        "<leader>mc",
+        function()
+          local mini = require("mini.files")
+          local last_path = mini.get_latest_path()
+          if not mini.close() then
+            if last_path == nil then
+              mini.open(last_path)
+            else
+              mini.open(vim.api.nvim_buf_get_name(0))
+            end
+          end
+        end,
+        mode = "n",
+        desc = "Mini Files Toggle CWD"
       }
     },
     config = function()
       local minifiles = require("mini.files")
       minifiles.setup({})
     end,
+  },
+  {
+    "chentoast/marks.nvim",
+    event = "VeryLazy",
+    opts = {},
+  },
+  {
+    "folke/snacks.nvim",
+    commit = "5eac729",
+    priority = 1000,
+    lazy = false,
+    opts = {
+      lazygit = { enabled = true },
+      bigfile = { enabled = true },
+      dashboard = {
+        enabled = true,
+        sections = {
+          { section = "header" },
+          { icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
+          { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1, limit = 5, pane = 2 },
+          { icon = " ", title = "Projects", section = "projects", indent = 2, padding = 2, pane = 2, limit = 5 },
+          { section = "startup" },
+        },
+        config = {
+          keys = {
+            { "e", "New file", ":ene<BAR> startinsert <CR>" },
+            { "g", " " .. "Find Text", ":Telescope live_grep <CR>" },
+            { "f", " " .. "Find Files", ":Telescope find_files <CR>" },
+            { "z", " " .. "Find Files FZF", ":FZF <CR>" },
+            { "c", " " .. "Edit NVIM Config", [[<cmd>PossessionLoad ~/.config<CR>]] },
+            { "r", " " .. "Edit Zsh file", ":e ~/.zshrc<CR>" },
+            { "l", "" .. " Lazy", ":Lazy<CR>" },
+          },
+        }
+      },
+      indent = {
+        enabled = true,
+      },
+      scope = { enabled = true, },
+      notifier = {
+        enabled = true,
+        timeout = 1000
+      },
+    },
+    keys = {
+      { "<leader><space>", function() require("snacks").picker.smart() end,                 desc = "Opens Snacks Picker" },
+      { "<leader>gf",      function() require("snacks").picker.grep() end,                  desc = "Grep" },
+      { "<leader>ff",      function() require("snacks").picker.files() end,                 desc = "Find Files" },
+      { "<leader>gb",      function() require("snacks").picker.grep_buffers() end,          desc = "Grep Buffers" },
+      { "gd",              function() require("snacks").picker.lsp_definitions() end,       desc = "LSP Definition" },
+      { "gD",              function() require("snacks").picker.lsp_declarations() end,      desc = "LSP Declerations" },
+      { "<leader>gls",     function() require("snacks").picker.lsp_symbols() end,           desc = "LSP Symbols" },
+      { "<leader>gws",     function() require("snacks").picker.lsp_workspace_symbols() end, desc = "LSP Symbols for Workspace" },
+      { "<leader>ql",      function() require("snacks").picker.qflist() end,                desc = "Quickfix List open" },
+    },
+    init = function()
+      local Snacks = require("snacks")
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "VeryLazy",
+        callback = function()
+          _G.dd = function(...)
+            Snacks.debug.inspect(...)
+          end
+          _G.bt = function()
+            Snacks.debug.backtrace()
+          end
+          vim.print = _G.dd
+          Snacks.toggle.treesitter():map("<leader>uT")
+        end
+      })
+      Snacks.setup({})
+    end
   },
   {
     "kwkarlwang/bufresize.nvim",
@@ -134,7 +219,7 @@ return {
     config = function()
       require("diffview").setup({
         hooks = {
-          diff_read_buf = function(bufnr)
+          diff_read_buf = function(_)
             vim.opt_local.wrap = false
             vim.opt_local.list = false
             vim.opt_local.colorcolumn = false
@@ -227,72 +312,6 @@ return {
     end
   },
   {
-    "goolord/alpha-nvim",
-    commit = "a35468c",
-    config = function()
-      local alpha = require "alpha"
-      local session_dir = os.getenv("HOME") .. "/.config/nvim/sessions/"
-      local most_recent_session = session_dir .. "recent-session.txt"
-      local file_lines = {}
-      local lsp_functions = require("config.functions")
-
-      local file = io.open(most_recent_session, "r")
-
-      local last_five_sessions = function()
-        local exists = lsp_functions.does_session_file_exist()
-        if exists == true then
-          file = io.open(most_recent_session, "r")
-          for line in file:lines() do
-            table.insert(file_lines, line)
-          end
-          file:close()
-          return { unpack(file_lines, math.max(#file_lines - 4, 1), #file_lines) }
-        else
-          return {}
-        end
-      end
-      vim.schedule_wrap(vim.print(file_lines))
-      local start_val = 0
-      local dashboard = require "alpha.themes.dashboard"
-      dashboard.section.buttons.val = {
-        dashboard.button("e", "New file", ":ene<BAR> startinsert <CR>"),
-        dashboard.button("g", " " .. " Find Text", ":Telescope live_grep <CR>"),
-        dashboard.button("f", " " .. " Find Files", ":Telescope find_files <CR>"),
-        dashboard.button("z", " " .. " Find Files FZF", ":FZF <CR>"),
-        dashboard.button("c", " " .. " Nvim Config", [[<cmd>PossessionLoad ~/.config<CR>]]),
-        dashboard.button("l", "" .. " Lazy", ":Lazy<CR>"),
-        (function()
-          local group = { type = "group", opts = { spacing = 1 } }
-          group.val = {
-            { type = "text", val = "Last 5 Sessions", opts = { position = "center" } }
-          }
-          local last_sessions = last_five_sessions()
-          for i, session in pairs(last_sessions) do
-            local button = dashboard.button(tostring(i), "勒 " .. session,
-              "<cmd>PossessionLoad " .. session .. "<cr>")
-            table.insert(group.val, button)
-          end
-          start_val = start_val + #last_sessions
-          return group
-        end)(),
-        (function()
-          local group = { type = "group", opts = { spacing = 1 } }
-          group.val = {
-            { type = "text", val = "Previous Sessions", opts = { position = "center" } }
-          }
-          for i, session in pairs(require("possession.query").as_list()) do
-            local button = dashboard.button(tostring(i + start_val), "勒 " .. session.name,
-              "<cmd>PossessionLoad " .. session.name .. "<cr>")
-            table.insert(group.val, button)
-          end
-          return group
-        end)(),
-        dashboard.button("q", " " .. " Quit", ":qa<CR>"),
-      }
-      alpha.setup(dashboard.config)
-    end
-  },
-  {
     "jedrzejboczar/possession.nvim",
     requires = { "nvim-lua/plenary.nvim" },
     commit = "8fb21fa",
@@ -351,7 +370,6 @@ return {
                 if i >= max_line_length then
                   break
                 end
-                vim.schedule_wrap(vim.print(line))
                 file:write(line .. "\n")
               end
               file:close()

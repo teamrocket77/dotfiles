@@ -72,18 +72,4 @@ return {
     version = "compat/0.7",
     config = function() end,
   },
-  -- vim.keymap.set('n', '<leader>cf', ':GetCurrentFunctions<CR>', {noremap = true, silent = true})
-  {
-    "stevearc/aerial.nvim",
-    opts = {},
-    -- Optional dependencies
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "nvim-tree/nvim-web-devicons",
-    },
-    config = function()
-      require("aerial").setup()
-      vim.keymap.set("n", "<leader>at", ":AerialToggle<CR>", { noremap = true, silent = true })
-    end,
-  },
 }
