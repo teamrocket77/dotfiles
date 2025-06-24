@@ -121,9 +121,9 @@ return {
             { key = "e", icon = "", desc = "New file", action = ":ene | startinsert" },
             { key = "g", icon = " ", desc = "Find Text", action = function() require("snacks").picker.grep() end },
             { key = "f", icon = " ", desc = "Find Files", action = function() require("snacks").picker.files() end },
-            { key = "c", icon = " ", desc = "Edit NVIM Config", action = [[<cmd>PossessionLoad ~/.config]] },
+            { key = "c", icon = " ", desc = "Edit NVIM Config", action = ":PossessionLoad ~/.config" },
             { key = "r", icon = " ", desc = "Edit Zsh file", action = ":e ~/.zshrc" },
-            { key = "l", icon = "󰒲", desc = "Lazy", action = ":Lazy<CR>" },
+            { key = "l", icon = "󰒲", desc = "Lazy", action = ":Lazy" },
           },
         }
       },
