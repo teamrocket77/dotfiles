@@ -13,7 +13,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
+      { out,                            "WarningMsg" },
       { "\nPress any key to exit..." },
     }, true, {})
     vim.fn.getchar()
@@ -29,14 +29,14 @@ vim.opt.rtp:prepend(lazypath)
 -- vim.g.maplocalleader = "\\"
 
 -- Setup lazy.nvim
-local isLinux = function()
-  local system = vim.loop.os_uname().sysname
-  if string.lower(system) == "linux" then
-    return { import = "linux" }
-  else
-    return { import = "mac" }
-  end
-end
+-- local isLinux = function()
+--   local system = vim.loop.os_uname().sysname
+--   if string.lower(system) == "linux" then
+--     return { import = "linux" }
+--   else
+--     return { import = "mac" }
+--   end
+-- end
 -- Setup ai
 local useAI = function()
   if os.getenv('OPENAI_API_KEY') then
@@ -47,13 +47,11 @@ end
 require("lazy").setup({
   spec = {
     -- import your plugins
+    -- isLinux(),
     { import = "plugins" },
-    isLinux(),
-	useAI(),
+    useAI(),
   },
   install = { colorscheme = { "" } },
   -- automatically check for plugin updates
   checker = { enabled = true },
 })
-require("config.functions")
-require("config.maps")
