@@ -125,7 +125,6 @@ return {
             function()
               local home = os.getenv("HOME")
               local cur_dir = vim.fn.getcwd()
-              vim.print(cur_dir)
               local possession = require("possession.session")
               local found = false
               local list = possession.list()
@@ -133,14 +132,13 @@ return {
               for k, _ in pairs(list) do
                 val = k
                 val:gsub("~", home)
-                vim.print(val)
                 if string.find(val, cur_dir) and not found then
                   found = true
                   break
                 end
               end
               if found then
-                return { key = "z", desc = "Load CWD session", action = ":PossessionLoad " .. cur_dir:gsub(home, "~"), indent = 2, pane = 2 }
+                return { key = "z", desc = "Load CWD session", action = ":PossessionLoad " .. cur_dir:gsub(home, "~"), indent = 2 }
               end
               return {}
             end,
