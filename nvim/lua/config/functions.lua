@@ -114,7 +114,6 @@ nvim_create_autocmd("InsertLeave", {
   end,
 })
 
-
 nvim_create_user_command("DiffSaved", diff_with_saved, {})
 nvim_create_user_command("DiffoffComplex", diff_off_func, {})
 nvim_create_user_command("ToggleZoom", toggle_zoom, {})
@@ -246,7 +245,6 @@ lsp_functions.get_lsp = function()
   vim.bo.bufhidden = "wipe"
   vim.bo.swapfile = false
   vim.bo.readonly = true
-
   vim.api.nvim_win_set_cursor(0, { 1, 0 })
 end
 

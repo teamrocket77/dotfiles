@@ -50,8 +50,15 @@ vim.lsp.config("*", {
     vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, opts)
     vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, opts)
     vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+    vim.keymap.set("n", "<leader>dline", function()
+      local underline = vim.diagnostic.config().underline
+      vim.diagnostic.config({ underline = not underline })
+    end, opts)
   end,
 })
+
+vim.diagnostic.config({ underline = false })
+
 
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next)

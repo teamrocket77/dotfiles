@@ -118,7 +118,7 @@ return {
         },
         preset = {
           keys = {
-            { key = "e", icon = "", desc = "New file", action = ":ene<BAR> startinsert" },
+            { key = "e", icon = "", desc = "New file", action = ":ene | startinsert" },
             { key = "g", icon = " ", desc = "Find Text", action = function() require("snacks").picker.grep() end },
             { key = "f", icon = " ", desc = "Find Files", action = function() require("snacks").picker.files() end },
             { key = "c", icon = " ", desc = "Edit NVIM Config", action = [[<cmd>PossessionLoad ~/.config]] },
@@ -168,6 +168,12 @@ return {
           Snacks.rename.on_rename_file(event.data.from, event.data.to)
         end,
       })
+
+      vim.api.nvim_create_user_command("ObjInspector", function()
+        vim.api.nvim_feedkeys(':lua require("snacks").notify(vim.inspect(x), {timeout = 0, ft="y"})', "n", false)
+        -- currently cannot pass tables
+      end, { desc = "Writes most of the stuff required for the vim inspect to work with snacks" })
+
       Snacks.setup({})
     end
   },
