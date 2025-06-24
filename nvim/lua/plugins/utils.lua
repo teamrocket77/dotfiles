@@ -122,6 +122,28 @@ return {
             { key = "g", icon = " ", desc = "Find Text", action = function() require("snacks").picker.grep() end },
             { key = "f", icon = " ", desc = "Find Files", action = function() require("snacks").picker.files() end },
             { key = "c", icon = " ", desc = "Edit NVIM Config", action = ":PossessionLoad ~/.config" },
+            function()
+              local home = os.getenv("HOME")
+              local cur_dir = vim.fn.getcwd()
+              vim.print(cur_dir)
+              local possession = require("possession.session")
+              local found = false
+              local list = possession.list()
+              local val = ""
+              for k, _ in pairs(list) do
+                val = k
+                val:gsub("~", home)
+                vim.print(val)
+                if string.find(val, cur_dir) and not found then
+                  found = true
+                  break
+                end
+              end
+              if found then
+                return { key = "z", desc = "Load CWD session", action = ":PossessionLoad " .. cur_dir:gsub(home, "~"), indent = 2, pane = 2 }
+              end
+              return {}
+            end,
             { key = "r", icon = " ", desc = "Edit Zsh file", action = ":e ~/.zshrc" },
             { key = "l", icon = "󰒲", desc = "Lazy", action = ":Lazy" },
           },
@@ -168,7 +190,6 @@ return {
           Snacks.rename.on_rename_file(event.data.from, event.data.to)
         end,
       })
-
       vim.api.nvim_create_user_command("ObjInspector", function()
         vim.api.nvim_feedkeys(':lua require("snacks").notify(vim.inspect(x), {timeout = 0, ft="y"})', "n", false)
         -- currently cannot pass tables
@@ -335,7 +356,8 @@ return {
         session_dir = session_dir,
         autosave = {
           current = function(name)
-            if name == "~" then
+            local home = os.getenv("HOME")
+            if name == "~" or name == home then
               return false
             end
             return true
