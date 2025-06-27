@@ -122,6 +122,8 @@ return {
             { key = "g", icon = " ", desc = "Find Text", action = function() require("snacks").picker.grep() end },
             { key = "f", icon = " ", desc = "Find Files", action = function() require("snacks").picker.files() end },
             { key = "c", icon = " ", desc = "Edit NVIM Config", action = ":PossessionLoad ~/.config" },
+            { key = "r", icon = " ", desc = "Edit Zsh file", action = ":e ~/.zshrc" },
+            { key = "l", icon = "󰒲", desc = "Lazy", action = ":Lazy" },
             function()
               local home = os.getenv("HOME")
               local cur_dir = vim.fn.getcwd()
@@ -138,12 +140,16 @@ return {
                 end
               end
               if found then
-                return { key = "z", desc = "Load CWD session", action = ":PossessionLoad " .. cur_dir:gsub(home, "~"), indent = 2 }
+                return {
+                  key = "z",
+                  desc = "Load CWD session " .. cur_dir,
+                  action = ":PossessionLoad " ..
+                      cur_dir:gsub(home, "~"),
+                  indent = 2
+                }
               end
               return {}
             end,
-            { key = "r", icon = " ", desc = "Edit Zsh file", action = ":e ~/.zshrc" },
-            { key = "l", icon = "󰒲", desc = "Lazy", action = ":Lazy" },
           },
         }
       },
@@ -157,15 +163,53 @@ return {
       },
     },
     keys = {
-      { "<leader><space>", function() require("snacks").picker.smart() end,                 desc = "Opens Snacks Picker" },
-      { "<leader>gf",      function() require("snacks").picker.grep() end,                  desc = "Grep" },
-      { "<leader>ff",      function() require("snacks").picker.files() end,                 desc = "Find Files" },
-      { "<leader>gb",      function() require("snacks").picker.grep_buffers() end,          desc = "Grep Buffers" },
-      { "gd",              function() require("snacks").picker.lsp_definitions() end,       desc = "LSP Definition" },
-      { "gD",              function() require("snacks").picker.lsp_declarations() end,      desc = "LSP Declerations" },
-      { "<leader>gls",     function() require("snacks").picker.lsp_symbols() end,           desc = "LSP Symbols" },
-      { "<leader>gws",     function() require("snacks").picker.lsp_workspace_symbols() end, desc = "LSP Symbols for Workspace" },
-      { "<leader>ql",      function() require("snacks").picker.qflist() end,                desc = "Quickfix List open" },
+      { "<leader><space>", function() require("snacks").picker.smart() end,            desc = "Opens Snacks Picker" },
+      { "<leader>gf",      function() require("snacks").picker.grep() end,             desc = "Grep" },
+      { "<leader>ff",      function() require("snacks").picker.files() end,            desc = "Find Files" },
+      { "<leader>gb",      function() require("snacks").picker.grep_buffers() end,     desc = "Grep Buffers" },
+      { "gd",              function() require("snacks").picker.lsp_definitions() end,  desc = "LSP Definition" },
+      { "gD",              function() require("snacks").picker.lsp_declarations() end, desc = "LSP Declerations" },
+      {
+        "<leader>gp",
+        function()
+          local items               = {}
+          local possession          = require("possession")
+          local possession_sessions = possession.list()
+          local longest_name        = 0
+          local idx                 = 1
+          local name                = ""
+          for k, v in pairs(possession_sessions) do
+            local name = possession_sessions[k]["name"]
+            table.insert(items, {
+              idx = idx,
+              score = idx,
+              text = name,
+              name = name,
+            })
+            longest_name = math.max(longest_name, string.len(name))
+            idx = idx + 1
+          end
+          vim.print(vim.inspect(items))
+          local snacks = require("snacks")
+          snacks.picker({
+            items = items,
+            format = function(item)
+              local ret = {}
+              ret[#ret + 1] = { ("%-" .. longest_name .. "s"):format(item.name), "SnacksPickerLabel" }
+              ret[#ret + 1] = { item.text, "SnacksPickerComment" }
+              return ret
+            end,
+            confirm = function(picker, item)
+              picker:close()
+              vim.cmd(("PossessionLoad %s"):format(item.name))
+            end,
+          })
+        end,
+        desc = "Session Picker"
+      },
+      { "<leader>gls", function() require("snacks").picker.lsp_symbols() end,           desc = "LSP Symbols" },
+      { "<leader>gws", function() require("snacks").picker.lsp_workspace_symbols() end, desc = "LSP Symbols for Workspace" },
+      { "<leader>ql",  function() require("snacks").picker.qflist() end,                desc = "Quickfix List open" },
     },
     init = function()
       local Snacks = require("snacks")
@@ -415,6 +459,7 @@ return {
           list = "SList",
         },
       })
+      vim.api.nvim_set_keymap("n", "<C-s>", ":PossessionSaveCwd<CR>", { noremap = true, silent = true })
     end
   },
   {
