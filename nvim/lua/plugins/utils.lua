@@ -132,9 +132,9 @@ return {
               local list = possession.list()
               local val = ""
               for k, _ in pairs(list) do
-                val = k
-                val:gsub("~", home)
-                if string.find(val, cur_dir) and not found then
+                val = list[k]["name"]
+                val = val:gsub("~", home)
+                if val == cur_dir then
                   found = true
                   break
                 end
@@ -142,7 +142,7 @@ return {
               if found then
                 return {
                   key = "z",
-                  desc = "Load CWD session " .. cur_dir,
+                  desc = "Load CWD session ",
                   action = ":PossessionLoad " ..
                       cur_dir:gsub(home, "~"),
                   indent = 2

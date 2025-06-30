@@ -61,7 +61,7 @@ return {
           end
           )
         }),
-        sources = {
+        sources = cmp.config.sources({
           { name = "nvim_lsp", },
           { name = "luasnip", },
           { name = "buffer", },
@@ -75,7 +75,7 @@ return {
               end
             }
           },
-        },
+        }),
       })
       cmp.setup.cmdline(":", {
         mapping = cmp.mapping.preset.cmdline(),

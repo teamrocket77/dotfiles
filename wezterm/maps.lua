@@ -39,6 +39,7 @@ local keys = {
   { key = "t",          mods = "LEADER",      action = action.CloseCurrentTab({ confirm = true }) },
   { key = "z",          mods = "LEADER",      action = action.TogglePaneZoomState },
   { key = "|",          mods = "LEADER",      action = action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+  { key = "Space",      mods = "LEADER",      action = action.RotatePanes("Clockwise") },
   {
     key = ",",
     mods = "LEADER",
