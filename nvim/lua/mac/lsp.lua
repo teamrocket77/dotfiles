@@ -43,6 +43,7 @@ vim.lsp.config("*", {
 
     local opts = { buffer = 0 }
     vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+    vim.keymap.set("n", "ga", ":lua vim.lsp.buf.code_action()<CR>", opts)
     vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
     vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
     vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
@@ -57,11 +58,38 @@ vim.lsp.config("*", {
   end,
 })
 
-vim.diagnostic.config({ underline = false })
+vim.diagnostic.config({
+  underline = false,
+  virtual_text = {
+    severity = {
+      vim.diagnostic.severity.ERROR
+    },
+    prefix = "<",
+    suffix = ">",
+    source = true,
+  },
+  -- update_in_insert = true,
+  severity_sort = true,
+  float = {
+    source = true,
+  },
+})
 
+vim.keymap.set("n", "[d", function()
+  vim.diagnostic.jump({ count = -1, float = 1 })
+end)
 
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
+vim.keymap.set("n", "]d", function()
+  vim.diagnostic.jump({ count = 1, float = 1 })
+end)
+
+vim.keymap.set("n", "<C-j>", function()
+  vim.diagnostic.jump({ severity = { vim.diagnostic.severity.ERROR, }, count = 1, float = 1 })
+end)
+
+vim.keymap.set("n", "<C-k>", function()
+  vim.diagnostic.jump({ severity = { vim.diagnostic.severity.ERROR, }, count = -1, float = 1 })
+end)
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist)
 vim.keymap.set("n", "<leader>flt", vim.diagnostic.open_float)
 vim.keymap.set("n", "<leader>buf", functions.get_lsp)

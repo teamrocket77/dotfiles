@@ -123,6 +123,16 @@ return {
             { key = "f", icon = " ", desc = "Find Files", action = function() require("snacks").picker.files() end },
             { key = "c", icon = " ", desc = "Edit NVIM Config", action = ":PossessionLoad ~/.config" },
             { key = "r", icon = " ", desc = "Edit Zsh file", action = ":e ~/.zshrc" },
+            function()
+              local home = os.getenv("HOME")
+              local config = "/.aws/config"
+              local f = io.open(home .. config, "r")
+              if f ~= nil then
+                return { key = "a", icon = "", desc = "View AWS config file", action = ":view " .. home .. config }
+              else
+                return {}
+              end
+            end,
             { key = "l", icon = "󰒲", desc = "Lazy", action = ":Lazy" },
             function()
               local home = os.getenv("HOME")
@@ -357,7 +367,13 @@ return {
     end,
   },
   {
-    "OXY2DEV/markview.nvim",
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    ft = { "markdown" },
+    build = function() vim.fn["mkdp#util#install"]() end,
+  },
+  {
+    "OXY2DEV/markview.nvim", -- in terminal markdown preview
     lazy = false,
     commit = "1edad11",
     opts = {
@@ -380,7 +396,7 @@ return {
         sections = {
           lualine_a = { "filename" },
           lualine_c = {},
-          lualine_x = { "encoding", "searchcount", "filetype" },
+          lualine_x = { "lsp_status", "filetype" },
           lualine_y = { session_name }
         },
       })
@@ -489,4 +505,27 @@ return {
       { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,            desc = "Toggle Flash Search" },
     },
   },
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    dependencies = { "MunifTanjim/nui.nvim" },
+    opts = {
+      cmdline = { enabled = true },
+      popupmenu = { enabled = true },
+      notify = { enabled = false },
+      lsp = {
+        enabled = false,
+        hover = { enabled = false },
+        override = {
+          ["cmp.entry.get_documentation"] = true
+        }
+      },
+      messages = {
+        view_search = false
+      }
+    },
+    presets = {
+      lsp_doc_border = false, -- add a border to hover docs and signature help
+    },
+  }
 }

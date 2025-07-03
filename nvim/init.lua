@@ -31,7 +31,7 @@ vim.opt.clipboard:append({ "unnamed" })
 vim.opt.hlsearch = true
 vim.g.doge_enable_mappings = 0
 vim.g.python3_host_prog = home .. "/.pyenv/versions/pynvim/bin/python"
-vim.lsp.set_log_level("off")
+-- vim.lsp.set_log_level("off")
 
 vim.opt.list = true
 
