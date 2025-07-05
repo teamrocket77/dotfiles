@@ -17,7 +17,7 @@ local config = wezterm.config_builder()
 for k, v in pairs({
   default_workspace = "init",
   audible_bell = "Disabled",
-  -- color_scheme = "AdventureTime",
+  color_scheme = "AdventureTime",
   font = wezterm.font("JetBrains Mono"),
   font_size = 16,
   scrollback_lines = 20000,
@@ -34,7 +34,7 @@ for k, v in pairs({
   window_decorations = "RESIZE",
   automatically_reload_config = true,
   window_background_opacity = 0.6,
-  macos_window_background_blur = 60,
+  macos_window_background_blur = 20,
   notification_handling = "AlwaysShow",
 }) do
   config[k] = v
