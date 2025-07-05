@@ -7,6 +7,15 @@ local have_jq = function()
     return {}
   end
 end
+local normalize_list = function(t)
+  local normalized = {}
+  for _, v in pairs(t) do
+    if v ~= nil then
+      table.insert(normalized, v)
+    end
+  end
+  return normalized
+end
 
 local has_png_paste = function()
   return {
@@ -216,6 +225,40 @@ return {
           })
         end,
         desc = "Session Picker"
+      },
+      {
+        "<leader>ghar",
+        function()
+          local snacks = require("snacks")
+          local harpoon = require("harpoon")
+          snacks.picker({
+            finder = function()
+              local file_paths = {}
+              local list = normalize_list(harpoon:list().items)
+              for i, item in ipairs(list) do
+                table.insert(file_paths, { text = item.value, file = item.value })
+              end
+              return file_paths
+            end,
+            win = {
+              input = {
+                keys = { ["dd"] = { "harpoon_delete", mode = { "n", "x" } } },
+              },
+              list = {
+                keys = { ["dd"] = { "harpoon_delete", mode = { "n", "x" } } },
+              },
+            },
+            actions = {
+              harpoon_delete = function(picker, item)
+                local to_remove = item or picker:selected()
+                harpoon:list():remove({ value = to_remove.text })
+                harpoon:list().items = normalize_list(harpoon:list().items)
+                picker:find({ refresh = true })
+              end,
+            },
+          })
+        end,
+        desc = "Get Harpoon files"
       },
       { "<leader>gls", function() require("snacks").picker.lsp_symbols() end,           desc = "LSP Symbols" },
       { "<leader>gws", function() require("snacks").picker.lsp_workspace_symbols() end, desc = "LSP Symbols for Workspace" },
@@ -513,16 +556,15 @@ return {
       cmdline = { enabled = true },
       popupmenu = { enabled = true },
       notify = { enabled = false },
+      messages = { enabled = false, },
       lsp = {
+        progress = { enabled = false },
         enabled = false,
         hover = { enabled = false },
         override = {
           ["cmp.entry.get_documentation"] = true
         }
       },
-      messages = {
-        view_search = false
-      }
     },
     presets = {
       lsp_doc_border = false, -- add a border to hover docs and signature help

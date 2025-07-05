@@ -98,12 +98,9 @@ end
 
 cmd([[match TrailingWhitespace /\s\+$/]])
 
-nvim_set_hl(0, "TrailingWhitespace", { link = "Error" })
-
 nvim_create_autocmd("InsertEnter", {
   callback = function()
     opt.listchars.trail = nil
-    nvim_set_hl(0, "TrailingWhitespace", { link = "Whitespace" })
   end,
 })
 
