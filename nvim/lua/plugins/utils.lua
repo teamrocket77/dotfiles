@@ -122,7 +122,23 @@ return {
           { section = "header" },
           { icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
           { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1, limit = 5, pane = 2 },
-          { icon = " ", title = "Projects", section = "projects", indent = 2, padding = 2, pane = 2, limit = 5 },
+          {
+            icon = " ",
+            title = "Projects",
+            section = "projects",
+            indent = 2,
+            padding = 2,
+            pane = 2,
+            limit = 5,
+            action = function(dir)
+              vim.notify(dir)
+              local home = os.getenv("HOME")
+              local cur_dir = dir:gsub(home, "~")
+              local change_dir_cmd = ("cd %s | "):format(dir)
+              local load_session_cmd = ("PossessionLoad %s"):format(cur_dir)
+              vim.cmd(change_dir_cmd .. load_session_cmd)
+            end
+          },
           { section = "startup" },
         },
         preset = {
@@ -130,8 +146,8 @@ return {
             { key = "e", icon = "", desc = "New file", action = ":ene | startinsert" },
             { key = "g", icon = " ", desc = "Find Text", action = function() require("snacks").picker.grep() end },
             { key = "f", icon = " ", desc = "Find Files", action = function() require("snacks").picker.files() end },
-            { key = "c", icon = " ", desc = "Edit NVIM Config", action = ":PossessionLoad ~/.config" },
-            { key = "r", icon = " ", desc = "Edit Zsh file", action = ":e ~/.zshrc" },
+            { key = "c", icon = " ", desc = "Edit NVIM Config", action = ":cd ~/.config | :PossessionLoad ~/.config" },
+            { key = "r", icon = " ", desc = "Edit Zsh file", action = ":cd ~/ | :e ~/.zshrc" },
             function()
               local home = os.getenv("HOME")
               local config = "/.aws/config"
@@ -158,12 +174,13 @@ return {
                   break
                 end
               end
+              local session = cur_dir:gsub(home, "~")
               if found then
                 return {
                   key = "z",
                   desc = "Load CWD session ",
-                  action = ":PossessionLoad " ..
-                      cur_dir:gsub(home, "~"),
+                  action = ":cd " .. cur_dir .. "| " .. ":PossessionLoad " ..
+                      session,
                   indent = 2
                 }
               end
@@ -220,7 +237,9 @@ return {
             end,
             confirm = function(picker, item)
               picker:close()
-              vim.cmd(("PossessionLoad %s"):format(item.name))
+              local change_dir_cmd = ("cd %s | "):format(item.name)
+              local load_session_cmd = ("PossessionLoad %s"):format(item.name)
+              vim.cmd(change_dir_cmd .. load_session_cmd)
             end,
           })
         end,
