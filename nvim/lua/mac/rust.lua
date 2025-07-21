@@ -8,3 +8,7 @@ vim.lsp.config("rust_analyzer", {
     },
   },
 })
+
+vim.lsp.config("asm_lsp", {
+  settings = {},
+})

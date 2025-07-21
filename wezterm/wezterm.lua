@@ -17,14 +17,11 @@ local config = wezterm.config_builder()
 for k, v in pairs({
   default_workspace = "init",
   audible_bell = "Disabled",
-  color_scheme = "AdventureTime",
   font = wezterm.font("JetBrains Mono"),
   font_size = 16,
   scrollback_lines = 20000,
   leader = { key = "a", mods = "CTRL", timeout_milliseconds = 2000 },
   keys = keys,
-  default_cursor_style = "BlinkingBar",
-  color_scheme = "Nord (Gogh)",
   window_padding = {
     left = 3,
     right = 3,

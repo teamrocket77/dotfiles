@@ -1,20 +1,4 @@
 return {
-  -- {
-  --   "folke/tokyonight.nvim",
-  --   config = function()
-  --     require("tokyonight").setup({
-  --       transparent = true,
-  --       styles = {
-  --         sidebars = "transparent",
-  --         floats = "transparent",
-  --       },
-  --       on_colors = function(colors)
-  --         colors.comment = "#3599AE"
-  --       end,
-  --     })
-  --     vim.cmd.colorscheme "tokyonight-night"
-  --   end,
-  -- },
   {
     "catppuccin/nvim",
     name = "catppuccin",
@@ -23,18 +7,22 @@ return {
       require("catppuccin").setup({
         transparent_background = true,
         show_end_of_buffer = true,
-        background = {
-          light = "latte",
-        },
+        -- background = {
+        --   light = "latte",
+        -- },
         dim_inactive = {
           enabled = false,
           percentage = .30
         },
         integrations = {
           gitsigns = false,
+          cmp = true,
+          treesitter = true,
+          notify = true,
           mini = {
-            enabled = false,
-          }
+            enabled = true,
+            indentscope_color = "",
+          },
         }
       })
       -- setup must be called before loading

@@ -303,6 +303,7 @@ lsp_functions.servers = {
   "cmake",
   "lua_ls",
   "dockerls",
+  "asm_lsp",
   "basedpyright",
   "ruff",
   "graphql",
