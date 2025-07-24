@@ -10,12 +10,15 @@ local home = os.getenv("HOME")
 local bar = wezterm.plugin.require("https://github.com/adriankarlen/bar.wezterm")
 local logging = wezterm.plugin.require("https://github.com/sei40kr/wez-logging")
 local domains = wezterm.plugin.require("https://github.com/DavidRR-F/quick_domains.wezterm")
+local ssh_domains = require("domains")
 
 -- This will hold the default configuration
 local config = wezterm.config_builder()
 
 for k, v in pairs({
+  -- default_prog = { "/opt/homebrew/bin/nu" },
   default_workspace = "init",
+  ssh_domains = ssh_domains,
   audible_bell = "Disabled",
   font = wezterm.font("JetBrains Mono"),
   font_size = 16,
