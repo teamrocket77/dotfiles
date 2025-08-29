@@ -306,7 +306,7 @@ lsp_functions.servers = {
   "asm_lsp",
   "basedpyright",
   "ruff",
-  "graphql",
+  -- "graphql",
   "terraformls",
   "yamlls",
   "bashls",
