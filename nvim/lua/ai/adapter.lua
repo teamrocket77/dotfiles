@@ -1,6 +1,16 @@
 -- fmt
 return {
   {
+      "OXY2DEV/markview.nvim",
+      lazy = false, priority = 49, commit = "2d68c06",
+      opts = {
+        preview = {
+          icon_provider = "devicons"
+        }
+      }
+
+  },
+  {
     -- https://github.com/olimorris/codecompanion.nvim
     "olimorris/codecompanion.nvim",
     version = "v14.9.1",
@@ -8,11 +18,10 @@ return {
       "nvim-lua/plenary.nvim",
       { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
       "j-hui/fidget.nvim",
-      "OXY2DEV/markview.nvim",
     },
     config = function()
-      local codecompanion = require("codecompanion")
-      codecompanion.setup({
+      local code_companion = require("codecompanion")
+      code_companion.setup({
         log_level = "DEBUG",
         strategies = {
           chat = { adapter = "gemini_2_5" },
@@ -52,7 +61,7 @@ return {
         },
       })
       vim.keymap.set("n", "<Leader>cc", function()
-        codecompanion.toggle()
+        code_companion.toggle()
       end, { noremap = true, silent = true })
       require("ai.custom.util"):init()
     end,
