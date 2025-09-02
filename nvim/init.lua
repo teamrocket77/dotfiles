@@ -1,16 +1,19 @@
 local home = os.getenv("HOME")
+local opts = vim.o
+
 vim.g.mapleader = " "
 
-vim.o.autoindent = true
-vim.o.ignorecase = false
-vim.o.number = true
-vim.o.relativenumber = true
-vim.o.shiftwidth = 4
-vim.o.smartindent = true
-vim.o.smarttab = true
-vim.o.softtabstop = 2
-vim.o.tabstop = 4
-vim.o.wildmenu = true
+opts.autoindent = true
+opts.ignorecase = false
+opts.number = true
+opts.relativenumber = true
+opts.shiftwidth = 4
+opts.smartindent = true
+opts.smarttab = true
+opts.softtabstop = 2
+opts.tabstop = 4
+opts.wildmenu = true
+opts.spell = false
 
 vim.cmd([[ set mouse=a ]])
 

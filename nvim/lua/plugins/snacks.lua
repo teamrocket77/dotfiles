@@ -211,7 +211,5 @@ return {
       vim.api.nvim_feedkeys(':lua require("snacks").notify(vim.inspect(x), {timeout = 0, ft="y"})', "n", false)
       -- currently cannot pass tables
     end, { desc = "Writes most of the stuff required for the vim inspect to work with snacks" })
-
-    Snacks.setup({})
   end
 }

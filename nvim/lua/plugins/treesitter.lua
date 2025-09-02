@@ -11,17 +11,6 @@ return {
     config = function()
       local treesitter = require("nvim-treesitter.configs")
       treesitter.setup({
-        ensure_installed = {
-          "bash",
-          "dockerfile",
-          "terraform",
-          "rust",
-          "markdown",
-          "yaml",
-          "c",
-          "lua",
-          "python",
-        },
         auto_install = true,
         disable = function(lang, buf)
           local kb = 1024
@@ -69,7 +58,6 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter-context",
-    version = "compat/0.7",
-    config = function() end,
+    commit = "dca8726",
   },
 }
