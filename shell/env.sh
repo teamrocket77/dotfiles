@@ -1,6 +1,9 @@
 export GIT_CONFIG_SYSTEM="$HOME/.config/gitconfig/gitconfig.toml"
 export GPG_TTY=$(tty)
 WEZTERM_CONFIG_DIR="$HOME/.config/wezterm/"
+export HISTFILE="$HOME/.zsh_history"
+export HISTSIZE=100000
+export SAVEHIST=100000
 
 if [ -f  ~/zsh/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh ]; then
 	source ~/zsh/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
