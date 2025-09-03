@@ -24,8 +24,13 @@ fi
 notify(){
 	terminal-notifier -title $1 -message $2
 }
-main-notify(){
-	notify "Python" "Python script is done"
+
+py-notify(){
+	notify "Python" $1
+}
+
+Py-notify(){
+	notify "Python" $1
 }
 get_keymaps(){
   grep -ir "<leader>" ~/.config/nvim | awk -v N=2 '{sep=""; for (i=N; i<=NF;i++) {printf("%s%s", sep, $i); sep=OFS}; printf("\n")}'
