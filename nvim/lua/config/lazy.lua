@@ -39,7 +39,7 @@ vim.opt.rtp:prepend(lazypath)
 -- end
 -- Setup ai
 local useAI = function()
-  if os.getenv('OPENAI_API_KEY') then
+  if os.getenv("OPENAI_API_KEY") then
     return { import = "ai" }
   end
 end
@@ -49,7 +49,7 @@ require("lazy").setup({
     -- import your plugins
     -- isLinux(),
     { import = "plugins" },
-    useAI(),
+    -- useAI(),
   },
   install = { colorscheme = { "" } },
   -- automatically check for plugin updates
