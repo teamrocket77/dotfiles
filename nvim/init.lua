@@ -35,14 +35,16 @@ vim.opt.clipboard:append({ "unnamed" })
 vim.opt.hlsearch = true
 vim.g.doge_enable_mappings = 0
 vim.g.python3_host_prog = home .. "/.pyenv/versions/pynvim/bin/python"
--- vim.lsp.set_log_level("off")
+-- log level setting
+vim.lsp.set_log_level("info")
 
 vim.opt.list = true
 
 -- :h option-list
 -- :h E355
 vim.o.directory = home .. "/.config/nvim/swapfiles/"
-require("mac.init")
-require("config.lazy")
+lsp_functions = require("config.functions")
+lsp_functions.require_lsp()
 require("config.functions")
+require("config.lazy")
 require("config.maps")

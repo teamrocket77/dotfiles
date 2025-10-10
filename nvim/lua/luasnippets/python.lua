@@ -1,4 +1,3 @@
-local ts_utils = require('nvim-treesitter.ts_utils')
 local ls = require("luasnip")
 local s = ls.snippet
 local d = ls.dynamic_node
@@ -47,40 +46,11 @@ local function to_init_assign(args)
   )
 end
 
-local function handle_args()
-	local function_node_types = {
-		function_definition = true
-	}
-	local parameters = {
-		parameters = true
-	}
-	local node = ts_utils.get_node_at_cursor()
-	while node ~= nil do
-		if function_node_types[node:type()] then
-			break
-		end
-		node = node:parent()
-	end
-	if not node then
-		vim.notify "We are not inside of a functions arguments cannot be used"
-	end
-	local children = ts_utils.get_named_children(node)
-	for _, child in ipairs(children) do
-		if parameters[child:type()] then
-			vim.notify('We found parameters')
-			for parameter in child:iter_children() do
-				vim.notify(vim.inspect(parameter:type()))
-				-- vim.notify(vim.inspect(ts_utils.get_node_text(parameter)))
-			end
-		end
-	end
-end
-
 local function choose_doc_string(args)
   if args[1][1] ~= "" or args[2][1] ~= "" then
-	  if args[1][1] ~= "" then
-		  handle_args()
-	  end
+    if args[1][1] ~= "" then
+      handle_args()
+    end
     return to_init_assign(args)
   end
   return isn(nil, t("pass"), "$PARENT_INDENT")

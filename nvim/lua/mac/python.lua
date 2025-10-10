@@ -1,13 +1,9 @@
--- local util = require("lspconfig.util")
 local root_files = {
   "pyproject.toml",
   "requirements.txt",
   "pyrightconfig.json",
   "uv.lock",
 }
-
-
-
 
 vim.lsp.config("basedpyright", {
   root_dir = vim.fs.root(0, root_files),

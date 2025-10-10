@@ -107,6 +107,7 @@ return {
     { "<leader>gf",      function() require("snacks").picker.grep() end,             desc = "Grep" },
     { "<leader>ff",      function() require("snacks").picker.files() end,            desc = "Find Files" },
     { "<leader>gb",      function() require("snacks").picker.grep_buffers() end,     desc = "Grep Buffers" },
+    { "<leader>gnh",     function() require("snacks").notifier.show_history() end,   desc = "Snacks Notification history" },
     { "gd",              function() require("snacks").picker.lsp_definitions() end,  desc = "LSP Definition" },
     { "gD",              function() require("snacks").picker.lsp_declarations() end, desc = "LSP Declerations" },
     {

@@ -98,3 +98,4 @@ vim.keymap.set("n", "<leader>thi", functions.toggle_hints)
 for _, server in ipairs(functions.servers) do
   vim.lsp.enable(server)
 end
+vim.lsp.enable("sourcekit")
