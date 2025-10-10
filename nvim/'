@@ -100,7 +100,7 @@ local function rm_lsp_file()
   local home = os.getenv("HOME")
   local rm_file = home .. "/.local/state/nvim/lsp.log"
   os.remove(rm_file)
-  require("snacks").notify("Removed LSP file")
+  require("Snacks").notify("Removed LSP file")
 end
 cmd([[match TrailingWhitespace /\s\+$/]])
 
@@ -120,7 +120,6 @@ nvim_create_autocmd("InsertLeave", {
 nvim_create_user_command("DiffSaved", diff_with_saved, {})
 nvim_create_user_command("DiffoffComplex", diff_off_func, {})
 nvim_create_user_command("ToggleZoom", toggle_zoom, {})
-nvim_create_user_command("RMLogFile", rm_lsp_file, {})
 nvim_create_user_command(
   "AddBuffersToArgs",
   function(opts)

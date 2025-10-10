@@ -1,7 +1,0 @@
--- lsp enabler vim.lsp.enable vim.lsp.config
--- require("mac.lsp")
--- require("mac.python")
--- require("mac.lua")
--- require("mac.rust")
--- require("mac.swift")
--- require("mac.terraform")

@@ -43,7 +43,7 @@ vim.opt.list = true
 -- :h option-list
 -- :h E355
 vim.o.directory = home .. "/.config/nvim/swapfiles/"
-lsp_functions = require("config.functions")
+lsp_functions = require("config.lsp_functions")
 lsp_functions.require_lsp()
 require("config.functions")
 require("config.lazy")

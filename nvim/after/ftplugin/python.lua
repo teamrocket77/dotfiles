@@ -60,6 +60,8 @@ end
 PyPath = getpythonpath()
 
 if PyPath then
+  -- https://codeberg.org/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation#python
+  -- untested
   -- check_package(Python_path)
   local dap = require("dap")
   dap.adapters.python = function(cb, config)

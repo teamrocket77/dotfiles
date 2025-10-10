@@ -1,3 +1,4 @@
+local lsp_functions = {}
 local getPlatform = function()
   local system = vim.uv.os_uname().sysname
   if string.lower(system) == "linux" then
