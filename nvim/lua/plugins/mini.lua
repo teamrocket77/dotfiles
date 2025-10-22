@@ -1,6 +1,13 @@
 return {
   {
+    "nvim-mini/mini.extra",
+    version = false,
+  },
+  {
     "nvim-mini/mini.files",
+    dependencies = {
+      { "nvim-mini/mini.extra", },
+    },
     commit = "49c8559",
     keys = {
       {
@@ -44,7 +51,11 @@ return {
     },
     config = function()
       local minifiles = require("mini.files")
-      minifiles.setup()
+      minifiles.setup({
+        options = {
+          permanent_delete = false
+        }
+      })
     end,
   },
   {

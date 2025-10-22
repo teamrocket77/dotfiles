@@ -46,6 +46,10 @@ vim.opt.list = true
 vim.o.directory = home .. "/.config/nvim/swapfiles/"
 lsp_functions = require("config.lsp_functions")
 lsp_functions.require_lsp()
+
+vim.api.nvim_set_hl(0, "NormalFloat", { bg = "None" })
+vim.api.nvim_set_hl(0, "FloatBorder", { bg = "None" })
+
 require("config.functions")
 require("config.lazy")
 require("config.maps")
