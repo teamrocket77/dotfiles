@@ -57,7 +57,7 @@ local get_python_path = function()
     return false
   end
 end
-PyPath = getpythonpath()
+PyPath = get_python_path()
 
 if PyPath then
   -- https://codeberg.org/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation#python

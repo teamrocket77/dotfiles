@@ -14,6 +14,7 @@ opts.softtabstop = 2
 opts.tabstop = 4
 opts.wildmenu = true
 opts.spell = false
+-- vim.opt.sessionoptions = "buffers,curdir,help,resize,tabpages,terminal, winsize,winpos"
 
 vim.cmd([[ set mouse=a ]])
 

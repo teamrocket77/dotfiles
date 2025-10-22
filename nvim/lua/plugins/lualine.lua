@@ -48,7 +48,7 @@ return {
     auto_theme_custom.visual.a.fg = colors.blue
 
     local function session_name()
-      return require("possession.session").get_session_name() or ""
+      -- return require("possession.session").get_session_name() or ""
     end
     lualine.setup({
       options = {
