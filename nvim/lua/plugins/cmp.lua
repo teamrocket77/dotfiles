@@ -3,7 +3,7 @@ return {
     "hrsh7th/nvim-cmp",
     commit = "8c82d0b",
     dependencies = {
-      { "saadparwaiz1/cmp_luasnip",            commit = "98d9cb5", build = "make install_jsregexp" },
+      { "saadparwaiz1/cmp_luasnip",            commit = "98d9cb5" },
       { "L3MON4D3/LuaSnip",                    commit = "4585605" },
       { "rafamadriz/friendly-snippets",        commit = "572f566" },
       { "hrsh7th/cmp-cmdline",                 commit = "d126061" },
@@ -61,11 +61,11 @@ return {
           end
           )
         }),
-        sources = {
+        sources = cmp.config.sources({
           { name = "nvim_lsp", },
           { name = "luasnip", },
           { name = "buffer", },
-          { name = "nvim_lsp_signature_help", },
+          -- { name = "nvim_lsp_signature_help", },
           { name = "nvim_lua", },
           {
             name = "path",
@@ -75,7 +75,7 @@ return {
               end
             }
           },
-        },
+        }),
       })
       cmp.setup.cmdline(":", {
         mapping = cmp.mapping.preset.cmdline(),

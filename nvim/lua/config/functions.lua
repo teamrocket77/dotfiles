@@ -96,14 +96,17 @@ local function diff_with_saved()
   cmd("setlocal bt=nofile bh=wipe nobl noswf ro ft=" .. filetype)
 end
 
+local function rm_lsp_file()
+  local home = os.getenv("HOME")
+  local rm_file = home .. "/.local/state/nvim/lsp.log"
+  os.remove(rm_file)
+  require("snacks").notify("Removed LSP file")
+end
 cmd([[match TrailingWhitespace /\s\+$/]])
-
-nvim_set_hl(0, "TrailingWhitespace", { link = "Error" })
 
 nvim_create_autocmd("InsertEnter", {
   callback = function()
     opt.listchars.trail = nil
-    nvim_set_hl(0, "TrailingWhitespace", { link = "Whitespace" })
   end,
 })
 
@@ -117,6 +120,7 @@ nvim_create_autocmd("InsertLeave", {
 nvim_create_user_command("DiffSaved", diff_with_saved, {})
 nvim_create_user_command("DiffoffComplex", diff_off_func, {})
 nvim_create_user_command("ToggleZoom", toggle_zoom, {})
+nvim_create_user_command("RMLogFile", rm_lsp_file, {})
 nvim_create_user_command(
   "AddBuffersToArgs",
   function(opts)
@@ -306,12 +310,15 @@ lsp_functions.servers = {
   "cmake",
   "lua_ls",
   "dockerls",
+  "asm_lsp",
   "basedpyright",
   "ruff",
-  "graphql",
+  -- "graphql",
   "terraformls",
   "yamlls",
   "bashls",
+  "clangd",
+  -- "sourcekit"
 }
 
 add_servers(lsp_functions.servers)

@@ -1,0 +1,12 @@
+[window]
+opacity = 0.75
+blur = true
+option_as_alt = "Both"
+
+[font]
+# size = 17.0 # Adjust as needed
+size = 14.0
+normal = {family = "JetBrainsMono Nerd Font"}
+
+[cursor]
+style = { shape = "Block", blinking = "Always"}

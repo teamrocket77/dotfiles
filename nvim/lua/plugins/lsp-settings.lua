@@ -4,9 +4,9 @@ return {
   { "neovim/nvim-lspconfig" },
   {
     "mason-org/mason.nvim",
-    version = "v1.11.0",
+    commit = "ad7146a", --v2.1.0
     dependencies = {
-      { "mason-org/mason-lspconfig.nvim", version = "v1.32.0" },
+      { "mason-org/mason-lspconfig.nvim", commit = "f2fa604" },
       { "neovim/nvim-lspconfig" },
       { "hrsh7th/cmp-nvim-lsp" },
       { "wesleimp/stylua.nvim" },
@@ -25,7 +25,8 @@ return {
       mason.setup()
       mason_lsp.setup({
         automatic_installation = true,
-        ensure_installed = functions.servers
+        ensure_installed = functions.servers,
+        automatic_enable = false
       })
     end,
   },

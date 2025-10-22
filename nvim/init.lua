@@ -1,15 +1,20 @@
 local home = os.getenv("HOME")
+local opts = vim.o
+
 vim.g.mapleader = " "
-vim.o.number = true
-vim.o.relativenumber = true
-vim.o.shiftwidth = 4
-vim.o.softtabstop = 2
-vim.o.tabstop = 4
-vim.o.ignorecase = true
-vim.o.wildmenu = true
-vim.o.smarttab = true
-vim.o.autoindent = true
-vim.o.smartindent = true
+
+opts.autoindent = true
+opts.ignorecase = false
+opts.number = true
+opts.relativenumber = true
+opts.shiftwidth = 4
+opts.smartindent = true
+opts.smarttab = true
+opts.softtabstop = 2
+opts.tabstop = 4
+opts.wildmenu = true
+opts.spell = false
+-- vim.opt.sessionoptions = "buffers,curdir,help,resize,tabpages,terminal, winsize,winpos"
 
 vim.cmd([[ set mouse=a ]])
 
@@ -31,14 +36,20 @@ vim.opt.clipboard:append({ "unnamed" })
 vim.opt.hlsearch = true
 vim.g.doge_enable_mappings = 0
 vim.g.python3_host_prog = home .. "/.pyenv/versions/pynvim/bin/python"
-vim.lsp.set_log_level("off")
+-- log level setting
+vim.lsp.set_log_level("info")
 
 vim.opt.list = true
 
 -- :h option-list
 -- :h E355
 vim.o.directory = home .. "/.config/nvim/swapfiles/"
-require("mac.init")
-require("config.lazy")
+lsp_functions = require("config.lsp_functions")
+lsp_functions.require_lsp()
+
+vim.api.nvim_set_hl(0, "NormalFloat", { bg = "None" })
+vim.api.nvim_set_hl(0, "FloatBorder", { bg = "None" })
+
 require("config.functions")
+require("config.lazy")
 require("config.maps")

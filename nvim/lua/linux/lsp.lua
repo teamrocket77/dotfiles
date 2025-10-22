@@ -127,7 +127,6 @@ return {
 
       local linters = {
         "pylint",
-        "asm-lsp",
         "yamllint",
       }
       local servers = {
