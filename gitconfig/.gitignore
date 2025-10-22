@@ -1,0 +1,3 @@
+!.envrc.tmpl
+.envrc*
+*.vim_session

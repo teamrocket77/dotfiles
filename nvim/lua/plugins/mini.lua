@@ -133,10 +133,10 @@ return {
       end
 
       require("mini.sessions").setup({
-        file = vim.fn.fnamemodify(vim.fn.getcwd() .. ".vim", ":t"),
+        file = vim.fn.fnamemodify(vim.fn.getcwd() .. ".vim_session", ":t"),
       })
       local LoadCustomSession = function()
-        local cwd = vim.fn.fnamemodify(vim.fn.getcwd() .. ".vim", ":t")
+        local cwd = vim.fn.fnamemodify(vim.fn.getcwd() .. ".vim_session", ":t")
         require("mini.sessions").read(cwd)
         vim.print("Loaded Session :" .. cwd)
       end
@@ -146,7 +146,7 @@ return {
       {
         "<leader>mis",
         function()
-          local cwd = vim.fn.fnamemodify(vim.fn.getcwd() .. ".vim", ":t")
+          local cwd = vim.fn.fnamemodify(vim.fn.getcwd() .. ".vim_session", ":t")
           require("mini.sessions").write(cwd)
         end,
         mode = "n",
