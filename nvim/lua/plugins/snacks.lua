@@ -24,17 +24,7 @@ return {
         { section = "header" },
         { icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
         { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1, limit = 5, pane = 2 },
-        function()
-          return {
-            icon = " ",
-            title = "Session ",
-            key = "s",
-            desc = "Restore Session",
-            action = function()
-              vim.cmd("LoadCustomSession")
-            end
-          }
-        end,
+        { icon = " ", desc = "Restore Session", section = "session", key = "s", },
         { section = "startup" },
       },
       preset = {

@@ -11,7 +11,7 @@ return {
     commit = "49c8559",
     keys = {
       {
-        "<leader>mif",
+        "<leader>mit",
         function()
           local mini = require("mini.files")
           if not mini.close() then
@@ -22,7 +22,7 @@ return {
         desc = "Mini Files Toggle"
       },
       {
-        "<leader>mit",
+        "<leader>mif",
         function()
           local mini = require("mini.files")
           if not mini.close() then
@@ -118,36 +118,13 @@ return {
   {
     "nvim-mini/mini.sessions",
     config = function()
-      local lru_session_path = vim.fn.expand("data") .. "/session/most_recent_session.txt"
-
-      local session_file_exists = function()
-        local file = io.open(lru_session_path, "r+")
-        -- file isn't there and we can't make it
-        if file == nil then
-          file = io.open(lru_session_path, "w")
-          if file == nil then
-            error("Unable to make LRU Session file")
-          end
-        end
-        return file
-      end
-
-      require("mini.sessions").setup({
-        file = vim.fn.fnamemodify(vim.fn.getcwd() .. ".vim_session", ":t"),
-      })
-      local LoadCustomSession = function()
-        local cwd = vim.fn.fnamemodify(vim.fn.getcwd() .. ".vim_session", ":t")
-        require("mini.sessions").read(cwd)
-        vim.print("Loaded Session :" .. cwd)
-      end
-      vim.api.nvim_create_user_command("LoadCustomSession", LoadCustomSession, {})
+      require("mini.sessions").setup()
     end,
     keys = {
       {
         "<leader>mis",
         function()
-          local cwd = vim.fn.fnamemodify(vim.fn.getcwd() .. ".vim_session", ":t")
-          require("mini.sessions").write(cwd)
+          vim.cmd("mksession")
         end,
         mode = "n",
         desc = "Save Session"
@@ -159,14 +136,6 @@ return {
         end,
         mode = "n",
         desc = "LRU Session Change Dir"
-      },
-      {
-        "<leader>mir",
-        function()
-          vim.cmd("LoadCustomSession")
-        end,
-        mode = "n",
-        desc = "Load Session"
       },
     },
   },
