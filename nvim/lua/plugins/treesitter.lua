@@ -10,6 +10,7 @@ return {
       local treesitter = require("nvim-treesitter")
       local ignore_languages = {}
       treesitter.setup({
+        ensure_installed = { "markdown", "markdown_line" },
         auto_install = true,
         highlight = {
           enable = true,

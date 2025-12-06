@@ -1,7 +1,11 @@
 local has_png_paste = function()
   return {
     "epwalsh/obsidian.nvim",
-    dependencies = "nvim-lua/plenary.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "hrsh7th/nvim-cmp",
+    },
+
     version = "v3.9.0",
     config = function()
       local home = os.getenv("HOME") .. "/vaults/"
