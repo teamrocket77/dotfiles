@@ -118,13 +118,15 @@ return {
   {
     "nvim-mini/mini.sessions",
     config = function()
-      require("mini.sessions").setup()
+      local lru_session_path = vim.fn.expand("data") .. "/session/most_recent_session.txt"
+
+      require("mini.sessions").setup({})
     end,
     keys = {
       {
         "<leader>mis",
         function()
-          vim.cmd("mksession")
+          require("mini.sessions").write("Session.vim")
         end,
         mode = "n",
         desc = "Save Session"
@@ -136,6 +138,14 @@ return {
         end,
         mode = "n",
         desc = "LRU Session Change Dir"
+      },
+      {
+        "<leader>mir",
+        function()
+          require("mini.sessions").read("Session.vim")
+        end,
+        mode = "n",
+        desc = "Load Session"
       },
     },
   },
