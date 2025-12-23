@@ -7,6 +7,7 @@ local nvim_create_user_command = vim.api.nvim_create_user_command
 local nvim_create_autocmd = vim.api.nvim_create_autocmd
 
 local gpgGroup = vim.api.nvim_create_augroup("customGpg", { clear = true })
+local l_functions = require("config.lsp_functions")
 
 opt.listchars:append({
   tab = "│─",
@@ -186,52 +187,6 @@ vim.api.nvim_command("autocmd FileType qf nnoremap <buffer> dd :RemoveQFItem<cr>
 -- Return an empty table to satisfy plugin loader requirements
 local lsp_functions = {}
 
-lsp_functions.formatting_options = {
-  python = "ruff"
-}
-
----@param ev table
----@param settings table
-lsp_functions.conditional_formatting = function(ev, settings)
-  local ft           = vim.bo.filetype
-  local final_client = nil
-  local clients      = vim.lsp.get_clients({ bufnr = 0, method = "textDocument/formatting" })
-  if lsp_functions.formatting_options[ft] ~= nil then
-    for _, client_v in pairs(clients) do
-      if client_v.name == lsp_functions.formatting_options[ft] then
-        final_client = client_v
-      end
-    end
-  else
-    -- take any server that supports formatting if it's not defined
-    local final_client = clients[1].name
-  end
-  if final_client == nil then
-    return
-  end
-
-  local cursor_position = vim.api.nvim_win_get_cursor(0)
-  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, true)
-  local line_cutoff = 5
-  settings = vim.tbl_deep_extend("force", settings, {
-    filter = function(client)
-      return client.name == lsp_functions.formatting_options[ft]
-    end,
-    id = final_client.id
-  })
-  if #lines <= line_cutoff then
-    line_cutoff = #lines
-  end
-  for _, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, line_cutoff, true)) do
-    if string.find(line, "fmt") then
-      vim.lsp.buf.format(settings)
-      return
-    end
-  end
-  vim.api.nvim_win_set_cursor(0, cursor_position)
-end
-
-
 lsp_functions.inlay_hint_servers = {
   lua_ls = true,
   basedpyright = true,
@@ -279,10 +234,16 @@ local have_go_ls_installed = function(t)
 end
 
 ---@param t table
+local have_jenkins_installed = function(t)
+  table.insert(t, "lemminx")
+end
+
+---@param t table
 local add_servers = function(t)
   have_ruby(t)
   have_ghcup_ls_installed(t)
   have_go_ls_installed(t)
+  have_jenkins_installed(t)
 end
 
 ---@return boolean

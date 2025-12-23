@@ -1,4 +1,3 @@
--- fmt
 return {
   {
     "junegunn/fzf",

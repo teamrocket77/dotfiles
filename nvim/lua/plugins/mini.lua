@@ -6,7 +6,7 @@ return {
   {
     "nvim-mini/mini.files",
     dependencies = {
-      { "nvim-mini/mini.extra", },
+      { "nvim-mini/mini.extra" },
     },
     commit = "49c8559",
     keys = {
@@ -19,7 +19,7 @@ return {
           end
         end,
         mode = "n",
-        desc = "Mini Files Toggle"
+        desc = "Mini Files Toggle",
       },
       {
         "<leader>mif",
@@ -30,7 +30,7 @@ return {
           end
         end,
         mode = "n",
-        desc = "Mini Files Toggle"
+        desc = "Mini Files Toggle",
       },
       {
         "<leader>mic",
@@ -46,15 +46,15 @@ return {
           end
         end,
         mode = "n",
-        desc = "Mini Files Toggle CWD"
-      }
+        desc = "Mini Files Toggle CWD",
+      },
     },
     config = function()
       local minifiles = require("mini.files")
       minifiles.setup({
         options = {
-          permanent_delete = false
-        }
+          permanent_delete = false,
+        },
       })
     end,
   },
@@ -77,8 +77,8 @@ return {
       local picker = require("mini.pick")
       picker.setup({
         window = {
-          config = win_config
-        }
+          config = win_config,
+        },
       })
 
       local split_by_lines = function(text)
@@ -100,20 +100,12 @@ return {
               vim.cmd("cd " .. chosen_dir)
               vim.print("Changed dir to " .. chosen_dir)
               return false
-            end
-          }
+            end,
+          },
         })
       end
       vim.api.nvim_create_user_command("SessionPicker", SessionPicker, {})
     end,
-  },
-  {
-    -- https://github.com/nvim-mini/mini.ai
-    "nvim-mini/mini.ai",
-    commit = "e139eb1",
-    config = function()
-      require("mini.ai").setup()
-    end
   },
   {
     "nvim-mini/mini.sessions",
@@ -129,7 +121,7 @@ return {
           require("mini.sessions").write("Session.vim")
         end,
         mode = "n",
-        desc = "Save Session"
+        desc = "Save Session",
       },
       {
         "<leader>mil",
@@ -137,7 +129,7 @@ return {
           vim.cmd("SessionPicker")
         end,
         mode = "n",
-        desc = "LRU Session Change Dir"
+        desc = "LRU Session Change Dir",
       },
       {
         "<leader>mir",
@@ -145,7 +137,7 @@ return {
           require("mini.sessions").read("Session.vim")
         end,
         mode = "n",
-        desc = "Load Session"
+        desc = "Load Session",
       },
     },
   },
