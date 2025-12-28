@@ -18,4 +18,25 @@ lsp_functions.require_lsp = function()
     require(platform_name .. "." .. module_name)
   end
 end
+
+
+lsp_functions.check_jenkins = function()
+  local value = os.getenv("INSTALL_JENKINS_NVIM")
+  if value ~= "" then
+    return true
+  else
+    return false
+  end
+end
+
+lsp_functions.is_jenkins_plugin_installed = function()
+  local success, _ = pcall(require, "jenkinsfile_linter")
+  if success then
+    return true
+  else
+    return false
+  end
+end
+vim.api.nvim_create_user_command("JenkinsLinterInstalled", lsp_functions.is_jenkins_plugin_installed, {})
+
 return lsp_functions

@@ -10,6 +10,7 @@ return {
       local treesitter = require("nvim-treesitter")
       local ignore_languages = {}
       treesitter.setup({
+        ensure_installed = { "markdown", "markdown_line" },
         auto_install = true,
         highlight = {
           enable = true,
@@ -41,7 +42,11 @@ return {
   {
     "nvim-treesitter/nvim-treesitter-context",
     commit = "ed1cf48d5af252248c55f50b9427e8ce883a2c6b",
-    config = function() end,
+    config = function()
+      require("treesitter-context").setup({
+        multiline_threshold = 5
+      })
+    end,
   },
   {
     "nvim-treesitter/nvim-treesitter-textobjects",

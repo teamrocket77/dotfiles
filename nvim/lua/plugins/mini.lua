@@ -6,12 +6,12 @@ return {
   {
     "nvim-mini/mini.files",
     dependencies = {
-      { "nvim-mini/mini.extra", },
+      { "nvim-mini/mini.extra" },
     },
     commit = "49c8559",
     keys = {
       {
-        "<leader>mif",
+        "<leader>mit",
         function()
           local mini = require("mini.files")
           if not mini.close() then
@@ -19,10 +19,10 @@ return {
           end
         end,
         mode = "n",
-        desc = "Mini Files Toggle"
+        desc = "Mini Files Toggle",
       },
       {
-        "<leader>mit",
+        "<leader>mif",
         function()
           local mini = require("mini.files")
           if not mini.close() then
@@ -30,7 +30,7 @@ return {
           end
         end,
         mode = "n",
-        desc = "Mini Files Toggle"
+        desc = "Mini Files Toggle",
       },
       {
         "<leader>mic",
@@ -46,15 +46,15 @@ return {
           end
         end,
         mode = "n",
-        desc = "Mini Files Toggle CWD"
-      }
+        desc = "Mini Files Toggle CWD",
+      },
     },
     config = function()
       local minifiles = require("mini.files")
       minifiles.setup({
         options = {
-          permanent_delete = false
-        }
+          permanent_delete = false,
+        },
       })
     end,
   },
@@ -77,8 +77,8 @@ return {
       local picker = require("mini.pick")
       picker.setup({
         window = {
-          config = win_config
-        }
+          config = win_config,
+        },
       })
 
       local split_by_lines = function(text)
@@ -100,57 +100,28 @@ return {
               vim.cmd("cd " .. chosen_dir)
               vim.print("Changed dir to " .. chosen_dir)
               return false
-            end
-          }
+            end,
+          },
         })
       end
       vim.api.nvim_create_user_command("SessionPicker", SessionPicker, {})
     end,
   },
   {
-    -- https://github.com/nvim-mini/mini.ai
-    "nvim-mini/mini.ai",
-    commit = "e139eb1",
-    config = function()
-      require("mini.ai").setup()
-    end
-  },
-  {
     "nvim-mini/mini.sessions",
     config = function()
       local lru_session_path = vim.fn.expand("data") .. "/session/most_recent_session.txt"
 
-      local session_file_exists = function()
-        local file = io.open(lru_session_path, "r+")
-        -- file isn't there and we can't make it
-        if file == nil then
-          file = io.open(lru_session_path, "w")
-          if file == nil then
-            error("Unable to make LRU Session file")
-          end
-        end
-        return file
-      end
-
-      require("mini.sessions").setup({
-        file = vim.fn.fnamemodify(vim.fn.getcwd() .. ".vim", ":t"),
-      })
-      local LoadCustomSession = function()
-        local cwd = vim.fn.fnamemodify(vim.fn.getcwd() .. ".vim", ":t")
-        require("mini.sessions").read(cwd)
-        vim.print("Loaded Session :" .. cwd)
-      end
-      vim.api.nvim_create_user_command("LoadCustomSession", LoadCustomSession, {})
+      require("mini.sessions").setup({})
     end,
     keys = {
       {
         "<leader>mis",
         function()
-          local cwd = vim.fn.fnamemodify(vim.fn.getcwd() .. ".vim", ":t")
-          require("mini.sessions").write(cwd)
+          require("mini.sessions").write("Session.vim")
         end,
         mode = "n",
-        desc = "Save Session"
+        desc = "Save Session",
       },
       {
         "<leader>mil",
@@ -158,15 +129,15 @@ return {
           vim.cmd("SessionPicker")
         end,
         mode = "n",
-        desc = "LRU Session Change Dir"
+        desc = "LRU Session Change Dir",
       },
       {
         "<leader>mir",
         function()
-          vim.cmd("LoadCustomSession")
+          require("mini.sessions").read("Session.vim")
         end,
         mode = "n",
-        desc = "Load Session"
+        desc = "Load Session",
       },
     },
   },

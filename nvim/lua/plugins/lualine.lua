@@ -47,18 +47,49 @@ return {
     auto_theme_custom.terminal.a.fg = colors.blue
     auto_theme_custom.visual.a.fg = colors.blue
 
+    -- this is continuously called
+    -- TODO: fix me
     local function session_name()
-      -- return require("possession.session").get_session_name() or ""
+      local cwd = vim.fn.getcwd()
+      local handler = io.popen("ls -a " .. cwd)
+      local result = handler:read("*a")
+      if result == nil then
+        return [[Error]]
+      end
+      local result_table = {}
+      for line in result:gmatch("([^\n]*)") do
+        table.insert(result_table, line)
+      end
+      local filename_to_match = "Session.vim"
+      local found_session = false
+      vim.print(result)
+      vim.print(result_table)
+      for _, file in ipairs(result_table) do
+        if file == filename_to_match then
+          found_session = true
+          break
+        end
+      end
+      vim.print(found_session)
+      if found_session then
+        return [[Session Valid]]
+      end
+      return [[Session invalid]]
     end
+    vim.api.nvim_create_user_command("CheckForSession", session_name, {})
     lualine.setup({
       options = {
         theme = auto_theme_custom
       },
       sections = {
-        lualine_a = { "filename" },
+        lualine_a = {
+          { "filename",  path = 1 },
+          { "fileformat" },
+        },
         lualine_c = {},
         lualine_x = { "lsp_status", "filetype" },
-        lualine_y = { session_name }
+        lualine_z = {
+        }
       },
     })
   end

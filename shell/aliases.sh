@@ -16,7 +16,9 @@ if [ $+command[terraform] ]; then
 	alias tf="terraform"
 	alias tfp="tf plan"
 	alias tfa="tf apply"
+	alias tfc="tf validate && tf plan"
 	alias tfv='terraform validate'
+	alias tfo='terraform plan -out=tfplan'
 	tfaa(){
 		terraform $1 --auto-approve
 	}
