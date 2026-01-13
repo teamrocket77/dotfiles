@@ -78,7 +78,7 @@ local function add_matching_buffers_to_args(pattern)
     vim.cmd("args add " .. table.concat(buflist, " "))
     vim.api.nvim_command("buffer " .. current_bufnr) -- Switch back to the original buffer
   else
-    vim.notify("No buffers matched the pattern.")    -- Requires a notification plugin
+    vim.notify("No buffers matched the pattern.") -- Requires a notification plugin
     -- Or use: vim.cmd("echo 'No buffers matched the pattern.'")
   end
 end
@@ -122,15 +122,10 @@ nvim_create_user_command("DiffSaved", diff_with_saved, {})
 nvim_create_user_command("DiffoffComplex", diff_off_func, {})
 nvim_create_user_command("ToggleZoom", toggle_zoom, {})
 nvim_create_user_command("RMLogFile", rm_lsp_file, {})
-nvim_create_user_command(
-  "AddBuffersToArgs",
-  function(opts)
-    add_matching_buffers_to_args(opts.args)
-  end,
-  { nargs = 1, desc = "Add buffers matching a regex pattern to the args list" }
-)
+nvim_create_user_command("AddBuffersToArgs", function(opts)
+  add_matching_buffers_to_args(opts.args)
+end, { nargs = 1, desc = "Add buffers matching a regex pattern to the args list" })
 nvim_create_user_command("RemoveQFItem", remove_qf_item, {})
-
 
 vim.api.nvim_create_autocmd({ "BufReadPre", "FileReadPre" }, {
   pattern = "*.gpg",
@@ -144,7 +139,7 @@ vim.api.nvim_create_autocmd({ "BufReadPre", "FileReadPre" }, {
     vim.opt_local.bin = true
     -- Save the current 'ch' value to a buffer-local variable
     vim.b.ch_save = vim.opt_local.ch:get()
-    vim.cmd "set ch=2"
+    vim.cmd("set ch=2")
   end,
 })
 
@@ -152,13 +147,13 @@ nvim_create_autocmd({ "BufReadPost", "FileReadPost" }, {
   pattern = "*.gpg",
   group = gpgGroup,
   callback = function()
-    vim.cmd "'[,']!gpg -d 2> /dev/null"
+    vim.cmd("'[,']!gpg -d 2> /dev/null")
     -- Switch to normal mode for editing
     vim.opt_local.bin = false
     -- Restore the 'ch' value from the buffer-local variable
     vim.opt_local.ch = vim.b.ch_save
-    vim.cmd "unlet b:ch_save"
-    vim.cmd(":doautocmd BufReadPost " .. vim.fn.expand "%:r")
+    vim.cmd("unlet b:ch_save")
+    vim.cmd(":doautocmd BufReadPost " .. vim.fn.expand("%:r"))
   end,
 })
 
@@ -192,11 +187,10 @@ lsp_functions.inlay_hint_servers = {
   basedpyright = true,
 }
 
-
 lsp_functions.get_lsp = function()
-  local clients     = vim.lsp.get_clients({ bufnr = 0 })
+  local clients = vim.lsp.get_clients({ bufnr = 0 })
   local client_info = vim.inspect(clients)
-  local lines       = vim.split(client_info, "\n")
+  local lines = vim.split(client_info, "\n")
 
   vim.cmd("new")
   vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
@@ -206,7 +200,6 @@ lsp_functions.get_lsp = function()
   vim.bo.readonly = true
   vim.api.nvim_win_set_cursor(0, { 1, 0 })
 end
-
 
 lsp_functions.toggle_hints = function()
   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(), { 0 })
@@ -279,6 +272,7 @@ lsp_functions.servers = {
   "yamlls",
   "bashls",
   "clangd",
+  "ts_ls",
   -- "sourcekit"
 }
 
