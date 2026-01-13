@@ -56,5 +56,11 @@ vim.api.nvim_set_hl(0, "FloatBorder", { bg = "None" })
 vim.filetype.add({
   extenstion = {
     sh = { "envrc", "zsh" },
-  }
+  },
 })
+vim.filetype.add({
+  extension = {
+    scpt = "javascript",
+  },
+})
+vim.treesitter.language.register("javascript", "applescript")
