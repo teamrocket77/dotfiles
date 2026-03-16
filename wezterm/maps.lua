@@ -1,45 +1,42 @@
--- fmt
 local wezterm = require("wezterm") --[[@as Wezterm]]
 local action = wezterm.action
 local resurrect = wezterm.plugin.require("https://github.com/MLFlexer/resurrect.wezterm")
 local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
-require("resurrect-events")
+local bar = wezterm.plugin.require("https://github.com/adriankarlen/bar.wezterm")
+
+workspace_switcher.zoxide_path = "opt/homebrew/bin/zoxide"
+
 
 local keys = {
-  {
-    key = "!",
-    mods = "LEADER|SHIFT",
-    action = wezterm.action_callback(function(win, pane)
-      pane:move_to_new_tab()
-    end),
-  },
-  -- Make Option-Right equivalent to Alt-f; forward-word
-  { key = "-",          mods = "LEADER",      action = action.SplitVertical({ domain = "CurrentPaneDomain" }) },
-  { key = "DownArrow",  mods = "LEADER",      action = action.ActivatePaneDirection("Down") },
   { key = "LeftArrow",  mods = "CMD|SHIFT",   action = action.ActivateTabRelative(-1) },
-  { key = "LeftArrow",  mods = "LEADER",      action = action.ActivatePaneDirection("Left") },
-  { key = "LeftArrow",  mods = "OPT",         action = action({ SendString = "\x1bb" }) },
   { key = "RightArrow", mods = "CMD|SHIFT",   action = action.ActivateTabRelative(1) },
-  { key = "RightArrow", mods = "LEADER",      action = action.ActivatePaneDirection("Right") },
-  { key = "RightArrow", mods = "OPT",         action = action({ SendString = "\x1bf" }) },
-  { key = "UpArrow",    mods = "LEADER",      action = action.ActivatePaneDirection("Up") },
+
   { key = "[",          mods = "LEADER",      action = action.ActivateCopyMode },
-  { key = "[",          mods = "LEADER|CTRL", action = action.SwitchWorkspaceRelative(-1) },
-  { key = "]",          mods = "LEADER|CTRL", action = action.SwitchWorkspaceRelative(1) },
+  { key = ']',          mods = 'LEADER',      action = wezterm.action.PasteFrom 'Clipboard' },
+
   { key = "c",          mods = "LEADER",      action = action.SpawnTab("CurrentPaneDomain") },
   { key = "e",          mods = "LEADER",      action = action.EmitEvent("trigger-vim-with-scrollback") },
+
   { key = "h",          mods = "LEADER",      action = action.ActivatePaneDirection("Left") },
   { key = "j",          mods = "LEADER",      action = action.ActivatePaneDirection("Down") },
   { key = "k",          mods = "LEADER",      action = action.ActivatePaneDirection("Up") },
   { key = "l",          mods = "LEADER",      action = action.ActivatePaneDirection("Right") },
+
   { key = "l",          mods = "LEADER|CTRL", action = action.ShowLauncher },
+
   { key = "n",          mods = "LEADER",      action = action.ActivateTabRelative(1) },
-  { key = "p",          mods = "CMD",         action = action.CloseCurrentPane({ confirm = true }) },
   { key = "p",          mods = "LEADER",      action = action.ActivateTabRelative(-1) },
+
+  { key = "p",          mods = "CMD",         action = action.CloseCurrentPane({ confirm = true }) },
   { key = "t",          mods = "LEADER",      action = action.CloseCurrentTab({ confirm = true }) },
   { key = "z",          mods = "LEADER",      action = action.TogglePaneZoomState },
+
+  { key = "-",          mods = "LEADER",      action = action.SplitVertical({ domain = "CurrentPaneDomain" }) },
   { key = "|",          mods = "LEADER",      action = action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+
   { key = "Space",      mods = "LEADER",      action = action.RotatePanes("Clockwise") },
+  { key = "j",          mods = "CTRL",        action = wezterm.action.ScrollByPage(-.5) },
+  { key = "k",          mods = "CTRL",        action = wezterm.action.ScrollByPage(.5) },
   {
     key = ",",
     mods = "LEADER",
@@ -120,4 +117,31 @@ local keys = {
     end),
   },
 }
-return keys
+
+M = {}
+M.keys = keys
+M.apply = function(config)
+  -- application of switcher to config env
+  workspace_switcher.apply_to_config(config)
+
+  -- bar config
+  bar.apply_to_config(config, {
+    separator = {
+      left_icon = "|",
+      right_icon = "|",
+    },
+    modules = {
+      tabs = {
+        active_tab_fg = 2,
+        inactive_tab_fg = 4,
+      },
+      pane = { enabled = false },
+      cwd = { icon = "" },
+      username = { enabled = false },
+      clock = { enabled = false },
+      hostname = { enabled = false },
+    },
+  })
+end
+
+return M

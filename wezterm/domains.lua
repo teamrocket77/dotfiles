@@ -1,8 +1,8 @@
 local ssh_domains = {
   {
-    name = "vulpix",
-    remote_address = "192.168.0.246",
-    username = "vulpix",
+    name = "drif",
+    remote_address = "192.168.0.194",
+    username = "drif",
   }
 }
 

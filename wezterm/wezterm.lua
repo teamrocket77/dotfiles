@@ -3,39 +3,52 @@
 -- https://github.com/michaelbrusegard/awesome-wezterm?tab=readme-ov-file#neovim
 -- https://github.com/sei40kr/wez-logging
 local wezterm = require("wezterm") --[[@as Wezterm]]
-local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
-local keys = require("maps")
+local io = require("io")
+local act = wezterm.action
+local maps = require("maps")
 
 local home = os.getenv("HOME")
 local bar = wezterm.plugin.require("https://github.com/adriankarlen/bar.wezterm")
-local logging = wezterm.plugin.require("https://github.com/sei40kr/wez-logging")
-local domains = wezterm.plugin.require("https://github.com/DavidRR-F/quick_domains.wezterm")
-local ssh_domains = require("domains")
+-- local logging = wezterm.plugin.require("https://github.com/sei40kr/wez-logging")
 
 -- This will hold the default configuration
 local config = wezterm.config_builder()
+require("custom-events")
+
+local color_schemes = {
+  "Apple Classic",
+  "AlienBlood"
+}
 
 for k, v in pairs({
   -- default_prog = { "/opt/homebrew/bin/nu" },
   default_workspace = "init",
-  ssh_domains = ssh_domains,
+  ssh_domains = {
+    {
+      name = "drif",
+      remote_address = "192.168.0.194",
+      username = "drif",
+      -- multiplexing = "Ssh",
+    }
+  },
   audible_bell = "Disabled",
-  font = wezterm.font("JetBrains Mono"),
+  -- font = wezterm.font("JetBrains Mono"),
   font_size = 16,
   scrollback_lines = 20000,
   leader = { key = "a", mods = "CTRL", timeout_milliseconds = 2000 },
-  keys = keys,
+  keys = maps.keys,
   window_padding = {
     left = 3,
     right = 3,
-    top = 0,
+    top = 20,
     bottom = 0,
   },
   window_decorations = "RESIZE",
   automatically_reload_config = true,
-  window_background_opacity = 0.6,
-  macos_window_background_blur = 20,
+  window_background_opacity = .7,
+  macos_window_background_blur = 40,
   notification_handling = "AlwaysShow",
+  color_scheme = "Grey-green",
 }) do
   config[k] = v
 end
@@ -48,15 +61,7 @@ for i = 1, 9 do
   })
 end
 
-bar.apply_to_config(config, {
-  modules = {
-    tabs = {
-      active_tab_fg = 2,
-      inactive_tab_fg = 4,
-    },
-    pane = { enabled = false },
-    cwd = { enabled = false },
-    username = { enabled = false },
-  },
-})
+maps.apply(config)
+wezterm.plugin.list()
+
 return config
