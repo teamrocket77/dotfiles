@@ -8,6 +8,7 @@ if [ $+command[docker] ]; then
 	alias dcb='docker compose down && docker compose build'
 	alias dcu='docker compose up'
 fi
+
 if [ $+command[gls] ]; then
 	alias lsh='gls --ignore="*zip"'
 fi
@@ -22,4 +23,11 @@ if [ $+command[terraform] ]; then
 	tfaa(){
 		terraform $1 --auto-approve
 	}
+fi
+
+if [ "$USER" = "corvi" ]; then
+	alias tailscale="/Users/corvi/go/bin/Tailscale"
+	alias sshVulpix="ssh vulpix@192.168.0.246 -p 17070"
+	alias sshv="ssh vulpix@192.168.0.246"
+	alias sshDrif="ssh drif@192.168.0.194"
 fi
