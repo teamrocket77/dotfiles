@@ -43,17 +43,7 @@ load_plugin() {
 
 load_plugin "zsh-autosuggestions" "https://github.com/zsh-users/zsh-autosuggestions.git" "zsh-autosuggestions.plugin.zsh"
 load_plugin "zsh-syntax-highlighting" "https://github.com/zsh-users/zsh-syntax-highlighting.git" "zsh-syntax-highlighting.zsh"
-
-# 6. Themes and Integration
-if [[ ! -f ~/.p10k.zsh ]]; then
-	if [[ -d "$HOME/.config/" && -f "$HOME/.config/.p10k.zsh" ]]; then
-		source ~/.config/.p10k.zsh
-	else
-		echo "Unable to find P10 shell script"
-	fi
-else
-	source ~/.p10k.zsh
-fi
+load_plugin "powerlevel10k" "https://github.com/romkatv/powerlevel10k.git" "powerlevel10k.zsh-theme"
 
 if (( $+commands[direnv] )); then
     eval "$(direnv hook zsh)"
