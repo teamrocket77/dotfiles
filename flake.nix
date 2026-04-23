@@ -95,29 +95,6 @@
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
       environment.systemPackages = with pkgs; [ 
-	  ((vim-full.override {}).customize {
-		name = "vim";
-		vimrcConfig.packages.myplugins = with vimPlugins; {
-			start = [ 
-				vim-nix 
-				vim-lastplace
-				ale
-				coc-go
-				coc-sh
-				coc-yaml
- 			];
-			opt = [];
-		};
-		vimrcConfig.customRC = ''
-			set nocompatible
-			syntax on
-			set nu rnu hlsearch belloff=all
-			set mouse=a
-			autocmd FileType yaml setlocal expandtab tabstop=2 shiftwidth=2 softtabstop autoindent
-                        autocmd FileType yaml setlocal indentkeys-=0#
-                        filetype plugin indent on
-		'';
-           })
 	wezterm.packages.${pkgs.system}.default
     neovim.legacyPackages.${pkgs.system}.neovim
 	gnupg
@@ -129,6 +106,7 @@
 	zoxide
 	nixfmt
 	utm
+	nodejs_24
         ];
 
       # Necessary for using flakes on this system.
@@ -249,6 +227,8 @@
 	configuration
 	brew
 	home-config
+	./nix/vim.nix
+	./nix/mac.nix
 
 	nix-homebrew.darwinModules.nix-homebrew
 	home-manager.darwinModules.home-manager
