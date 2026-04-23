@@ -2,7 +2,6 @@ local wezterm = require("wezterm") --[[@as Wezterm]]
 local action = wezterm.action
 local resurrect = wezterm.plugin.require("https://github.com/MLFlexer/resurrect.wezterm")
 local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
-local bar = wezterm.plugin.require("https://github.com/adriankarlen/bar.wezterm")
 
 workspace_switcher.zoxide_path = "opt/homebrew/bin/zoxide"
 
@@ -12,7 +11,7 @@ local keys = {
   { key = "RightArrow", mods = "CMD|SHIFT",   action = action.ActivateTabRelative(1) },
 
   { key = "[",          mods = "LEADER",      action = action.ActivateCopyMode },
-  { key = ']',          mods = 'LEADER',      action = wezterm.action.PasteFrom 'Clipboard' },
+  { key = "]",          mods = "LEADER",      action = wezterm.action.PasteFrom "Clipboard" },
 
   { key = "c",          mods = "LEADER",      action = action.SpawnTab("CurrentPaneDomain") },
   { key = "e",          mods = "LEADER",      action = action.EmitEvent("trigger-vim-with-scrollback") },
@@ -123,25 +122,6 @@ M.keys = keys
 M.apply = function(config)
   -- application of switcher to config env
   workspace_switcher.apply_to_config(config)
-
-  -- bar config
-  bar.apply_to_config(config, {
-    separator = {
-      left_icon = "|",
-      right_icon = "|",
-    },
-    modules = {
-      tabs = {
-        active_tab_fg = 2,
-        inactive_tab_fg = 4,
-      },
-      pane = { enabled = false },
-      cwd = { icon = "" },
-      username = { enabled = false },
-      clock = { enabled = false },
-      hostname = { enabled = false },
-    },
-  })
 end
 
 return M

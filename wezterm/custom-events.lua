@@ -1,5 +1,4 @@
 local wezterm = require("wezterm") --[[@as Wezterm]]
-local colors = require("colors")
 local io = require("io")
 local os = require("os")
 
@@ -25,7 +24,7 @@ end)
 
 
 local mux = wezterm.mux
-wezterm.on('gui-startup', function(cmd)
+wezterm.on("gui-startup", function(cmd)
   local args = cmd and cmd.args or {}
 
   -- Set a workspace for coding
@@ -34,25 +33,25 @@ wezterm.on('gui-startup', function(cmd)
 
 
   mux.spawn_window {
-    workspace = 'obsidian vault',
+    workspace = "obsidian vault",
     cwd = personal_vault,
     args = args,
   }
 
   -- A workspace for automation
   mux.spawn_window {
-    workspace = 'config-main',
+    workspace = "config-main",
     cwd = config_dir,
     args = args,
   }
 
   mux.spawn_window {
-    workspace = 'config-nested',
+    workspace = "config-nested",
     cwd = config_dir .. "/.config",
     args = args,
   }
   mux.spawn_window {
-    workspace = 'init',
+    workspace = "init",
     cwd = home,
     args = args,
   }
@@ -166,20 +165,20 @@ function tab_title(tab_info)
 end
 
 wezterm.on(
-  'format-tab-title',
+  "format-tab-title",
   function(tab, tabs, panes, config, hover, max_width)
     local title = tab_title(tab)
     if tab.is_active then
       return {
-        { Background = { Color = 'blue' } },
-        { Text = ' ' .. title .. ' ' },
+        { Background = { Color = "blue" } },
+        { Text = " " .. title .. " " },
       }
     end
     if tab.is_last_active then
       -- Green color and append '*' to previously active tab.
       return {
-        { Background = { Color = 'green' } },
-        { Text = ' ' .. title .. '*' },
+        { Background = { Color = "green" } },
+        { Text = " " .. title .. "*" },
       }
     end
     return title
