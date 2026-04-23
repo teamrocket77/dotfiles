@@ -21,20 +21,20 @@ else
 fi
 }
 
-notify(){
-	terminal-notifier -title $1 -message $2
-}
+if (( $+commands[terminal-notifier] )); then
+	notify(){
+		terminal-notifier -title $1 -message $2
+	}
 
-py-notify(){
-	notify "Python" $1
-}
+	py-notify(){
+		notify "Python" $1
+	}
 
-Py-notify(){
-	notify "Python" $1
-}
-get_keymaps(){
-  grep -ir "<leader>" ~/.config/nvim | awk -v N=2 '{sep=""; for (i=N; i<=NF;i++) {printf("%s%s", sep, $i); sep=OFS}; printf("\n")}'
-}
+	Py-notify(){
+		notify "Python" $1
+	}
+
+fi
 set-title(){
     echo -e "\033]0;$1\007"
 }
