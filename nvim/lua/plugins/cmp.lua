@@ -120,15 +120,15 @@ return {
       })
     end,
   },
-  { "justinsgithub/wezterm-types", commit = "1518752", lazy = true, ft = { "lua" } },
+  { "DrKJeff16/wezterm-types", commit = "5b7c508243a210adfac464c98a9d19feed241e9a"},
   {
     "folke/lazydev.nvim",
     ft = "lua",
     commit = "f59bd14",
-    dependencies = { { "justinsgithub/wezterm-types" } },
+    dependencies = { { "DrKJeff16/wezterm-types" } },
     opts = {
       library = {
-        "lazy.nvim",
+        { path = "LazyVim",       words = { "LazyVim" } },
         { path = "wezterm-types", mods = { "wezterm" } },
       }
     },
