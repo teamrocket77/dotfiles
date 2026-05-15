@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib,... }:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -15,9 +15,47 @@
   # release notes.
   home.stateVersion = "25.11"; # Please read the comment before changing.
 
+  programs = {
+    direnv.enable = true;
+    direnv.nix-direnv.enable = true;
+  };
+  xdg = {
+    configFile = {
+     "wezterm" = {
+          source = config.lib.file.mkOutOfStoreSymlink "/Users/corvi/dotfiles/wezterm";
+          recursive = true;
+      };
+      "aerospace" = {
+        source = config.lib.file.mkOutOfStoreSymlink "/Users/corvi/dotfiles/aerospace";
+        recursive = true;
+      };
+      "nvim" = {
+        source = config.lib.file.mkOutOfStoreSymlink "/Users/corvi/dotfiles/nvim";
+        recursive = true;
+      };
+      "tmux" = {
+        source = config.lib.file.mkOutOfStoreSymlink "/Users/corvi/dotfiles/tmux";
+        recursive = true;
+      };
+    };
+  };
+  
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = [
+  home.packages = with pkgs; [
+    wget
+    pyenv
+    k9s
+
+    # deps for python
+    gcc
+    gnumake
+    zlib
+    libffi
+    readline
+    bzip2
+    openssl
+    ncurses
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -34,6 +72,8 @@
     # (pkgs.writeShellScriptBin "my-hello" ''
     #   echo "Hello, ${config.home.username}!"
     # '')
+  ] ++ lib.optionals pkgs.stdenv.isDarwin [
+    pkgs.cocoapods
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
