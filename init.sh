@@ -6,3 +6,4 @@ if [[ -d ~/.config/shell ]]; then
         fi
     done
 fi
+export PATH="$HOME/.local/bin:$PATH"

@@ -9,6 +9,9 @@ require("mini.icons").setup()
 require("mini.files").setup({})
 require("mini.extra").setup({})
 require("mini.sessions").setup({})
+require("mini.statusline").setup({})
+require("mini.snippets").setup({})
+-- require("mini.hues").setup({})
 
 
 local maps = vim.keymap
@@ -35,12 +38,19 @@ maps.set(
   end
 )
 
-maps.set({"n"}, "<Space>gp", 
+maps.set({"n"}, "<Space>gp",
 function()
 	require("mini.pick").builtin.grep_live()
 end
-  )
-maps.set('n', '<leader>gfp', function()
+)
+
+maps.set({"n"}, "<Space>gf",
+function()
+	require("mini.pick").builtin.files()
+end
+)
+
+maps.set('n', '<leader>glp', function()
   vim.ui.input({ prompt = 'Extension to search (e.g., c, nix, lua): ' }, function(input)
     -- Cancel if you press Escape or leave it blank
     if not input or input == "" then return end
@@ -59,4 +69,5 @@ maps.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, {
     buffer = 0, 
     desc = "See available code actions" 
 })
+
 maps.set({"n"}, "gls", function() require("mini.extra").pickers.lsp() end)

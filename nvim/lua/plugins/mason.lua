@@ -12,13 +12,36 @@ M.clang_config = function()
 	})
 end
 
-M.defualt_config  = function()
+local capabilities = {
+  textDocument = {
+    foldingRange = {
+      dynamicRegistration = false,
+      lineFoldingOnly = true
+    }
+  }
+}
+
+
+M.default_config  = function()
+
+  local capabilities = require("blink.cmp").get_lsp_capabilties(capabilities)
+  capabilities = vim.tbl_deep_extend('force', capabilities, require('blink.cmp').get_lsp_capabilities({}, false))
+  capabilities = vim.tbl_deep_extend('force', capabilities, {
+  textDocument = {
+    foldingRange = {
+      dynamicRegistration = false,
+      lineFoldingOnly = true
+    }
+  }
+})
+
 	vim.lsp.config("*", {
 		---@param client vim.lsp.Client
 		---@param bufnr integer
 		on_attach = function(client, bufnr) end,
 
-		capabilities = get_cmp(),
+		capabilities = capabilities,
+
 		---@param client vim.lsp.Client
 		---@param bufnr integer
 		on_init = function(client, bufnr)
@@ -198,6 +221,9 @@ function M.setup(tbl)
 			automatic_enable = false
 		})
 	end
+
+  M.default_config()
+  M.python_config()
 
 	for _, server in ipairs(tbl.servers) do
 		vim.lsp.enable(server)

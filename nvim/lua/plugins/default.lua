@@ -1,5 +1,4 @@
 require("plugins.dap")
-require("plugins.cmp")
 require("plugins.trouble")
 require("plugins.mini")
 require("plugins.conform")
@@ -18,6 +17,7 @@ s.servers = {
   "bashls",
 }
 
+require("plugins.cmp")
 require("plugins.mason").setup(s)
 require("plugins.undotree")
 

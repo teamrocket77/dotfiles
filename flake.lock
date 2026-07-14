@@ -233,22 +233,6 @@
         "type": "github"
       }
     },
-    "neovim": {
-      "locked": {
-        "lastModified": 1774803651,
-        "narHash": "sha256-XjX1KKPlmzWFrGh3UopCYQk8aD0UV9LqlvqUH4ayXcw=",
-        "owner": "NixOs",
-        "repo": "nixpkgs",
-        "rev": "73a57bd3fe25d96c42311ae567e86ca542e62329",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOs",
-        "ref": "73a57bd",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -405,7 +389,6 @@
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
         "mac-app-util": "mac-app-util",
-        "neovim": "neovim",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs_5",

@@ -159,6 +159,8 @@
   # commands will contain the start times of their commands rather than the end times of
   # their preceding commands.
   typeset -g POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=false
+  typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm'
+  typeset -g POWERLEVEL9K_AWS_SHOW_ON_COMMAND='aws|terraform'
 
   # Transient prompt works similarly to the builtin transient_rprompt option. It trims down prompt
   # when accepting a command line. Supported values:

@@ -8,7 +8,6 @@
           vim-nix
           vim-lastplace
           ale
-          coc-go
           coc-sh
           coc-yaml
         ];
@@ -21,6 +20,7 @@
         		 set mouse=a
         		 autocmd FileType yaml setlocal expandtab tabstop=2 shiftwidth=2 softtabstop autoindent
         		 autocmd FileType yaml setlocal indentkeys-=0#
+                 " autocmd FileType nix setlocal tabstop=2 shiftwidth=2
         		 filetype plugin indent on
         		 '';
     })

@@ -28,3 +28,4 @@ fi
 (( ! ${+functions[p10k]} )) || p10k finalize
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
 export POWERLEVEL_SET=true
+export PATH="$HOME/.local/bin:$PATH"

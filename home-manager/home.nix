@@ -228,6 +228,10 @@ in {
         source = config.lib.file.mkOutOfStoreSymlink "/Users/corvi/dotfiles/tmux";
         recursive = true;
       };
+      "ghostty" = {
+        source = config.lib.file.mkOutOfStoreSymlink "/Users/corvi/dotfiles/ghostty";
+        recursive = true;
+      };
     };
   };
   
@@ -247,8 +251,9 @@ in {
     readline
     bzip2
     openssl
-    ncurses
 	awscli2
+    ghostty-bin
+    libiconv
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello

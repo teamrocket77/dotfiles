@@ -3,10 +3,18 @@
 {
     imports = [
         ../dev.nix
-            ../base.nix
+        ../base.nix
     ];
     environment.systemPackages = with pkgs; [
         utm
+		fluxcd
+		anki-bin
+		cargo
+		rustc
+		tenv
+		halloy
+		tree-sitter
+        clang-tools
     ];
     nix-homebrew = {
         enable = true;
@@ -36,7 +44,7 @@
         { name = "flux-app"; }
         { name = "draw-things"; }
         { name = "google-chrome"; }
-        { name = "firefox"; }
+        { name = "obsidian"; }
         ];
     };
     security.pam.services.sudo_local = {
@@ -71,14 +79,15 @@
                 NSTextShowsControlCharacters = false;
             };
             SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false;
-            dock = {
-                autohide = true;
-                persistent-others = [ ];
-            };
             finder = {
                 AppleShowAllExtensions = true;
                 AppleShowAllFiles = true;
             };
+			CustomUserPreferences = {
+				com.apple.Safari = {
+					AutoOpenSafeDownloads = false;
+				};
+			};
         };
     };
 
