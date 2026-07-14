@@ -8,23 +8,23 @@ local get_cmp = function()
   return module.default_capabilities()
 end
 
-vim.lsp.config("sourcekit", {
-  cmd = {
-    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp",
-    -- "-Xswiftc",
-    -- "-sdk",
-    -- "-Xswiftc",
-    -- "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk",
-    -- "-Xswiftc",
-    -- "-target",
-    -- "-Xswiftc",
-    -- "iPhoneSimulator26.0"
-  },
-  capabilities = {
-    workspace = {
-      didChangeWatchedFiles = {
-        dynamicRegistration = true,
-      },
-    },
-  },
-})
+-- vim.lsp.config("sourcekit", {
+--   cmd = {
+--     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp",
+--     -- "-Xswiftc",
+--     -- "-sdk",
+--     -- "-Xswiftc",
+--     -- "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk",
+--     -- "-Xswiftc",
+--     -- "-target",
+--     -- "-Xswiftc",
+--     -- "iPhoneSimulator26.0"
+--   },
+--   capabilities = {
+--     workspace = {
+--       didChangeWatchedFiles = {
+--         dynamicRegistration = true,
+--       },
+--     },
+--   },
+-- })

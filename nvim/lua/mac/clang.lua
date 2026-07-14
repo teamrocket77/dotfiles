@@ -1,2 +1,10 @@
-if vim.fn.executable("clangd") == 1 then
-end
+vim.lsp.config("clangd", {
+  cmd = {
+    "clangd",
+    "--background-index",
+    "--clang-tidy",
+    "--header-insertion=iwyu",
+    "--completion-style=detailed",
+  }
+})
+vim.lsp.enable("clangd")

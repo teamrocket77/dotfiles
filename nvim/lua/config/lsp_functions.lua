@@ -2,7 +2,7 @@ local lsp_functions = {}
 local getPlatform = function()
   local system = vim.uv.os_uname().sysname
   if string.lower(system) == "linux" then
-    return "linux"
+    return ""
   else
     return "mac"
   end
@@ -15,6 +15,7 @@ lsp_functions.require_lsp = function()
   vim.print(lsp_dir)
   for _, file in ipairs(vim.fn.readdir(lsp_dir), [[v:val =~ ""]]) do
     local module_name = file:gsub("%.lua$", "")
+    vim.notify("loding lsp: " .. module_name)
     require(platform_name .. "." .. module_name)
   end
 end

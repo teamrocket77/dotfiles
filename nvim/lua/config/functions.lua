@@ -212,40 +212,6 @@ lsp_functions.toggle_hints = function()
   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(), { 0 })
 end
 
----@param t table
-local have_ruby = function(t)
-  if os.execute("rbenv 2>&1") == 0 then
-    table.insert(t, "ruby_lsp")
-  end
-end
-
----@param t table
-local have_ghcup_ls_installed = function(t)
-  if os.execute("ghcup -h > /dev/null 2>&1") == 0 then
-    table.insert(t, "hls")
-  end
-end
-
----@param t table
-local have_go_ls_installed = function(t)
-  if os.execute("go version > /dev/null 2>&1") == 0 then
-    table.insert(t, "gopls")
-  end
-end
-
----@param t table
-local have_jenkins_installed = function(t)
-  table.insert(t, "lemminx")
-end
-
----@param t table
-local add_servers = function(t)
-  have_ruby(t)
-  have_ghcup_ls_installed(t)
-  have_go_ls_installed(t)
-  have_jenkins_installed(t)
-end
-
 ---@return boolean
 lsp_functions.does_session_file_exist = function()
   local session_dir = os.getenv("HOME") .. "/.config/nvim/sessions/"
@@ -265,23 +231,5 @@ lsp_functions.does_session_file_exist = function()
   return true
 end
 
-lsp_functions.servers = {
-  "slint_lsp",
-  "rust_analyzer",
-  "cmake",
-  "lua_ls",
-  "dockerls",
-  "asm_lsp",
-  "basedpyright",
-  "ruff",
-  -- "graphql",
-  "terraformls",
-  "yamlls",
-  "bashls",
-  "clangd",
-  -- "sourcekit"
-}
-
-add_servers(lsp_functions.servers)
 
 return lsp_functions

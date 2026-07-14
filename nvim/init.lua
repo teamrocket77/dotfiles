@@ -44,13 +44,20 @@ vim.opt.list = true
 -- :h option-list
 -- :h E355
 vim.o.directory = home .. "/.config/nvim/swapfiles/"
-lsp_functions = require("config.lsp_functions")
-lsp_functions.require_lsp()
 
-require("config.functions")
-require("config.lazy")
-require("config.maps")
+vim.keymap.set('n', '+', '<C-a>')
+vim.keymap.set('n', '-', '<C-x>')
 
+vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, { desc = 'Show line diagnostics' })
+
+-- Move between diagnostic errors
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic' })
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic' })
+
+-- Put all project/buffer diagnostics into a list window
+vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic list' })
+
+require("plugins.default")
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "None" })
 vim.api.nvim_set_hl(0, "FloatBorder", { bg = "None" })
 vim.filetype.add({

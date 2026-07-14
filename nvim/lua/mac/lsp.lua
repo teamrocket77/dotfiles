@@ -73,7 +73,6 @@ end)
 vim.keymap.set("n", "<C-k>", function()
   vim.diagnostic.jump({ severity = { vim.diagnostic.severity.ERROR }, count = -1, float = 1 })
 end)
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist)
 vim.keymap.set("n", "<leader>flt", vim.diagnostic.open_float)
 vim.keymap.set("n", "<leader>buf", functions.get_lsp)
 vim.keymap.set("n", "<leader>thi", functions.toggle_hints)
@@ -81,4 +80,3 @@ vim.keymap.set("n", "<leader>thi", functions.toggle_hints)
 for _, server in ipairs(functions.servers) do
   vim.lsp.enable(server)
 end
-vim.lsp.enable("sourcekit")
