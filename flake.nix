@@ -2,8 +2,8 @@
   description = "Example nix-darwin system flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.11-darwin";
-    nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
+    nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
     # home-manager = {
@@ -27,8 +27,7 @@
     };
     # pinned packages
     wezterm.url = "github:wezterm/wezterm/dd6e5bd2f492c8f710f569fe1d17c9cffb2b0821?dir=nix";
-    neovim.url = "github:NixOs/nixpkgs/73a57bd";
-	mac-app-util.url = "github:hraban/mac-app-util";
+    mac-app-util.url = "github:hraban/mac-app-util";
   };
 
   outputs =
@@ -41,7 +40,6 @@
       homebrew-cask,
       wezterm,
       # home-manager,
-      neovim,
       aerospace,
 	  mac-app-util,
     }:
@@ -80,6 +78,14 @@
         {
           # Necessary for using flakes on this system.
           nix.settings.experimental-features = "nix-command flakes";
+		  nix.gc = {
+			  automatic = true;
+			  interval = {
+				  Weekday = 7;
+				  Hour = 8;
+				  Minute = 0;
+			  };
+		  };
 		  nixpkgs.overlays = [
 		  ];
 
@@ -105,6 +111,9 @@
                 		else
                 			echo "Unable to source $HOME/dotfiles/nix.zsh"
                 		fi
+                        export PYENV_ROOT="$HOME/.pyenv"
+                        [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+                        eval "$(pyenv init -)"
                 		'';
             };
             gnupg.agent = {
