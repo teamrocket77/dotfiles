@@ -44,36 +44,6 @@
 	  mac-app-util,
     }:
     let
-        # home-config = { pkgs, config, ... }: {
-        #   home-manager = {
-        #     useGlobalPkgs = true;
-        #     useUserPackages = true;
-        #     users.corvi =
-        #       { pkgs, config, ... }:
-        #       {
-        #         home.stateVersion = "25.11";
-		# 		programs.vscode = {
-		# 			enable = true;
-		# 		};
-        #         xdg.configFile."wezterm" = {
-        #           source = config.lib.file.mkOutOfStoreSymlink "/Users/corvi/dotfiles/wezterm";
-        #           recursive = true;
-        #         };
-        #         xdg.configFile."aerospace" = {
-        #           source = config.lib.file.mkOutOfStoreSymlink "/Users/corvi/dotfiles/aerospace";
-        #           recursive = true;
-        #         };
-        #         xdg.configFile."nvim" = {
-        #           source = config.lib.file.mkOutOfStoreSymlink "/Users/corvi/dotfiles/nvim";
-        #           recursive = true;
-        #         };
-        #         xdg.configFile."tmux" = {
-        #           source = config.lib.file.mkOutOfStoreSymlink "/Users/corvi/dotfiles/tmux";
-        #           recursive = true;
-        #         };
-        #       };
-        #   };
-        # };
       configuration = { pkgs, ... }:
         {
           # Necessary for using flakes on this system.
