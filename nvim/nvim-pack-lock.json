@@ -1,9 +1,49 @@
 {
   "plugins": {
+    "LuaSnip": {
+      "rev": "458560534a73f7f8d7a11a146c801db00b081df0",
+      "src": "https://github.com/L3MON4D3/LuaSnip",
+      "version": "'4585605'"
+    },
     "blink.cmp": {
       "rev": "78336bc89ee5365633bcf754d93df01678b5c08f",
       "src": "https://github.com/saghen/blink.cmp.git",
       "version": "'78336bc89ee5365633bcf754d93df01678b5c08f'"
+    },
+    "cmp-buffer": {
+      "rev": "b74fab3656eea9de20a9b8116afa3cfc4ec09657",
+      "src": "https://github.com/hrsh7th/cmp-buffer",
+      "version": "'b74fab3'"
+    },
+    "cmp-cmdline": {
+      "rev": "d126061b624e0af6c3a556428712dd4d4194ec6d",
+      "src": "https://github.com/hrsh7th/cmp-cmdline",
+      "version": "'d126061'"
+    },
+    "cmp-nvim-lsp": {
+      "rev": "a8912b88ce488f411177fc8aed358b04dc246d7b",
+      "src": "https://github.com/hrsh7th/cmp-nvim-lsp",
+      "version": "'a8912b8'"
+    },
+    "cmp-nvim-lsp-signature-help": {
+      "rev": "031e6ba70b0ad5eee49fd2120ff7a2e325b17fa7",
+      "src": "https://github.com/hrsh7th/cmp-nvim-lsp-signature-help",
+      "version": "'031e6ba'"
+    },
+    "cmp-nvim-lua": {
+      "rev": "f12408bdb54c39c23e67cab726264c10db33ada8",
+      "src": "https://github.com/hrsh7th/cmp-nvim-lua",
+      "version": "'f12408b'"
+    },
+    "cmp-path": {
+      "rev": "c6635aae33a50d6010bf1aa756ac2398a2d54c32",
+      "src": "https://github.com/hrsh7th/cmp-path",
+      "version": "'c6635aa'"
+    },
+    "cmp_luasnip": {
+      "rev": "98d9cb5c2c38532bd9bdb481067b20fea8f32e90",
+      "src": "https://github.com/saadparwaiz1/cmp_luasnip",
+      "version": "'98d9cb5'"
     },
     "conform.nvim": {
       "rev": "3543d000dafbc41cc7761d860cfdb24e82154f75",
@@ -14,6 +54,11 @@
       "rev": "ec0bf2842189f65f60fd40bf3557cac1029cc932",
       "src": "https://github.com/folke/flash.nvim",
       "version": "'ec0bf2842189f65f60fd40bf3557cac1029cc932'"
+    },
+    "friendly-snippets": {
+      "rev": "572f5660cf05f8cd8834e096d7b4c921ba18e175",
+      "src": "https://github.com/rafamadriz/friendly-snippets",
+      "version": "'572f566'"
     },
     "lazydev.nvim": {
       "rev": "01bc2aacd51cf9021eb19d048e70ce3dd09f7f93",
@@ -39,6 +84,15 @@
       "rev": "cf758e9df66451889aab56613a21b8673f045ec2",
       "src": "https://github.com/folke/noice.nvim",
       "version": "'cf758e9df66451889aab56613a21b8673f045ec2'"
+    },
+    "nui.nvim": {
+      "rev": "de740991c12411b663994b2860f1a4fd0937c130",
+      "src": "https://github.com/MunifTanjim/nui.nvim"
+    },
+    "nvim-cmp": {
+      "rev": "8c82d0bd31299dbff7f8e780f5e06d2283de9678",
+      "src": "https://github.com/hrsh7th/nvim-cmp",
+      "version": "'8c82d0b'"
     },
     "nvim-dap": {
       "rev": "6a5bba0ddea5d419a783e170c20988046376090d",

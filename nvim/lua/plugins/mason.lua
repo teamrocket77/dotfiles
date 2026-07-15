@@ -1,4 +1,111 @@
+vim.pack.add({
+  { src = "https://github.com/hrsh7th/nvim-cmp", version = "8c82d0b"},
+  { src = "https://github.com/saadparwaiz1/cmp_luasnip",            version = "98d9cb5" },
+  { src = "https://github.com/L3MON4D3/LuaSnip",                    version = "4585605" },
+  { src = "https://github.com/rafamadriz/friendly-snippets",        version = "572f566" },
+  { src = "https://github.com/hrsh7th/cmp-cmdline",                 version = "d126061" },
+  { src = "https://github.com/hrsh7th/cmp-path",                    version = "c6635aa" },
+  { src = "https://github.com/hrsh7th/cmp-buffer",                  version = "b74fab3" },
+  { src = "https://github.com/hrsh7th/cmp-nvim-lua",                version = "f12408b" },
+  { src = "https://github.com/hrsh7th/cmp-nvim-lsp",                version = "a8912b8" },
+  { src = "https://github.com/hrsh7th/cmp-nvim-lsp-signature-help", version = "031e6ba" },
+})
+
 local M = {}
+local cmp = require("cmp")
+local luasnip = require("luasnip")
+
+cmp.setup({
+  enabled = function()
+    local disabled = false
+    disabled = disabled or (vim.api.nvim_get_option_value("buftype", { buf = 0 }) == "prompt")
+    disabled = disabled or (vim.fn.reg_recording() ~= "")
+    disabled = disabled or (vim.fn.reg_executing() ~= "")
+    disabled = disabled or require("cmp.config.context").in_treesitter_capture("comment")
+    return not disabled
+  end,
+  performance = { max_view_entries = 7 },
+  matching = {
+    disallow_fuzzy_matching = false,
+    disallow_fullfuzzy_matching = false,
+    disallow_symbol_nonprefix_matching = false,
+    disallow_partial_fuzzy_matching = false,
+  },
+  snippet = {
+    expand = function(args)
+      require("luasnip").lsp_expand(args.body)
+    end,
+  },
+  mapping = cmp.mapping.preset.insert({
+    ["<Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        if luasnip.expand_or_jumpable() then
+          luasnip.expand_or_jump()
+        elseif #cmp.get_entries() == 1 then
+          cmp.confirm({ select = true })
+        end
+      elseif vim.api.nvim_get_mode().mode == "i" then
+        local expandtab = vim.bo.expandtab
+        local shiftwidth = vim.bo.shiftwidth
+        if expandtab then
+          vim.api.nvim_feedkeys(string.rep(" ", shiftwidth), "i", true)
+        else
+          vim.api.nvim_feedkeys("\t", "n", true)
+        end
+      else
+        fallback()
+      end
+    end
+    )
+  }),
+  sources = cmp.config.sources({
+    { name = "nvim_lsp", },
+    { name = "luasnip", },
+    { name = "buffer", },
+    -- { name = "nvim_lsp_signature_help", },
+    { name = "nvim_lua", },
+    {
+      name = "path",
+      option = {
+        get_cwd = function()
+          return vim.fn.getcwd()
+        end
+      }
+    },
+  }),
+})
+cmp.setup.cmdline(":", {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = cmp.config.sources({
+      {
+        name = "path",
+        option = {
+          get_cwd = function()
+            return vim.fn.getcwd()
+          end
+        }
+      }
+    },
+    {
+      {
+        name = "cmdline",
+        max_item_count = max_item_count,
+        option = {
+          ignore_cmds = { "Man", "!" }
+        }
+      }
+    })
+})
+vim.keymap.set({ "i", "s" }, "<Tab>", function()
+  if luasnip.jumpable(1) then
+    luasnip.jump(1)
+  end
+end)
+vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
+  if luasnip.jumpable(-1) then
+    luasnip.jump(-1)
+  end
+end)
 
 M.clang_config = function()
 	vim.lsp.config("clangd", {
@@ -12,35 +119,22 @@ M.clang_config = function()
 	})
 end
 
-local capabilities = {
-  textDocument = {
-    foldingRange = {
-      dynamicRegistration = false,
-      lineFoldingOnly = true
-    }
-  }
-}
-
+local get_cmp = function()
+  local ok, module = pcall(require, "cmp_nvim_lsp")
+  if not ok then
+    return nil
+  end
+  return module.default_capabilities()
+end
 
 M.default_config  = function()
-
-  local capabilities = require("blink.cmp").get_lsp_capabilties(capabilities)
-  capabilities = vim.tbl_deep_extend('force', capabilities, require('blink.cmp').get_lsp_capabilities({}, false))
-  capabilities = vim.tbl_deep_extend('force', capabilities, {
-  textDocument = {
-    foldingRange = {
-      dynamicRegistration = false,
-      lineFoldingOnly = true
-    }
-  }
-})
 
 	vim.lsp.config("*", {
 		---@param client vim.lsp.Client
 		---@param bufnr integer
 		on_attach = function(client, bufnr) end,
 
-		capabilities = capabilities,
+		capabilities = get_cmp(),
 
 		---@param client vim.lsp.Client
 		---@param bufnr integer

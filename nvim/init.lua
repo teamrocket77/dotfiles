@@ -56,6 +56,7 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnos
 
 -- Put all project/buffer diagnostics into a list window
 vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic list' })
+vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 
 require("plugins.default")
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "None" })
