@@ -41,8 +41,10 @@ load_plugin() {
     source "$ZSH_PLUGIN_DIR/$name/$file"
 }
 
-load_plugin "zsh-autosuggestions" "https://github.com/zsh-users/zsh-autosuggestions.git" "zsh-autosuggestions.plugin.zsh"
-load_plugin "zsh-syntax-highlighting" "https://github.com/zsh-users/zsh-syntax-highlighting.git" "zsh-syntax-highlighting.zsh"
+if [ -n "$NIX_PROFILES" ]; then
+	load_plugin "zsh-autosuggestions" "https://github.com/zsh-users/zsh-autosuggestions.git" "zsh-autosuggestions.plugin.zsh"
+	load_plugin "zsh-syntax-highlighting" "https://github.com/zsh-users/zsh-syntax-highlighting.git" "zsh-syntax-highlighting.zsh"
+fi
 
 if (( $+commands[direnv] )); then
     eval "$(direnv hook zsh)"

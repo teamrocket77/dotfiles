@@ -33,12 +33,16 @@ in {
     direnv.nix-direnv.enable = true;
 	zsh = {
 		enable = true;
+        enableCompletion = true;
+        syntaxHighlighting.enable = true;
 		initContent = ''
-			if [ -f "$HOME/dotfiles/nix.zsh" ]; then
-				source "$HOME/dotfiles/nix.zsh"
-			else
-				echo "Unable to source $HOME/dotfiles/nix.zsh"
-			fi
+if [ -f "$HOME/dotfiles/nix.zsh" ]; then
+    source "$HOME/dotfiles/nix.zsh"
+else
+    echo "Unable to source $HOME/dotfiles/nix.zsh"
+fi
+autoload -Uz compinit
+compinit
 		'';
 		shellAliases = {
 			darwin-switch="sudo darwin-rebuild switch --flake ~/dotfiles";
@@ -47,6 +51,17 @@ in {
 			home-check="home-manager check --flake ~/dotfiles/home-manager/#corvi";
 
 		};
+        plugins = [
+              {
+                name = "pure";
+                src = pkgs.fetchFromGitHub {
+                  owner = "sindresorhus";
+                  repo = "pure";
+                  rev = "v1.28.3";
+                  sha256 = "sha256-ZNi0ruTX9HRELXq1yvTm+StOuQ0UZgK6toMSgwqSD9A=";
+                };
+              }
+        ];
 	};
 	firefox = {
 		enable = true;
@@ -232,6 +247,10 @@ in {
         source = config.lib.file.mkOutOfStoreSymlink "/Users/corvi/dotfiles/ghostty";
         recursive = true;
       };
+      "kitty" = {
+        source = config.lib.file.mkOutOfStoreSymlink "/Users/corvi/dotfiles/kitty";
+        recursive = true;
+      };
     };
   };
   
@@ -242,6 +261,7 @@ in {
     pyenv
     k9s
     neovim
+    kitty
 
     # deps for python
     gcc

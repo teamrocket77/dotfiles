@@ -69,22 +69,11 @@
 			darwin-switch="sudo darwin-rebuild switch --flake ~/dotfiles";
 			darwin-check="sudo darwin-rebuild check --flake ~/dotfiles";
 			g="git";
-			gd="git";
 		  };
           programs = {
             zsh = {
               enable = true;
               histSize = 10000;
-              interactiveShellInit = ''
-                		if [ -f "$HOME/dotfiles/nix.zsh" ]; then
-                			source "$HOME/dotfiles/nix.zsh"
-                		else
-                			echo "Unable to source $HOME/dotfiles/nix.zsh"
-                		fi
-                        export PYENV_ROOT="$HOME/.pyenv"
-                        [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-                        eval "$(pyenv init -)"
-                		'';
             };
             gnupg.agent = {
               enable = true;
