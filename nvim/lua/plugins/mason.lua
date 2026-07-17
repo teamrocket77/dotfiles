@@ -249,6 +249,50 @@ M.python_config = function()
 		}
 	})
 end
+
+M.yaml_config = function()
+	-- yamlls attaches to `yaml.gitlab` too, so it layers schema completion/
+	-- validation on top of gitlab-ci-ls' cross-file intelligence.
+	-- The GitLab CI schema is vendored locally (schemas/gitlab-ci.json) because
+	-- GitLab's raw endpoint is Cloudflare-gated and 429s non-browser clients.
+	local gitlab_ci_schema = vim.fs.joinpath(vim.fn.stdpath("config"), "schemas", "gitlab-ci.json")
+	vim.lsp.config("yamlls", {
+		settings = {
+			yaml = {
+				-- GitLab's `!reference [...]` is a custom YAML tag; declare it so
+				-- yamlls stops flagging it as an unknown/unresolved tag. It takes a
+				-- sequence argument. (gitlab-ci-ls resolves the target itself.)
+				customTags = {
+					"!reference sequence",
+				},
+				schemaStore = {
+					enable = true,
+					url = "https://www.schemastore.org/api/json/catalog.json",
+				},
+				schemas = {
+					[gitlab_ci_schema] = {
+						".gitlab-ci.yml",
+						"*.gitlab-ci.yml",
+						"**/*ci*.yml",
+						"**/*ci*.yaml",
+					},
+				},
+			},
+		},
+	})
+end
+
+M.gitlab_config = function()
+	-- Dedicated GitLab CI language server: include/extends/!reference resolution,
+	-- go-to-definition across files, job hover. Attaches to `yaml.gitlab` buffers.
+	local cache_dir = vim.fs.joinpath(vim.fn.stdpath("cache"), "gitlab-ci-ls")
+	vim.lsp.config("gitlab_ci_ls", {
+		init_options = {
+			cache_path = cache_dir,
+			log_path = vim.fs.joinpath(cache_dir, "log", "gitlab-ci-ls.log"),
+		},
+	})
+end
 M.default_config = function()
 	--[[
 	cmd = xcrun -f sourcekit-lsp
@@ -318,6 +362,8 @@ function M.setup(tbl)
 
   M.default_config()
   M.python_config()
+  M.yaml_config()
+  M.gitlab_config()
 
 	for _, server in ipairs(tbl.servers) do
 		vim.lsp.enable(server)

@@ -37,7 +37,6 @@ vim.opt.hlsearch = true
 vim.g.doge_enable_mappings = 0
 vim.g.python3_host_prog = home .. "/.pyenv/versions/pynvim/bin/python"
 -- log level setting
-vim.lsp.set_log_level("info")
 
 vim.opt.list = true
 
@@ -61,6 +60,16 @@ vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 require("plugins.default")
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "None" })
 vim.api.nvim_set_hl(0, "FloatBorder", { bg = "None" })
+-- GitLab CI: treat yaml files with a `ci` path segment (e.g. `.gitlab-ci.yml`,
+-- `ci/pipeline.yml`) as `yaml.gitlab` so both gitlab_ci_ls and yamlls attach.
+local function yaml_ft(path, _)
+  path = path:lower()
+  if path:match("[/._-]ci[/._-]") or path:match("gitlab%-ci") then
+    return "yaml.gitlab"
+  end
+  return "yaml"
+end
+
 vim.filetype.add({
   filename = {
     envrc = "sh",
@@ -68,6 +77,8 @@ vim.filetype.add({
   },
   extension = {
     ["*.Jenkinsfile"] = "groovy",
-    ["*.envrc"] = "sh"
+    ["*.envrc"] = "sh",
+    yml = yaml_ft,
+    yaml = yaml_ft,
   }
 })

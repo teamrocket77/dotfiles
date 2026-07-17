@@ -14,6 +14,7 @@ s.servers = {
   "ruff",
   "terraformls",
   "yamlls",
+  "gitlab_ci_ls",
   "bashls",
 }
 
