@@ -190,12 +190,20 @@ on-mode-changed = []
     run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
+	if.app-id = 'net.kovidgoyal.kitty'
+	run = 'move-node-to-workspace 1'
+
+[[on-window-detected]]
+	if.app-id = 'com.mitchellh.ghostty'
+	run = 'move-node-to-workspace 1'
+
+[[on-window-detected]]
     if.app-id = 'com.apple.journal'
     run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
     if.app-id = 'com.google.Chrome'
-    run = 'move-node-to-workspace 3'
+    run = 'move-node-to-workspace 1'
 
 [[on-window-detected]]
     if.app-id = 'com.apple.Music'

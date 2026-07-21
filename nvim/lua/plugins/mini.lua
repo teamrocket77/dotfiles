@@ -4,7 +4,20 @@ vim.pack.add({
 })
 
 require("mini.starter").setup()
-require("mini.pick").setup()
+require("mini.pick").setup({
+  window = {
+    config = function()
+      local h = vim.o.lines
+      local w = vim.o.columns
+      return {
+        width = math.floor(w * .90),
+        height = math.floor(h * .7),
+        col = math.floor(w * .75),
+        row = math.floor(h * .1),
+      }
+    end
+  }
+})
 require("mini.icons").setup()
 require("mini.files").setup({})
 require("mini.extra").setup({})
@@ -70,4 +83,11 @@ maps.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, {
     desc = "See available code actions" 
 })
 
-maps.set({"n"}, "gls", function() require("mini.extra").pickers.lsp() end)
+-- LSP symbol navigation via mini.pick (mini.extra)
+maps.set({ "n" }, "gls", function()
+	require("mini.extra").pickers.lsp({ scope = "document_symbol" })
+end, { desc = "LSP document symbols (current file)" })
+
+maps.set({ "n" }, "glS", function()
+	require("mini.extra").pickers.lsp({ scope = "workspace_symbol" })
+end, { desc = "LSP workspace symbols (project)" })
