@@ -18,6 +18,14 @@ require("mini.pick").setup({
     end
   }
 })
+-- Make the currently-selected picker item stand out (default links to CursorLine).
+-- Re-applied on ColorScheme so it survives theme reloads.
+local function set_pick_hl()
+	vim.api.nvim_set_hl(0, "MiniPickMatchCurrent", { link = "Visual", bold = true })
+end
+set_pick_hl()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = set_pick_hl })
+
 require("mini.icons").setup()
 require("mini.files").setup({})
 require("mini.extra").setup({})

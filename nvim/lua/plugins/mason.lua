@@ -343,7 +343,6 @@ function M.setup(tbl)
 	local lsp = require("lspconfig")
 
 	mason.setup()
-	vim.print(tbl.servers)
 
 
 	if tbl.servers ~= nil then 
