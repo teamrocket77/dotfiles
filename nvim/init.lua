@@ -44,8 +44,8 @@ vim.opt.list = true
 -- :h E355
 vim.o.directory = home .. "/.config/nvim/swapfiles/"
 
-vim.keymap.set('n', '+', '<C-a>')
-vim.keymap.set('n', '-', '<C-x>')
+vim.keymap.set('n', '+', '<C-a>', { desc = 'Increment number under cursor' })
+vim.keymap.set('n', '-', '<C-x>', { desc = 'Decrement number under cursor' })
 
 vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, { desc = 'Show line diagnostics' })
 

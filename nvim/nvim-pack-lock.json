@@ -140,6 +140,11 @@
       "rev": "be23eacb2a63380bd79e207a738c728214ecc9d3",
       "src": "https://github.com/mbbill/undotree",
       "version": "'be23eacb2a63380bd79e207a738c728214ecc9d3'"
+    },
+    "which-key.nvim": {
+      "rev": "fcbf4eea17cb299c02557d576f0d568878e354a4",
+      "src": "https://github.com/folke/which-key.nvim",
+      "version": "'fcbf4eea17cb299c02557d576f0d568878e354a4'"
     }
   }
 }

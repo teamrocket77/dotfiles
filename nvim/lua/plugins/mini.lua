@@ -63,7 +63,26 @@ function()
 end
 )
 
-maps.set('n', '<leader>glp', function()
+-- Live grep including hidden dotfiles (still respects .gitignore).
+-- Scopes rg's --hidden to this picker only via RIPGREP_CONFIG_PATH,
+-- restored when the picker closes so <Space>gp keeps its defaults.
+maps.set({"n"}, "<Space>gap",
+function()
+	local prev = vim.env.RIPGREP_CONFIG_PATH
+	vim.env.RIPGREP_CONFIG_PATH = vim.fn.stdpath("config") .. "/rg.conf"
+	vim.api.nvim_create_autocmd("User", {
+		pattern = "MiniPickStop",
+		once = true,
+		callback = function()
+			vim.env.RIPGREP_CONFIG_PATH = prev
+		end,
+	})
+	require("mini.pick").builtin.grep_live()
+end,
+{ desc = "Live grep incl. hidden files" }
+)
+
+maps.set('n', '<leader>gep', function()
   vim.ui.input({ prompt = 'Extension to search (e.g., c, nix, lua): ' }, function(input)
     -- Cancel if you press Escape or leave it blank
     if not input or input == "" then return end
