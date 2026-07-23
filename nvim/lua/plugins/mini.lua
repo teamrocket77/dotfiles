@@ -55,6 +55,8 @@ maps.set(
     local mini = require("mini.files")
     if not mini.close() then
   	mini.open(vim.api.nvim_buf_get_name(0))
+  	-- Force hidden/dotfiles to show for this picker only.
+  	mini.refresh({ content = { filter = function() return true end } })
     end
   end
 )

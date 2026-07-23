@@ -5,6 +5,14 @@ local os = require("os")
 local resurrect = wezterm.plugin.require("https://github.com/MLFlexer/resurrect.wezterm")
 local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
 local home = os.getenv("HOME")
+
+-- Color scheme used by the status/formatter handlers below. Must match
+-- current_theme in wezterm.lua. Previously these handlers referenced an
+-- undefined global `colors`, which crashed the workspace switcher on render.
+local current_theme = "Grey-green"
+local scheme = wezterm.color.get_builtin_schemes()[current_theme] or {}
+local scheme_ansi = scheme.ansi or { "#000000", "#cc0000", "#4e9a06", "#c4a000", "#3465a4", "#75507b", "#06989a", "#d3d7cf" }
+local scheme_bg = scheme.background or "#1c1c1c"
 wezterm.on("trigger-vim-with-scrollback", function(window, pane)
   local text = pane:get_lines_as_text(pane:get_dimensions().scrollback_rows)
   local name = os.tmpname()
@@ -27,29 +35,10 @@ local mux = wezterm.mux
 wezterm.on("gui-startup", function(cmd)
   local args = cmd and cmd.args or {}
 
-  -- Set a workspace for coding
-  local personal_vault = home .. "/Documents/vaults/personal"
-  local config_dir = home .. "/dotfiles"
-
-
-  mux.spawn_window {
-    workspace = "obsidian vault",
-    cwd = personal_vault,
-    args = args,
-  }
-
-  -- A workspace for automation
-  mux.spawn_window {
-    workspace = "config-main",
-    cwd = config_dir,
-    args = args,
-  }
-
-  mux.spawn_window {
-    workspace = "config-nested",
-    cwd = config_dir .. "/.config",
-    args = args,
-  }
+  -- Spawn a single "init" workspace on launch. The other workspaces
+  -- (obsidian vault, config-main, config-nested, …) are reached on demand via
+  -- ctrl+a ctrl+s (zoxide + resurrect), rather than pre-spawned — pre-spawning
+  -- them made wezterm cycle through the extra workspaces when closing a window.
   mux.spawn_window {
     workspace = "init",
     cwd = home,
@@ -106,8 +95,8 @@ end)
 workspace_switcher.workspace_formatter = function(label)
   return wezterm.format({
     { Attribute = { Italic = true } },
-    { Foreground = { Color = colors.colors.ansi[3] } },
-    { Background = { Color = colors.colors.background } },
+    { Foreground = { Color = scheme_ansi[3] } },
+    { Background = { Color = scheme_bg } },
     { Text = "󱂬 : " .. label },
   })
 end
@@ -115,7 +104,7 @@ end
 wezterm.on("smart_workspace_switcher.workspace_switcher.created", function(window, path, label)
   window:gui_window():set_right_status(wezterm.format({
     { Attribute = { Intensity = "Bold" } },
-    { Foreground = { Color = colors.colors.ansi[5] } },
+    { Foreground = { Color = scheme_ansi[5] } },
     { Text = get_folder_basename(path) .. "  " },
   }))
   local workspace_state = resurrect.workspace_state
@@ -133,7 +122,7 @@ wezterm.on("smart_workspace_switcher.workspace_switcher.chosen", function(window
   wezterm.log_info(window)
   window:gui_window():set_right_status(wezterm.format({
     { Attribute = { Intensity = "Bold" } },
-    { Foreground = { Color = colors.colors.ansi[5] } },
+    { Foreground = { Color = scheme_ansi[5] } },
     { Text = get_folder_basename(path) .. "  " },
   }))
 end)

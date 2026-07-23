@@ -3,12 +3,23 @@ local action = wezterm.action
 local resurrect = wezterm.plugin.require("https://github.com/MLFlexer/resurrect.wezterm")
 local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
 
-workspace_switcher.zoxide_path = "opt/homebrew/bin/zoxide"
+workspace_switcher.zoxide_path = "/opt/homebrew/bin/zoxide"
 
 
 local keys = {
   { key = "LeftArrow",  mods = "CMD|SHIFT",   action = action.ActivateTabRelative(-1) },
   { key = "RightArrow", mods = "CMD|SHIFT",   action = action.ActivateTabRelative(1) },
+
+  -- word navigation (matches kitty: alt+left/right send ESC-b / ESC-f)
+  { key = "LeftArrow",  mods = "OPT",         action = action.SendString("\x1bb") },
+  { key = "RightArrow", mods = "OPT",         action = action.SendString("\x1bf") },
+
+  -- goto tab by number (matches kitty winmode 1-5)
+  { key = "1",          mods = "LEADER",      action = action.ActivateTab(0) },
+  { key = "2",          mods = "LEADER",      action = action.ActivateTab(1) },
+  { key = "3",          mods = "LEADER",      action = action.ActivateTab(2) },
+  { key = "4",          mods = "LEADER",      action = action.ActivateTab(3) },
+  { key = "5",          mods = "LEADER",      action = action.ActivateTab(4) },
 
   { key = "[",          mods = "LEADER",      action = action.ActivateCopyMode },
   { key = "]",          mods = "LEADER",      action = wezterm.action.PasteFrom "Clipboard" },

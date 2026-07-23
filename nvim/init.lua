@@ -55,6 +55,18 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnos
 
 -- Put all project/buffer diagnostics into a list window
 vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic list' })
+
+-- Zoom the current window to "fullscreen" within nvim; toggle to restore splits.
+vim.api.nvim_create_user_command("ToggleZoom", function()
+  if (vim.g.zoom_status or 0) == 0 then
+    vim.cmd("wincmd _ | wincmd |")
+    vim.g.zoom_status = 1
+  else
+    vim.cmd("wincmd =")
+    vim.g.zoom_status = 0
+  end
+end, {})
+vim.keymap.set("n", "<leader>0", ":ToggleZoom<CR>", { desc = "Toggle window zoom/fullscreen" })
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 
 require("plugins.default")

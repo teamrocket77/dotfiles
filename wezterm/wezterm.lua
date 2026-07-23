@@ -4,7 +4,11 @@ local act = wezterm.action
 local maps = require("maps")
 
 local home = os.getenv("HOME")
-local bar = wezterm.plugin.require("https://github.com/adriankarlen/bar.wezterm")
+-- NOTE: bar.wezterm intentionally not required — we use our own status line
+-- (update-status / update-right-status) and tab bar (colors.tab_bar,
+-- format-tab-title). Requiring it without bar.apply_to_config(config) floods
+-- the logs with nil 'separator'/'padding' errors on every render.
+-- local bar = wezterm.plugin.require("https://github.com/adriankarlen/bar.wezterm")
 -- local logging = wezterm.plugin.require("https://github.com/sei40kr/wez-logging")
 
 -- This will hold the default configuration
@@ -12,7 +16,7 @@ local config = wezterm.config_builder() ---@type Config
 
 
 require("custom-events")
-local font_size = 16
+local font_size = 14
 local current_theme = "Grey-green"
 local scheme = wezterm.color.get_builtin_schemes()[current_theme]
 local color_schemes = {
@@ -26,7 +30,8 @@ local fg = scheme and scheme.foreground or "#d0d0d0"
 
 config.default_workspace = "init"
 config.audible_bell = "Disabled"
-config.font_size = 16
+config.font = wezterm.font("JetBrainsMono Nerd Font Mono")
+config.font_size = font_size
 config.scrollback_lines = 20000
 config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 2000 }
 config.keys = maps.keys
@@ -47,7 +52,14 @@ config.macos_window_background_blur = 40
 config.notification_handling = "AlwaysShow"
 config.color_scheme = current_theme
 config.use_fancy_tab_bar = false
-config.tab_bar_at_bottom = true
+config.tab_bar_at_bottom = false
+
+-- dim inactive splits (background + text), like a stronger version of
+-- kitty's inactive_text_alpha. 1.0 = no change.
+config.inactive_pane_hsb = {
+  saturation = 0.8,
+  brightness = 0.6,
+}
 config.window_frame = {
   font_size = 10
 }
