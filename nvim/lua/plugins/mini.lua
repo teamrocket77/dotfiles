@@ -54,7 +54,11 @@ maps.set(
   function()
     local mini = require("mini.files")
     if not mini.close() then
-  	mini.open(vim.api.nvim_buf_get_name(0))
+  	-- On the mini.starter/home screen (and other nameless buffers) the current
+  	-- buffer has no file path, so mini.open("") errors. Fall back to the cwd.
+  	local name = vim.api.nvim_buf_get_name(0)
+  	local path = (name ~= "" and vim.loop.fs_stat(name)) and name or vim.fn.getcwd()
+  	mini.open(path)
   	-- Force hidden/dotfiles to show for this picker only.
   	mini.refresh({ content = { filter = function() return true end } })
     end
