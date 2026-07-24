@@ -37,6 +37,48 @@ local keys = {
   { key = "n",          mods = "LEADER",      action = action.ActivateTabRelative(1) },
   { key = "p",          mods = "LEADER",      action = action.ActivateTabRelative(-1) },
 
+  -- fuzzy-pick a tab in the CURRENT window/workspace and jump to it.
+  -- Native fuzzy InputSelector: no fzf/jq/remote-control needed.
+  {
+    key = "/",
+    mods = "LEADER",
+    action = wezterm.action_callback(function(window, pane)
+      local mux_win = window:mux_window()
+      local choices = {}
+      for _, item in ipairs(mux_win:tabs_with_info()) do
+        local t = item.tab
+        local title = t:get_title()
+        if not title or #title == 0 then
+          title = t:active_pane():get_title()
+        end
+        table.insert(choices, {
+          id = tostring(t:tab_id()),
+          label = string.format("%d: %s%s", item.index + 1, title, item.is_active and " *" or ""),
+        })
+      end
+      window:perform_action(
+        action.InputSelector({
+          title = "Select tab",
+          fuzzy = true,
+          fuzzy_description = "tab> ",
+          choices = choices,
+          action = wezterm.action_callback(function(_, _, id)
+            if not id then
+              return
+            end
+            for _, t in ipairs(mux_win:tabs()) do
+              if tostring(t:tab_id()) == id then
+                t:activate()
+                break
+              end
+            end
+          end),
+        }),
+        pane
+      )
+    end),
+  },
+
   { key = "p",          mods = "CMD",         action = action.CloseCurrentPane({ confirm = true }) },
   { key = "t",          mods = "LEADER",      action = action.CloseCurrentTab({ confirm = true }) },
   { key = "z",          mods = "LEADER",      action = action.TogglePaneZoomState },

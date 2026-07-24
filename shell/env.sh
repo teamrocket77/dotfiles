@@ -41,7 +41,9 @@ load_plugin() {
     source "$ZSH_PLUGIN_DIR/$name/$file"
 }
 
-if [ -n "$NIX_PROFILES" ]; then
+# On Nix machines the plugins are managed by home-manager; only self-manage them
+# on non-Nix (e.g. work) shells, and only if git is available to clone them.
+if [[ -z "$NIX_PROFILES" ]] && (( $+commands[git] )); then
 	load_plugin "zsh-autosuggestions" "https://github.com/zsh-users/zsh-autosuggestions.git" "zsh-autosuggestions.plugin.zsh"
 	load_plugin "zsh-syntax-highlighting" "https://github.com/zsh-users/zsh-syntax-highlighting.git" "zsh-syntax-highlighting.zsh"
 fi
