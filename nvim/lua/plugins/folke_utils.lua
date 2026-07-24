@@ -5,12 +5,21 @@ vim.pack.add({
 	{ src = "https://github.com/folke/lazydev.nvim", version = "01bc2aacd51cf9021eb19d048e70ce3dd09f7f93" },
   { src = "https://github.com/folke/which-key.nvim", version = "fcbf4eea17cb299c02557d576f0d568878e354a4"},
   { src = "https://github.com/folke/trouble.nvim", version = "748ca2789044607f19786b1d837044544c55e80a"},
+  -- LuaCATS type definitions for the wezterm API, wired into lua_ls via lazydev below
+  { src = "https://github.com/gonstoll/wezterm-types", version = "bba4eacfdce545a9d5c29c69d20bbb9c90189224" },
 })
 
 vim.schedule(function()
   require("noice").setup({})
   require("which-key").setup({})
   require("trouble").setup({})
+  -- Feed lua_ls the wezterm API types whenever a file requires the `wezterm`
+  -- module (e.g. ~/.config/wezterm/*.lua uses `require("wezterm") --[[@as Wezterm]]`).
+  require("lazydev").setup({
+    library = {
+      { path = "wezterm-types", mods = { "wezterm" } },
+    },
+  })
 end)
 
 local k = vim.keymap

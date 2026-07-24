@@ -31,6 +31,7 @@ local fg = scheme and scheme.foreground or "#d0d0d0"
 config.default_workspace = "init"
 config.audible_bell = "Disabled"
 config.font = wezterm.font("JetBrainsMono Nerd Font Mono")
+config.term = 'wezterm'
 config.font_size = font_size
 config.scrollback_lines = 20000
 config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 2000 }

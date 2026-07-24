@@ -141,6 +141,11 @@
       "src": "https://github.com/mbbill/undotree",
       "version": "'be23eacb2a63380bd79e207a738c728214ecc9d3'"
     },
+    "wezterm-types": {
+      "rev": "bba4eacfdce545a9d5c29c69d20bbb9c90189224",
+      "src": "https://github.com/gonstoll/wezterm-types",
+      "version": "'bba4eacfdce545a9d5c29c69d20bbb9c90189224'"
+    },
     "which-key.nvim": {
       "rev": "fcbf4eea17cb299c02557d576f0d568878e354a4",
       "src": "https://github.com/folke/which-key.nvim",
