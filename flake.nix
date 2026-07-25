@@ -26,7 +26,6 @@
       flake = false;
     };
     # pinned packages
-    wezterm.url = "github:wezterm/wezterm/dd6e5bd2f492c8f710f569fe1d17c9cffb2b0821?dir=nix";
     mac-app-util.url = "github:hraban/mac-app-util";
   };
 
@@ -38,7 +37,6 @@
       nix-homebrew,
       homebrew-core,
       homebrew-cask,
-      wezterm,
       # home-manager,
       aerospace,
 	  mac-app-util,

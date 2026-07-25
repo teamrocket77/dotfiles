@@ -52,7 +52,7 @@ config.window_background_opacity = 1
 config.macos_window_background_blur = 40
 config.notification_handling = "AlwaysShow"
 config.color_scheme = current_theme
-config.use_fancy_tab_bar = false
+config.use_fancy_tab_bar = true
 config.tab_bar_at_bottom = false
 
 -- dim inactive splits (background + text), like a stronger version of
@@ -91,30 +91,30 @@ wezterm.on("update-right-status", function(window, pane)
 end)
 
 config.colors = {
-  tab_bar = {
-    background = bg,
-    active_tab = {
-      bg_color = bg,
-      fg_color = fg,
-      intensity = "Bold"
-    },
-    inactive_tab = {
-      bg_color = bg,
-      fg_color = "#666666"
-    },
-    inactive_tab_hover = {
-      bg_color = bg,
-      fg_color = fg,
-    },
-    new_tab = {
-      bg_color = bg,
-      fg_color = "#666666"
-    },
-    new_tab_hover = {
-      bg_color = bg,
-      fg_color = fg,
-    },
-  }
+  -- tab_bar = {
+  --   background = bg,
+  --   active_tab = {
+  --     bg_color = bg,
+  --     fg_color = fg,
+  --     intensity = "Bold"
+  --   },
+  --   inactive_tab = {
+  --     bg_color = bg,
+  --     fg_color = "#666666"
+  --   },
+  --   inactive_tab_hover = {
+  --     bg_color = bg,
+  --     fg_color = fg,
+  --   },
+  --   new_tab = {
+  --     bg_color = bg,
+  --     fg_color = "#666666"
+  --   },
+  --   new_tab_hover = {
+  --     bg_color = bg,
+  --     fg_color = fg,
+  --   },
+  -- }
 }
 
 maps.apply(config)

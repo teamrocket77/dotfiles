@@ -36,6 +36,7 @@
         { name = "qemu"; }
         ];
         casks = [
+        { name = "font-jetbrains-mono-nerd-font"; }
         { name = "nikitabobko/tap/aerospace"; }
         { name = "docker-desktop"; }
         { name = "rectangle"; }

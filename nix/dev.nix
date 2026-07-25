@@ -1,7 +1,6 @@
 { pkgs, inputs, ... }:
 {
   environment.systemPackages = with pkgs; [
-    inputs.wezterm.packages.${stdenv.hostPlatform.system}.default
     gnupg
     rustc
     tree
