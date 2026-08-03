@@ -1,7 +1,6 @@
 # 1. Core Environment
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export GIT_CONFIG_SYSTEM="$XDG_CONFIG_HOME/gitconfig/gitconfig.toml"
-export GPG_TTY=$(tty)
 export WEZTERM_CONFIG_DIR="$XDG_CONFIG_HOME/wezterm"
 export HISTFILE="$HOME/.zsh_history"
 export HISTSIZE=100000
