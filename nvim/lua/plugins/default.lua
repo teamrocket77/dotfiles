@@ -15,6 +15,7 @@ s.servers = {
   "terraformls",
   "yamlls",
   "gitlab_ci_ls",
+  "helm_ls",
   "bashls",
 }
 

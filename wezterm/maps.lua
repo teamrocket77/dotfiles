@@ -27,6 +27,15 @@ local keys = {
   { key = "c",          mods = "LEADER",      action = action.SpawnTab("CurrentPaneDomain") },
   { key = "e",          mods = "LEADER",      action = action.EmitEvent("trigger-vim-with-scrollback") },
 
+  -- open Neovim's LSP log locked (nomodifiable) in vim in a new tab (LEADER + Shift+L = Log)
+  {
+    key = "L",
+    mods = "LEADER|SHIFT",
+    action = action.SpawnCommandInNewTab({
+      args = { "vim", "-M", wezterm.home_dir .. "/.local/state/nvim/lsp.log" },
+    }),
+  },
+
   { key = "h",          mods = "LEADER",      action = action.ActivatePaneDirection("Left") },
   { key = "j",          mods = "LEADER",      action = action.ActivatePaneDirection("Down") },
   { key = "k",          mods = "LEADER",      action = action.ActivatePaneDirection("Up") },

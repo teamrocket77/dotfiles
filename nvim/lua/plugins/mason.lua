@@ -391,5 +391,9 @@ vim.keymap.set("n", "<leader>flt", vim.diagnostic.open_float)
 -- vim.keymap.set("n", "<leader>buf", functions.get_lsp)
 -- vim.keymap.set("n", "<leader>thi", functions.toggle_hints)
 
+vim.api.nvim_create_user_command("LspInfo", function()
+  vim.cmd("checkhealth vim.lsp")
+end
+  , {desc = "Wrapper method"})
 
 return M

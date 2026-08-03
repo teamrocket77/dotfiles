@@ -72,9 +72,30 @@ vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 require("plugins.default")
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "None" })
 vim.api.nvim_set_hl(0, "FloatBorder", { bg = "None" })
+-- True when `path` lives inside a Helm chart (a Chart.yaml sits in some ancestor
+-- dir). Used to gate helm filetype detection so unrelated `templates/` dirs
+-- (CloudFormation, Ansible, ...) or stray `.tpl` files stay untouched.
+local function in_helm_chart(path)
+  return path ~= nil and vim.fs.root(path, "Chart.yaml") ~= nil
+end
+
 -- GitLab CI: treat yaml files with a `ci` path segment (e.g. `.gitlab-ci.yml`,
 -- `ci/pipeline.yml`) as `yaml.gitlab` so both gitlab_ci_ls and yamlls attach.
 local function yaml_ft(path, _)
+  local name = vim.fs.basename(path):lower()
+  -- Helm values overlays (values-prod.yaml, values-staging.yml, ...): tag as
+  -- `yaml.helm` so helm_ls attaches for values-schema completion while yamlls
+  -- still layers generic YAML validation on top (same trick as gitlab below).
+  if name:match("^values%-") then
+    return "yaml.helm"
+  end
+  -- Helm chart templates (e.g. devops/**/templates/*.yaml): these embed Go
+  -- template directives ({{ ... }}) and are NOT valid YAML, so hand them to
+  -- helm_ls (which lints them) as pure `helm` and keep yamlls away. Gated on a
+  -- Chart.yaml ancestor so only real charts are affected.
+  if path:match("/templates/") and in_helm_chart(path) then
+    return "helm"
+  end
   path = path:lower()
   if path:match("[/._-]ci[/._-]") or path:match("gitlab%-ci") then
     return "yaml.gitlab"
@@ -92,5 +113,10 @@ vim.filetype.add({
     ["*.envrc"] = "sh",
     yml = yaml_ft,
     yaml = yaml_ft,
+    -- Helm helper templates (_helpers.tpl, etc.) inside a chart -> helm; other
+    -- .tpl files fall through to Neovim's default detection.
+    tpl = function(path, _)
+      return in_helm_chart(path) and "helm" or nil
+    end,
   }
 })
