@@ -293,6 +293,19 @@ M.gitlab_config = function()
 		},
 	})
 end
+
+M.terragrunt_config = function()
+	-- Terragrunt language server. nvim-lspconfig doesn't ship a `terragrunt_ls`
+	-- config at the pinned rev, so register it here. Binary (`terragrunt-ls`) is
+	-- installed by mason via the server list; filetypes/root_markers mirror
+	-- upstream lspconfig.
+	vim.lsp.config("terragrunt_ls", {
+		cmd = { "terragrunt-ls" },
+		filetypes = { "hcl" },
+		root_markers = { "terragrunt.hcl", ".git" },
+	})
+end
+
 M.default_config = function()
 	--[[
 	cmd = xcrun -f sourcekit-lsp
@@ -363,6 +376,7 @@ function M.setup(tbl)
   M.python_config()
   M.yaml_config()
   M.gitlab_config()
+  M.terragrunt_config()
 
 	for _, server in ipairs(tbl.servers) do
 		vim.lsp.enable(server)

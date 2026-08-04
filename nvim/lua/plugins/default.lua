@@ -4,6 +4,7 @@ require("plugins.mini")
 require("plugins.conform")
 require("plugins.folke_utils")
 require("plugins.treesitter")
+require("plugins.markview")
 
 local s = {}
 s.servers = {
@@ -13,6 +14,7 @@ s.servers = {
   "basedpyright",
   "ruff",
   "terraformls",
+  "terragrunt_ls",
   "yamlls",
   "gitlab_ci_ls",
   "helm_ls",
