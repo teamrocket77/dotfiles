@@ -1,0 +1,68 @@
+theme = Apple Classic
+font-family = "JetBrains Mono"
+# background-opacity = 0.9
+window-theme = system
+unfocused-split-opacity = 0.6
+copy-on-select = clipboard
+focus-follows-mouse = true
+scrollback-limit = 10000000
+shell-integration = zsh
+keybind = super+alt+left=previous_tab
+keybind = super+alt+right=next_tab
+keybind = super+left=goto_split:previous
+keybind = super+right=goto_split:next
+
+# tmux-style splits via C-a leader (mirrors ~/.config/tmux/tmux.conf)
+keybind = ctrl+a>|=new_split:right
+keybind = ctrl+a>-=new_split:down
+keybind = ctrl+a>c=new_tab
+keybind = ctrl+a>h=goto_split:left
+keybind = ctrl+a>j=goto_split:down
+keybind = ctrl+a>k=goto_split:up
+keybind = ctrl+a>l=goto_split:right
+cursor-style = block
+shell-integration-features = no-cursor
+
+# --- Converted from WezTerm (wezterm/maps.lua); see conv.txt for the full log ---
+
+# Tab navigation (LEADER is ctrl+a, matching wezterm)
+keybind = super+shift+left=previous_tab
+keybind = super+shift+right=next_tab
+keybind = ctrl+a>1=goto_tab:1
+keybind = ctrl+a>2=goto_tab:2
+keybind = ctrl+a>3=goto_tab:3
+keybind = ctrl+a>4=goto_tab:4
+keybind = ctrl+a>5=goto_tab:5
+keybind = ctrl+a>n=next_tab
+keybind = ctrl+a>p=previous_tab
+keybind = ctrl+a>t=close_tab
+keybind = ctrl+a>,=prompt_tab_title
+# wezterm's fuzzy tab picker (LEADER /) -> Ghostty's tab overview (closest native)
+keybind = ctrl+a>/=toggle_tab_overview
+
+# Panes / splits
+keybind = ctrl+a>z=toggle_split_zoom
+keybind = super+p=close_surface
+
+# Clipboard / palette
+keybind = ctrl+a>]=paste_from_clipboard
+# wezterm ShowLauncher (LEADER ctrl+l) -> command palette
+keybind = ctrl+a>ctrl+l=toggle_command_palette
+
+# Copy mode replacement: copy-on-select is on (see top), and instead of a modal
+# copy mode we dump the scrollback to a file and open it (copy freely from there).
+# Also covers wezterm's LEADER e (open scrollback in vim). NOTE: :open uses the
+# OS default handler for the temp .txt -- set that to nvim to land in nvim.
+keybind = ctrl+a>[=write_scrollback_file:open
+keybind = ctrl+a>e=write_scrollback_file:open
+
+# Word navigation (option+arrow -> ESC b / ESC f), matches wezterm SendString
+keybind = alt+left=esc:b
+keybind = alt+right=esc:f
+
+# Half-page scroll. WARNING: these intercept ctrl+j / ctrl+k before the running
+# program sees them -- so your nvim <C-j>/<C-k> diagnostic-jump maps won't fire
+# inside Ghostty (same as your current wezterm setup). Delete these two lines to
+# let ctrl+j/ctrl+k pass through to the app instead.
+keybind = ctrl+j=scroll_page_fractional:-0.5
+keybind = ctrl+k=scroll_page_fractional:0.5
