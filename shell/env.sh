@@ -28,6 +28,13 @@ typeset -U path # This Zsh trick prevents duplicate entries in PATH automaticall
 ZSH_PLUGIN_DIR="$HOME/zsh"
 mkdir -p "$ZSH_PLUGIN_DIR"
 
+RG_CONF="nvim/rg.conf"
+if [[ -f "$HOME/dotfiles/$RG_CONF" ]]; then
+	export RIPGREP_CONFIG_PATH="$HOME/dotfiles/$RG_CONF"
+elif [[ -f "$HOME/.config/$RG_CONF" ]]; then
+	export RIPGREP_CONFIG_PATH="$HOME/.config/$RG_CONF"
+fi
+
 # Helper function to load/clone plugins
 load_plugin() {
     local name=$1

@@ -29,37 +29,10 @@ vim.api.nvim_create_autocmd("ColorScheme", { callback = set_pick_hl })
 require("mini.icons").setup()
 require("mini.files").setup({})
 require("mini.extra").setup({})
-require("mini.sessions").setup({
-	-- autowrite: save the *active* session on exit (VimLeavePre). Combined with
-	-- the VimEnter autoread below, opening a dir with a session -> edits are
-	-- saved back automatically on quit.
-	autowrite = true,
-	-- Leave built-in autoread off: it falls back to the latest *global* session
-	-- when the cwd has none. The VimEnter autocmd below reads the local session
-	-- only, so startup restore is scoped strictly to the current directory.
-	autoread = false,
-})
+require("mini.sessions").setup({})
 require("mini.statusline").setup({})
 require("mini.snippets").setup({})
 -- require("mini.hues").setup({})
-
--- Autoread the current directory's local session on startup, but only when
--- Neovim was opened with no file arguments (mirrors mini's own guard). Unlike
--- built-in autoread this never restores a global session -- it fires solely
--- when THIS dir has a session file. The read makes it the active session, so
--- mini's autowrite then saves it back on exit.
-vim.api.nvim_create_autocmd("VimEnter", {
-	nested = true,
-	once = true,
-	callback = function()
-		if vim.fn.argc() > 0 then return end
-		local ms = require("mini.sessions")
-		local file = ms.config.file
-		if file ~= "" and ms.detected[file] ~= nil then
-			ms.read(file)
-		end
-	end,
-})
 
 
 local maps = vim.keymap
@@ -92,44 +65,8 @@ maps.set(
   end
 )
 
--- mini.sessions: save / load / delete under <Space>ms* (Mini Session).
--- Sessions are :mksession files kept in the configured directory.
-maps.set({ "n" }, "<Space>msw", function()
-	vim.ui.input({ prompt = "Save session as (blank = current): " }, function(name)
-		if name == nil then return end -- cancelled with <Esc>
-		require("mini.sessions").write(name ~= "" and name or nil)
-	end)
-end, { desc = "Session: write/save" })
-
-maps.set({ "n" }, "<Space>msr", function()
-	require("mini.sessions").select("read")
-end, { desc = "Session: read/load (pick)" })
-
-maps.set({ "n" }, "<Space>msd", function()
-	require("mini.sessions").select("delete")
-end, { desc = "Session: delete (pick)" })
-
--- Live grep that also searches otherwise-hidden files listed in
--- grep-extra.ignore (e.g. .gitlab-ci.{yml,yaml}). Those start with a dot, so
--- rg skips them by default. A scoped rg config adds that file as an
--- --ignore-file whose negations re-include exactly those matches, while still
--- honoring .gitignore and keeping every other dotfile hidden. Add more there.
--- RIPGREP_CONFIG_PATH is scoped to this picker and restored when it closes.
 maps.set({"n"}, "<Space>gp",
 function()
-	local config = vim.fn.stdpath("config")
-	local conf = vim.fn.stdpath("cache") .. "/gp-rg.conf"
-	vim.fn.writefile({ "--ignore-file=" .. config .. "/grep-extra.ignore" }, conf)
-
-	local prev = vim.env.RIPGREP_CONFIG_PATH
-	vim.env.RIPGREP_CONFIG_PATH = conf
-	vim.api.nvim_create_autocmd("User", {
-		pattern = "MiniPickStop",
-		once = true,
-		callback = function()
-			vim.env.RIPGREP_CONFIG_PATH = prev
-		end,
-	})
 	require("mini.pick").builtin.grep_live()
 end
 )
