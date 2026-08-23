@@ -9,6 +9,9 @@
     ripgrep
     zoxide
     utm
+    zsh
+    bash
+    man-pages
     nodejs_24
   ];
 }

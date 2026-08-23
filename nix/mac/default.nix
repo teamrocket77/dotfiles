@@ -6,27 +6,30 @@
         ../base.nix
     ];
     environment.systemPackages = with pkgs; [
-        utm
-		fluxcd
-		anki-bin
-		cargo
-		rustc
-		tenv
-		halloy
-		tree-sitter
-        clang-tools
+      utm
+      fluxcd
+      anki-bin
+      cargo
+      rustc
+      tenv
+      halloy
+      tree-sitter
+      clang-tools
+      bat
+      pv
+      groff
     ];
     nix-homebrew = {
-        enable = true;
-        enableRosetta = true;
-        user = "corvi";
-        taps = {
-            "homebrew/homebrew-core" = inputs.homebrew-core;
-            "homebrew/homebrew-cask" = inputs.homebrew-cask;
-            "nikitabobko/AeroSpace" = inputs.aerospace;
+      enable = true;
+      enableRosetta = true;
+      user = "corvi";
+      taps = {
+        "homebrew/homebrew-core" = inputs.homebrew-core;
+        "homebrew/homebrew-cask" = inputs.homebrew-cask;
+        "nikitabobko/AeroSpace" = inputs.aerospace;
         };
-    };
-    homebrew = {
+        };
+        homebrew = {
         enable = true;
         brews = [
         { name = "minikube"; }
@@ -34,6 +37,9 @@
         { name = "helm"; }
         { name = "kubeconform"; }
         { name = "qemu"; }
+        { name = "kustomize"; }
+        { name = "mosh"; }
+        { name = "nmap"; }
         ];
         casks = [
         { name = "font-jetbrains-mono-nerd-font"; }
@@ -46,50 +52,52 @@
         { name = "draw-things"; }
         { name = "google-chrome"; }
         { name = "obsidian"; }
+        { name = "arc"; }
+        { name = "alacritty"; }
         ];
-    };
-    security.pam.services.sudo_local = {
+        };
+        security.pam.services.sudo_local = {
         enable = true;
         touchIdAuth = true;
         reattach = true;
-    };
-    users.users.corvi = {
+        };
+        users.users.corvi = {
         shell = pkgs.zsh;
         home = "/Users/corvi";
-    };
+        };
 
-    nixpkgs.hostPlatform = "aarch64-darwin";
-    nixpkgs.config.allowUnfree = true;
-    system = {
-        configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
+        nixpkgs.hostPlatform = "aarch64-darwin";
+        nixpkgs.config.allowUnfree = true;
+        system = {
+          configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
 
 # Used for backwards compatibility, please read the changelog before changing.
 # $ darwin-rebuild changelog
-        stateVersion = 6;
-        primaryUser = "corvi";
-        startup.chime = false;
-        defaults = {
-            NSGlobalDomain = {
-                AppleShowAllExtensions = true;
-                NSAutomaticCapitalizationEnabled = false;
-                NSAutomaticDashSubstitutionEnabled = false;
-                NSAutomaticPeriodSubstitutionEnabled = false;
-                NSAutomaticSpellingCorrectionEnabled = false;
-                NSAutomaticWindowAnimationsEnabled = false;
-                NSDocumentSaveNewDocumentsToCloud = false;
-                NSTextShowsControlCharacters = false;
-            };
-            SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false;
-            finder = {
-                AppleShowAllExtensions = true;
-                AppleShowAllFiles = true;
-            };
-			CustomUserPreferences = {
-				com.apple.Safari = {
-					AutoOpenSafeDownloads = false;
-				};
-			};
-        };
+stateVersion = 6;
+primaryUser = "corvi";
+startup.chime = false;
+defaults = {
+  NSGlobalDomain = {
+    AppleShowAllExtensions = true;
+    NSAutomaticCapitalizationEnabled = false;
+    NSAutomaticDashSubstitutionEnabled = false;
+    NSAutomaticPeriodSubstitutionEnabled = false;
+    NSAutomaticSpellingCorrectionEnabled = false;
+    NSAutomaticWindowAnimationsEnabled = false;
+    NSDocumentSaveNewDocumentsToCloud = false;
+    NSTextShowsControlCharacters = false;
+  };
+  SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false;
+  finder = {
+    AppleShowAllExtensions = true;
+    AppleShowAllFiles = true;
+  };
+  CustomUserPreferences = {
+    com.apple.Safari = {
+      AutoOpenSafeDownloads = false;
+    };
+  };
+};
     };
 
-}
+  }

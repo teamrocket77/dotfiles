@@ -1,5 +1,11 @@
 { pkgs, ... }:
 {
+  documentation = {
+      enable = true;
+      man  = {
+          enable = true;
+      };
+  };
   environment.systemPackages = with pkgs; [
     ((vim-full.override { }).customize {
       name = "vim";
@@ -34,7 +40,7 @@
       enableVim = true;
       extraConfig = ''
                 source-file ~/.config/tmux/tmux.conf
-      '';
+       '';
     };
   };
 }
