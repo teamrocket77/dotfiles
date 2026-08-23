@@ -2,6 +2,8 @@
 opacity = 0.95
 blur = true
 option_as_alt = "Both"
+decorations = "Buttonless"
+dynamic_title = false
 
 [font]
 # size = 17.0 # Adjust as needed
@@ -10,3 +12,7 @@ normal = {family = "JetBrainsMono Nerd Font"}
 
 [cursor]
 style = { shape = "Block", blinking = "Always"}
+
+[scrolling]
+multiplier = 3
+history = 10000
