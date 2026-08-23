@@ -61,4 +61,43 @@ fi
 if (( $+commands[zoxide] )); then
     eval "$(zoxide init zsh)"
 fi
-true
+
+# Enable colors for man pages
+export LESS_TERMCAP_mb=$'\e[1;32m'   # Start blinking (Green)
+export LESS_TERMCAP_md=$'\e[1;32m'   # Start bold (Green)
+export LESS_TERMCAP_me=$'\e[0m'      # End all mode changes
+export LESS_TERMCAP_se=$'\e[0m'      # End standout mode
+export LESS_TERMCAP_so=$'\e[01;33m'  # Start standout mode (Yellow background / status bar)
+export LESS_TERMCAP_ue=$'\e[0m'      # End underline
+export LESS_TERMCAP_us=$'\e[1;4;31m' # Start underline (Underlined Red)
+export LESS="-R"
+export GROFF_NO_SGR=1
+export manroffopt="-c"
+export GROFF_NO_SGR=1
+export manroffopt="-c"
+
+# weird stuff to handle man pages since  I have a hybrid setup
+XCRUN_MAN="$(xcrun --show-sdk-path)/usr/share/man"
+BREW_PREFIX="$(brew --prefix)"
+
+if [[ -f "$BREW_PREFIX/bin/zsh" && -f "$BREW_PREFIX/share/zsh/help" || -f "$BREW_PREFIX/share/zsh/helpfiles" ]]; then
+	export HELPDIR="$BREW_PREFIX/share/zsh/help"
+fi
+
+# not this could also be set via:
+#	1: home-manager
+#	2: nix-darwin
+if [[ -n "$HELPDIR" ]]; then
+	unalias run-help
+	autoload -Uz run-help
+	autoload -Uz run-help-git
+	autoload -Uz run-help-zsh
+fi
+
+if [[ -d "$XCRUN_MAN" ]]; then
+	export PATH="$XCRUN_MAN:$PATH"
+else
+fi
+
+alias make-what-is="sudo /usr/libexec/makewhatis $(manpath | tr ':' ' ')"
+alias help="run-help"

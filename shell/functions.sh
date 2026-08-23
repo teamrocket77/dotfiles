@@ -38,13 +38,5 @@ fi
 set-title(){
     echo -e "\033]0;$1\007"
 }
-
-# used to source dir
-# source_dir(){
-#     for file in "$1"/*; do
-#       if [[ -f "$file" ]]; then
-#         source "$file"
-#       fi
-#     done
-# }
-
+source-help(){
+}

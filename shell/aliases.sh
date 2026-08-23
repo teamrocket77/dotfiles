@@ -30,4 +30,6 @@ if [ "$USER" = "corvi" ]; then
 	alias sshVulpix="ssh vulpix@192.168.0.246 -p 17070"
 	alias sshv="ssh vulpix@192.168.0.246"
 	alias sshDrif="ssh drif@192.168.0.194"
+	alias mshDrif="mosh drif@192.168.0.194"
+	alias ksshDrif="kitten ssh drif@192.168.0.194"
 fi
