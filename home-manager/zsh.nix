@@ -10,7 +10,6 @@
                 echo "Unable to source $HOME/dotfiles/nix.zsh"
             fi
             autoload -Uz compinit
-            export HELPDIR="${pkgs.zsh}/share/zsh/${pkgs.zsh.version}/help"
   '';
   shellAliases = {
     darwin-switch="sudo darwin-rebuild switch --flake ~/dotfiles";
