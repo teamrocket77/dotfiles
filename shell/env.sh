@@ -88,7 +88,6 @@ fi
 #	1: home-manager
 #	2: nix-darwin
 if [[ -n "$HELPDIR" ]]; then
-	unalias run-help
 	autoload -Uz run-help
 	autoload -Uz run-help-git
 	autoload -Uz run-help-zsh
