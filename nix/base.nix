@@ -2,9 +2,7 @@
 {
   documentation = {
       enable = true;
-      man  = {
-          enable = true;
-      };
+      man.enable = true;
   };
   environment.systemPackages = with pkgs; [
     ((vim-full.override { }).customize {
@@ -32,6 +30,7 @@
     })
     nixfmt
     nixfmt-tree
+    tmux
 
   ];
   programs = {
