@@ -41,24 +41,7 @@ set-title(){
 source-help(){
 }
 
-mangrep() {
-    local page
-    local search_term="${1:-.}" 
-    
-    page=$(apropos "$search_term" | fzf --prompt="Man> " \
-        --preview="echo {} | awk -F ' - ' '{print \$1}' | awk -F ',' '{print \$1}' | sed -E 's/^([^[:space:](]+)[[:space:]]*\(([^)]+)\).*/\2 \1/' | xargs man" \
-        --preview-window=right:60%)
-
-    if [[ -n "$page" ]]; then
-        local cmd_args
-        cmd_args=$(echo "$page" | awk -F ' - ' '{print $1}' | awk -F ',' '{print $1}' | sed -E 's/^([^[:space:](]+)[[:space:]]*\(([^)]+)\).*/\2 \1/')
-        
-        # shellcheck disable=SC2086
-        man $cmd_args
-    fi
-}
-
-fman() {
+gman() {
     local page
     local search_term="."
     
