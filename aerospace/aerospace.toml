@@ -197,7 +197,7 @@ on-mode-changed = []
 
 [[on-window-detected]]
     if.app-id = 'com.google.Chrome'
-    run = 'move-node-to-workspace 1'
+    run = 'move-node-to-workspace u'
 
 [[on-window-detected]]
     if.app-id = 'com.apple.Music'
