@@ -100,3 +100,11 @@ fi
 
 alias make-what-is="sudo /usr/libexec/makewhatis $(manpath | tr ':' ' ')"
 alias help="run-help"
+export FZF_DEFAULT_OPTS="
+  --layout=reverse 
+  --height=45% 
+  --border=rounded 
+  --cycle 
+  --multi 
+  --bind 'ctrl-e:execute(echo {+f} > ~/fzf_selections.log)'
+"
