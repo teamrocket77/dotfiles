@@ -7,7 +7,7 @@ config-version = 2
 
 # You can use it to add commands that run after AeroSpace startup.
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
-after-startup-command = []
+after-startup-command = ['workspace u']
 
 # Start AeroSpace at login
 start-at-login = false
@@ -46,7 +46,7 @@ automatically-unhide-macos-hidden-apps = false
 # even when they are invisible.
 # This config version is only available since 'config-version = 2'
 # Fallback value (if you omit the key): persistent-workspaces = []
-persistent-workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+persistent-workspaces = ["u", "i", "o", "p"]
 
 # A callback that runs every time binding mode changes
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -128,26 +128,16 @@ on-mode-changed = []
     alt-equal = 'resize smart +50'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
-    alt-1 = 'workspace 1'
-    alt-2 = 'workspace 2'
-    alt-3 = 'workspace 3'
-    alt-4 = 'workspace 4'
-    alt-5 = 'workspace 5'
-    alt-6 = 'workspace 6'
-    alt-7 = 'workspace 7'
-    alt-8 = 'workspace 8'
-    alt-9 = 'workspace 9'
+    alt-u = 'workspace u'
+    alt-i = 'workspace i'
+    alt-o = 'workspace o'
+    alt-p = 'workspace p'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
-    alt-shift-1 = 'move-node-to-workspace 1'
-    alt-shift-2 = 'move-node-to-workspace 2'
-    alt-shift-3 = 'move-node-to-workspace 3'
-    alt-shift-4 = 'move-node-to-workspace 4'
-    alt-shift-5 = 'move-node-to-workspace 5'
-    alt-shift-6 = 'move-node-to-workspace 6'
-    alt-shift-7 = 'move-node-to-workspace 7'
-    alt-shift-8 = 'move-node-to-workspace 8'
-    alt-shift-9 = 'move-node-to-workspace 9'
+    alt-shift-u = 'move-node-to-workspace u'
+    alt-shift-i = 'move-node-to-workspace i'
+    alt-shift-o = 'move-node-to-workspace o'
+    alt-shift-p = 'move-node-to-workspace p'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
     alt-tab = 'workspace-back-and-forth'
@@ -175,31 +165,35 @@ on-mode-changed = []
 
 [[on-window-detected]]
     if.app-id = 'com.github.wez.wezterm'
-    run = 'move-node-to-workspace 1'
+    run = 'move-node-to-workspace u'
+
+[[on-window-detected]]
+    if.app-id = 'org.alacritty'
+    run = 'move-node-to-workspace u'
 
 [[on-window-detected]]
     if.app-id = 'com.apple.Safari'
-    run = 'move-node-to-workspace 1'
+    run = 'move-node-to-workspace u'
 
 [[on-window-detected]]
     if.app-id = 'com.apple.Notes'
-    run = 'move-node-to-workspace 1'
+    run = 'move-node-to-workspace i'
 
 [[on-window-detected]]
     if.app-id = 'com.apple.reminders'
-    run = 'move-node-to-workspace 2'
+    run = 'move-node-to-workspace i'
 
 [[on-window-detected]]
 	if.app-id = 'net.kovidgoyal.kitty'
-	run = 'move-node-to-workspace 1'
+	run = 'move-node-to-workspace u'
 
 [[on-window-detected]]
 	if.app-id = 'com.mitchellh.ghostty'
-	run = 'move-node-to-workspace 1'
+	run = 'move-node-to-workspace i'
 
 [[on-window-detected]]
     if.app-id = 'com.apple.journal'
-    run = 'move-node-to-workspace 2'
+    run = 'move-node-to-workspace o'
 
 [[on-window-detected]]
     if.app-id = 'com.google.Chrome'
@@ -207,8 +201,8 @@ on-mode-changed = []
 
 [[on-window-detected]]
     if.app-id = 'com.apple.Music'
-    run = 'move-node-to-workspace 3'
+    run = 'move-node-to-workspace i'
 
 [[on-window-detected]]
     if.app-id = 'com.apple.finder'
-    run = 'move-node-to-workspace 4'
+    run = 'move-node-to-workspace i'
