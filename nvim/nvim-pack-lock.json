@@ -60,6 +60,10 @@
       "src": "https://github.com/rafamadriz/friendly-snippets",
       "version": "'572f566'"
     },
+    "kitty-scrollback.nvim": {
+      "rev": "5a163bfeb789c1a2bfa143b0e78b02caa233bc43",
+      "src": "https://github.com/mikesmithgh/kitty-scrollback.nvim"
+    },
     "lazydev.nvim": {
       "rev": "01bc2aacd51cf9021eb19d048e70ce3dd09f7f93",
       "src": "https://github.com/folke/lazydev.nvim",

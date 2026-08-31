@@ -67,6 +67,20 @@ vim.api.nvim_create_user_command("ToggleZoom", function()
   end
 end, {})
 vim.keymap.set("n", "<leader>0", ":ToggleZoom<CR>", { desc = "Toggle window zoom/fullscreen" })
+
+-- Save + re-source the current file, so config edits take effect without
+-- hunting for the file. Works for .lua and .vim (`:source` runs Lua natively).
+vim.api.nvim_create_user_command("SRC", function()
+  local file = vim.api.nvim_buf_get_name(0)
+  if file == "" then
+    vim.notify("SRC: current buffer has no file to source", vim.log.levels.WARN)
+    return
+  end
+  vim.cmd("update") -- write only if modified, so on-disk == what we source
+  vim.cmd("source " .. vim.fn.fnameescape(file))
+  vim.notify("Sourced " .. vim.fn.fnamemodify(file, ":t"))
+end, { desc = "Save + source the current file" })
+
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 
 require("plugins.default")

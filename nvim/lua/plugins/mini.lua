@@ -30,7 +30,42 @@ require("mini.icons").setup()
 require("mini.files").setup({})
 require("mini.extra").setup({})
 require("mini.sessions").setup({})
-require("mini.statusline").setup({})
+-- Statusline with a fixed "nvim" chip as the leftmost item, so it's obvious at
+-- a glance that this bar belongs to nvim (vs tmux's status bar). The rest mirrors
+-- mini.statusline's default active content.
+local function statusline_active()
+  local MiniStatusline = require("mini.statusline")
+  local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
+  local git          = MiniStatusline.section_git({ trunc_width = 40 })
+  local diff         = MiniStatusline.section_diff({ trunc_width = 75 })
+  local diagnostics  = MiniStatusline.section_diagnostics({ trunc_width = 75 })
+  local lsp          = MiniStatusline.section_lsp({ trunc_width = 75 })
+  local filename     = MiniStatusline.section_filename({ trunc_width = 140 })
+  local fileinfo     = MiniStatusline.section_fileinfo({ trunc_width = 120 })
+  local location     = MiniStatusline.section_location({ trunc_width = 75 })
+  local search       = MiniStatusline.section_searchcount({ trunc_width = 75 })
+
+  return MiniStatusline.combine_groups({
+    { hl = "MiniStatuslineNvim",     strings = { "nvim" } },
+    { hl = mode_hl,                  strings = { mode } },
+    { hl = "MiniStatuslineDevinfo",  strings = { git, diff, diagnostics, lsp } },
+    "%<", -- Mark general truncate point
+    { hl = "MiniStatuslineFilename", strings = { filename } },
+    "%=", -- End left alignment
+    { hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
+    { hl = mode_hl,                  strings = { search, location } },
+  })
+end
+
+require("mini.statusline").setup({ content = { active = statusline_active } })
+
+-- Distinct chip color for the "nvim" label; re-apply on colorscheme change so it
+-- tracks the theme (mini defines MiniStatuslineModeNormal during setup).
+local function set_statusline_nvim_hl()
+  vim.api.nvim_set_hl(0, "MiniStatuslineNvim", { link = "MiniStatuslineModeNormal" })
+end
+set_statusline_nvim_hl()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = set_statusline_nvim_hl })
 require("mini.snippets").setup({})
 -- require("mini.hues").setup({})
 
@@ -94,6 +129,45 @@ function()
 	require("mini.pick").builtin.grep_live()
 end,
 { desc = "Live grep incl. hidden files" }
+)
+
+-- Two-step unrestricted grep: pick a directory first, then live-grep inside it,
+-- searching EVERYTHING incl. gitignored/hidden trees like .venv.
+-- Step 1: a directory picker built from `find` (ignores .gitignore, so .venv/
+--         and other ignored dirs are selectable). .git/ is pruned.
+-- Step 2: grep_live scoped to the chosen dir via source.cwd, with rg's
+--         --no-ignore --hidden pulled in through RIPGREP_CONFIG_PATH (rg-all.conf),
+--         restored when the grep picker closes.
+maps.set({"n"}, "<Space>gup",
+function()
+	local MiniPick = require("mini.pick")
+	MiniPick.builtin.cli(
+		{ command = { "find", ".", "-name", ".git", "-prune", "-o", "-type", "d", "-print" } },
+		{
+			source = {
+				name = "Dir to grep (all)",
+				choose = function(item)
+					if not item or item == "" then return end
+					-- Defer: let this picker finish tearing down (and fire its own
+					-- MiniPickStop) before we set env + open the grep picker.
+					vim.schedule(function()
+						local prev = vim.env.RIPGREP_CONFIG_PATH
+						vim.env.RIPGREP_CONFIG_PATH = vim.fn.stdpath("config") .. "/rg-all.conf"
+						vim.api.nvim_create_autocmd("User", {
+							pattern = "MiniPickStop",
+							once = true,
+							callback = function()
+								vim.env.RIPGREP_CONFIG_PATH = prev
+							end,
+						})
+						MiniPick.builtin.grep_live({}, { source = { cwd = item } })
+					end)
+				end,
+			},
+		}
+	)
+end,
+{ desc = "Grep incl. gitignored (.venv etc.), pick dir first" }
 )
 
 maps.set('n', '<leader>gep', function()

@@ -5,6 +5,7 @@ require("plugins.conform")
 require("plugins.folke_utils")
 require("plugins.treesitter")
 require("plugins.markview")
+require("plugins.kitty-scrollback")
 
 local s = {}
 s.servers = {
