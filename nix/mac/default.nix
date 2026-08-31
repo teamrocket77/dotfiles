@@ -33,7 +33,6 @@
         enable = true;
         brews = [
         { name = "minikube"; }
-        { name = "container"; }
         { name = "helm"; }
         { name = "kubeconform"; }
         { name = "qemu"; }
@@ -52,8 +51,9 @@
         { name = "draw-things"; }
         { name = "google-chrome"; }
         { name = "obsidian"; }
-        { name = "arc"; }
         { name = "alacritty"; }
+        { name = "1password-cli"; }
+        { name = "obsidian"; }
         ];
         };
         security.pam.services.sudo_local = {
