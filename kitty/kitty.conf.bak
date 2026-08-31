@@ -1,35 +1,124 @@
 # BEGIN_KITTY_THEME
-# Ayaka
+# Alien Blood
 include current-theme.conf
 # END_KITTY_THEME
 map alt+left send_text all \x1b\x62
 map alt+right send_text all \x1b\x66
 
-macos_option_as_alt no
+enabled_layouts splits,stack,vertical,tall,fat
+macos_option_as_alt left
 
-# --- window splits (tmux-style leader: ctrl+a then | or -) ---
-enabled_layouts splits,stack
-map ctrl+a>| launch --location=vsplit --cwd=current
-map ctrl+a>- launch --location=hsplit --cwd=current
+# copy mouse selections straight to the system clipboard (macOS has no primary selection)
+copy_on_select clipboard
 
-# move between splits (leader + arrows)
-map ctrl+a>h neighboring_window left
-map ctrl+a>l neighboring_window right
-map ctrl+a>k neighboring_window up
-map ctrl+a>j neighboring_window down
-map ctrl+a>n next_tab
-map ctrl+a>p previous_tab
-down
-# --- scrollback in nvim (leader + h/g) ---
-scrollback_pager nvim --cmd 'set eventignore=FileType' +'nnoremap q ZQ' +'call nvim_open_term(0, {})' +'set nomodified nolist' +'$' -
-map ctrl+a>r show_scrollback
-map ctrl+a>e show_last_command_output
-font_family JetBrains Mono
-font_size 16.0
+# remote control: let programs inside kitty (and `kitten @` from a socket) drive
+# windows/tabs/launches. listen_on adds a unix socket for out-of-band control.
+allow_remote_control yes
+listen_on unix:/tmp/kitty
+
+# --- window mode (tmux-style leader: press ctrl+a to enter, esc to exit) ---
+
+# ctrl+a enters a persistent keyboard mode. Because it does not use
+# `--on-action end`, the mode stays active after each action, so you can press
+# h/j/k/l repeatedly to jump across more than one window at a time.
+map --new-mode winmode --timeout 0.5 ctrl+a
+
+# move between splits (repeatable — stays in the mode)
+map --mode winmode h neighboring_window left
+map --mode winmode l neighboring_window right
+map --mode winmode k neighboring_window up
+map --mode winmode j neighboring_window down
+
+# tabs (repeatable)
+map --mode winmode n next_tab
+map --mode winmode p previous_tab
+
+# scroll the scrollback half a page, vim-style (repeatable). kitty has no
+# native half-page action, so chain a fixed 15 line-scrolls with combine.
+map --mode winmode ctrl+d combine : scroll_line_down : scroll_line_down : scroll_line_down : scroll_line_down : scroll_line_down : scroll_line_down : scroll_line_down : scroll_line_down : scroll_line_down : scroll_line_down : scroll_line_down : scroll_line_down : scroll_line_down : scroll_line_down : scroll_line_down
+map --mode winmode ctrl+u combine : scroll_line_up : scroll_line_up : scroll_line_up : scroll_line_up : scroll_line_up : scroll_line_up : scroll_line_up : scroll_line_up : scroll_line_up : scroll_line_up : scroll_line_up : scroll_line_up : scroll_line_up : scroll_line_up : scroll_line_up
+
+# fullscreen (zoom) the current pane — toggle back with the same key (repeatable)
+map --mode winmode z combine : toggle_layout stack : scroll_prompt_to_bottom
+
+# cycle to the next layout (repeatable)
+map --mode winmode space next_layout
+
+# create a new tab, then leave the mode
+map --mode winmode c combine : new_tab_with_cwd : pop_keyboard_mode
+
+# create splits, then leave the mode
+map --mode winmode | combine : launch --location=vsplit --cwd=current : pop_keyboard_mode
+map --mode winmode - combine : launch --location=hsplit --cwd=current : pop_keyboard_mode
+
+# scratch overlay: floats over the current window (tmux popup analog), then
+# leave the mode. Ephemeral — exit with Ctrl-D to return underneath.
+map --mode winmode s combine : launch --type=overlay --cwd=current : pop_keyboard_mode
+
+# open a plain window with NO kitty shortcuts active (passthrough mode), for
+# running tmux/ssh where ctrl+a must reach the program instead of entering
+# winmode. Leave passthrough — and re-enable kitty nav — with ctrl+shift+f12.
+map --mode winmode shift+s combine : launch --type=window --cwd=current : pop_keyboard_mode : push_keyboard_mode passthrough
+
+# suspend kitty shortcuts on the CURRENT window (no new window) — same
+# passthrough mode as shift+S. Leave it the same way, with ctrl+shift+f12.
+map --mode winmode t combine : pop_keyboard_mode : push_keyboard_mode passthrough
+
+# scrollback in nvim, then leave the mode
+map --mode winmode [ combine : show_scrollback : pop_keyboard_mode
+map --mode winmode e combine : show_last_command_output : pop_keyboard_mode
+
+# open Neovim's LSP log locked (nomodifiable) in a new tab, then leave the mode (L = Log)
+map --mode winmode shift+l combine : launch --type=tab sh -c "exec vim -M $HOME/.local/state/nvim/lsp.log" : pop_keyboard_mode
+
+# rename the current tab (interactive prompt), then leave the mode
+map --mode winmode , combine : set_tab_title : pop_keyboard_mode
+
+map --mode winmode 1  goto_tab 1
+map --mode winmode 2  goto_tab 2
+map --mode winmode 3  goto_tab 3
+map --mode winmode 4  goto_tab 4
+map --mode winmode 5  goto_tab 5
+
+# exit the mode
+map --mode winmode tab pop_keyboard_mode
+map --mode winmode ctrl+a pop_keyboard_mode
+
+# --- passthrough mode: suspend all kitty shortcuts ---
+# In this mode nothing is mapped except the way out, so every key — including
+# ctrl+a — is sent straight to the program. Use it to drive tmux inside kitty.
+# ctrl+shift+f12 toggles it both ways. NOTE: kitty keymaps are global, so this
+# affects whichever window is focused, not just the one launched with shift+S —
+# toggle it back off when you return to a kitty-managed window.
+map --new-mode passthrough kitty_mod+f12
+map --mode passthrough kitty_mod+f12 pop_keyboard_mode
+
+# --- scrollback in nvim ---
+scrollback_pager vim -u NONE -
+  \ -c 'w! /tmp/kitty_scrollback' 
+  \ -c 'term ++curwin cat /tmp/kitty_scrollback'
+  \ -c "set clipboard=unnamed | hi Normal ctermbg=235"
+  \ -c "autocmd ModeChanged *:[vV\x16]* setlocal nonumber norelativenumber | autocmd ModeChanged [vV\x16]*:* setlocal number relativenumber"
+  \ -c "nnoremap Y y$"
+
+
+font_size 14.0
+dynamic_background_opacity yes
 
 # Tab bar stuff
 tab_bar_edge top
-tab_bar_style fade
-tab_title_template "{index}: {title}"
+tab_bar_style powerline
+tab_title_template "{' #' if layout_name == 'stack' else '  '}{fmt.fg.red}{bell_symbol}{fmt.fg.tab}{title}  "
 active_tab_title_template "{index}: {title}*"
+# Inactive tabs: dark muted rose with light theme foreground for readable, recessed look
+# inactive_tab_background #4a3644
+# inactive_tab_foreground #cedaeb
 hide_window_decorations titlebar-only
+
+
+# BEGIN_KITTY_FONTS
+font_family      family="JetBrainsMono Nerd Font Mono"
+bold_font        auto
+italic_font      auto
+bold_italic_font auto
+# END_KITTY_FONTS
