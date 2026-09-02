@@ -1,0 +1,6 @@
+# Extra files for <Space>gp (mini.pick grep_live) to search.
+# rg skips dotfiles by default; each `!pattern` line re-includes a match while
+# still honoring .gitignore and keeping every other dotfile hidden.
+# Add your own negations below.
+!.gitlab-ci.yml
+!.gitlab-ci.yaml

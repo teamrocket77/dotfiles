@@ -44,10 +44,14 @@ local function statusline_active()
   local fileinfo     = MiniStatusline.section_fileinfo({ trunc_width = 120 })
   local location     = MiniStatusline.section_location({ trunc_width = 75 })
   local search       = MiniStatusline.section_searchcount({ trunc_width = 75 })
+  -- Read-only chip: shown for repos opened via <Space>mic and any other
+  -- non-modifiable/readonly buffer (help, etc.).
+  local readonly     = (vim.bo.readonly or not vim.bo.modifiable) and "RO" or ""
 
   return MiniStatusline.combine_groups({
     { hl = "MiniStatuslineNvim",     strings = { "nvim" } },
     { hl = mode_hl,                  strings = { mode } },
+    { hl = "MiniStatuslineReadonly", strings = { readonly } },
     { hl = "MiniStatuslineDevinfo",  strings = { git, diff, diagnostics, lsp } },
     "%<", -- Mark general truncate point
     { hl = "MiniStatuslineFilename", strings = { filename } },
@@ -63,6 +67,9 @@ require("mini.statusline").setup({ content = { active = statusline_active } })
 -- tracks the theme (mini defines MiniStatuslineModeNormal during setup).
 local function set_statusline_nvim_hl()
   vim.api.nvim_set_hl(0, "MiniStatuslineNvim", { link = "MiniStatuslineModeNormal" })
+  -- Read-only chip: reuse the "replace/visual"-style mode color so it reads as
+  -- a warning that this buffer can't be edited.
+  vim.api.nvim_set_hl(0, "MiniStatuslineReadonly", { link = "MiniStatuslineModeReplace" })
 end
 set_statusline_nvim_hl()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = set_statusline_nvim_hl })
@@ -100,6 +107,64 @@ maps.set(
   end
 )
 
+-- Read-only repo browser rooted at ~/code.
+--   <Space>mic : pick a repo under ~/code, open it in a NEW tab whose cwd is
+--                tab-scoped (tcd) to that repo, and browse it with mini.files.
+-- Because the grep pickers below use getcwd(), gp/gap/gup/gep automatically
+-- operate on the chosen repo while that tab is active. Every file opened from
+-- within the repo (via mini.files or any grep picker) is marked read-only
+-- (nomodifiable + readonly), so the whole tree behaves like `nvim -M`.
+local ro_roots = {} -- absolute, normalized repo roots opened read-only
+
+local function mark_readonly_under_roots(bufnr)
+	local name = vim.api.nvim_buf_get_name(bufnr)
+	if name == "" then return end
+	local path = vim.fs.normalize(name)
+	for _, root in ipairs(ro_roots) do
+		if path == root or path:sub(1, #root + 1) == root .. "/" then
+			vim.bo[bufnr].modifiable = false
+			vim.bo[bufnr].readonly = true
+			return
+		end
+	end
+end
+
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+	group = vim.api.nvim_create_augroup("CodeRepoReadOnly", { clear = true }),
+	callback = function(args) mark_readonly_under_roots(args.buf) end,
+})
+
+maps.set({ "n" }, "<Space>mic", function()
+	local code = vim.fn.expand("~/code")
+	if vim.fn.isdirectory(code) == 0 then
+		vim.notify("~/code does not exist", vim.log.levels.WARN)
+		return
+	end
+	local MiniPick = require("mini.pick")
+	MiniPick.builtin.cli(
+		{ command = { "find", code, "-mindepth", "1", "-maxdepth", "1", "-type", "d" } },
+		{
+			source = {
+				name = "Repo under ~/code (read-only)",
+				choose = function(item)
+					if not item or item == "" then return end
+					local root = vim.fs.normalize(item)
+					-- Defer so this picker finishes tearing down before we
+					-- open the new tab + browser.
+					vim.schedule(function()
+						vim.cmd("tabnew")
+						vim.cmd("tcd " .. vim.fn.fnameescape(root))
+						if not vim.tbl_contains(ro_roots, root) then
+							table.insert(ro_roots, root)
+						end
+						require("mini.files").open(root)
+					end)
+				end,
+			},
+		}
+	)
+end, { desc = "Open a ~/code repo read-only in a new tab" })
+
 maps.set({"n"}, "<Space>gp",
 function()
 	require("mini.pick").builtin.grep_live()
@@ -110,6 +175,13 @@ maps.set({"n"}, "<Space>gf",
 function()
 	require("mini.pick").builtin.files()
 end
+)
+
+maps.set({"n"}, "<Space>gw",
+function()
+	require("mini.pick").builtin.buffers()
+end,
+{ desc = "Fuzzy-find open buffers" }
 )
 
 -- Live grep including hidden dotfiles (still respects .gitignore).
