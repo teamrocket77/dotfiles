@@ -6,5 +6,6 @@ uv.lock
 **/uv/*
 .states/
 tmux/plugins
+**/__pycache__/
 **/*.swp
 **/*.swo
