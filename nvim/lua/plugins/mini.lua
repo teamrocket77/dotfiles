@@ -68,11 +68,18 @@ local function statusline_active()
   })
 end
 
-require("mini.statusline").setup({ content = { active = statusline_active } })
+-- Per-window statuslines (laststatus=2), but only the ACTIVE window's bar has
+-- content — the inactive content is blank. So with splits, the bar full of info
+-- sits directly under the focused pane and doubles as the "which pane is active"
+-- indicator, while inactive panes show an empty bar.
+require("mini.statusline").setup({
+  content = {
+    active = statusline_active,
+    inactive = function() return "" end,
+  },
+})
 
--- Global statusline: one bar at the bottom of the editor for the active window
--- only, instead of a per-window bar in every split.
-vim.o.laststatus = 3
+vim.o.laststatus = 2
 
 -- Distinct chip color for the "nvim" label; re-apply on colorscheme change so it
 -- tracks the theme (mini defines MiniStatuslineModeNormal during setup).
