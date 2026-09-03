@@ -60,6 +60,11 @@
       "src": "https://github.com/rafamadriz/friendly-snippets",
       "version": "'572f566'"
     },
+    "git-blame.nvim": {
+      "rev": "5c536e2d4134d064aa3f41575280bc8a2a0e03d7",
+      "src": "https://github.com/f-person/git-blame.nvim",
+      "version": "'5c536e2d4134d064aa3f41575280bc8a2a0e03d7'"
+    },
     "kitty-scrollback.nvim": {
       "rev": "5a163bfeb789c1a2bfa143b0e78b02caa233bc43",
       "src": "https://github.com/mikesmithgh/kitty-scrollback.nvim"

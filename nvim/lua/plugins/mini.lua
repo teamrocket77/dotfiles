@@ -47,9 +47,10 @@ local function statusline_active()
   local diff         = MiniStatusline.section_diff({ trunc_width = 75 })
   local diagnostics  = MiniStatusline.section_diagnostics({ trunc_width = 75 })
   local lsp          = MiniStatusline.section_lsp({ trunc_width = 75 })
-  local filename     = MiniStatusline.section_filename({ trunc_width = 140 })
   local fileinfo     = MiniStatusline.section_fileinfo({ trunc_width = 120 })
-  local location     = MiniStatusline.section_location({ trunc_width = 75 })
+  -- Force the short location form ('%l│%2v'): a huge trunc_width makes
+  -- is_truncated() always true so it never expands to line|total│col.
+  local location     = MiniStatusline.section_location({ trunc_width = math.huge })
   local search       = MiniStatusline.section_searchcount({ trunc_width = 75 })
   -- Read-only chip: shown for repos opened via <Space>mic and any other
   -- non-modifiable/readonly buffer (help, etc.).
@@ -61,7 +62,6 @@ local function statusline_active()
     { hl = "MiniStatuslineReadonly", strings = { readonly } },
     { hl = "MiniStatuslineDevinfo",  strings = { git, diff, diagnostics, lsp } },
     "%<", -- Mark general truncate point
-    { hl = "MiniStatuslineFilename", strings = { filename } },
     "%=", -- End left alignment
     { hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
     { hl = mode_hl,                  strings = { search, location } },
@@ -69,6 +69,10 @@ local function statusline_active()
 end
 
 require("mini.statusline").setup({ content = { active = statusline_active } })
+
+-- Global statusline: one bar at the bottom of the editor for the active window
+-- only, instead of a per-window bar in every split.
+vim.o.laststatus = 3
 
 -- Distinct chip color for the "nvim" label; re-apply on colorscheme change so it
 -- tracks the theme (mini defines MiniStatuslineModeNormal during setup).

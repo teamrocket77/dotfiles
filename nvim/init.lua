@@ -84,21 +84,29 @@ end, { desc = "Save + source the current file" })
 -- Create a named scratch buffer that cannot be written to disk. `nofile` means
 -- it isn't tied to a file, keeps no swapfile, and refuses `:w` (E382); `hide`
 -- keeps its contents in memory when backgrounded so switching away won't lose it.
-local function named_scratch(name)
+local function named_scratch(name, filetype)
   local buf = vim.api.nvim_create_buf(true, false) -- listed, not scratch-type
   vim.api.nvim_buf_set_name(buf, name)
 
   vim.bo[buf].buftype = "nofile"
   vim.bo[buf].bufhidden = "hide"
   vim.bo[buf].swapfile = false
+  -- Optional filetype for syntax highlighting (e.g. `:Scratch notes.md markdown`).
+  if filetype and filetype ~= "" then
+    vim.bo[buf].filetype = filetype
+  end
 
   vim.api.nvim_set_current_buf(buf)
   return buf
 end
 
 vim.api.nvim_create_user_command("Scratch", function(opts)
-  named_scratch(opts.args)
-end, { nargs = 1, desc = "Open a named scratch buffer that can't be written to disk" })
+  named_scratch(opts.fargs[1], opts.fargs[2])
+end, {
+  nargs = "+",
+  complete = "filetype", -- completes the 2nd arg against known filetypes
+  desc = "Open a named scratch buffer that can't be written to disk; optional 2nd arg sets filetype",
+})
 
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 
