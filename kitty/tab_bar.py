@@ -1,6 +1,8 @@
 import json
+import re
 import socket
 import subprocess
+import time
 from collections import defaultdict
 from datetime import datetime, timezone
 
@@ -22,7 +24,7 @@ timer_id = None
 
 ICON = "  "
 RIGHT_MARGIN = 1
-REFRESH_TIME = 15
+REFRESH_TIME = 5  # seconds between forced tab-bar redraws (clock / VPN / DnD)
 
 icon_fg = as_rgb(color_as_int(Color(255, 250, 205)))
 icon_bg = as_rgb(color_as_int(Color(47, 61, 68)))
@@ -30,7 +32,49 @@ icon_bg = as_rgb(color_as_int(Color(47, 61, 68)))
 # --- left prefix (program name + hostname + keyboard-mode indicator) ---
 # Short, tmux-style local hostname (strip any DNS suffix), first 5 chars —
 # same source tmux's #h uses. Cached at module load.
-HOSTNAME = socket.gethostname().split(".")[0][:5]
+HOSTNAME = socket.gethostname().split(".")[0][:6]
+
+# Pritunl VPN badge: when a CLI profile is connected, show its env in place of the
+# hostname. list -j is cached with a short TTL so the client isn't spawned on every
+# tab-bar redraw. Only CLI-started connections show here — GUI-started ones live in
+# a separate profile store.
+PRITUNL_BIN = "/Applications/Pritunl.app/Contents/Resources/pritunl-client"
+VPN_TTL = 10  # seconds
+_vpn_cache = {"ts": -VPN_TTL, "env": ""}
+
+
+def _env_from_name(name: str) -> str:
+    # "vincent.cradler-gov (devops) cli" -> "gov"; "vincent.cradler-ussf cli" -> "ussf".
+    # Drop a trailing " cli" tag and any " (server)" parenthetical, then take the
+    # segment after the last dash.
+    name = re.sub(r"\s*\bcli\b\s*$", "", name)
+    name = re.sub(r"\s*\([^)]*\)", "", name).strip()
+    if "-" in name:
+        name = name.rsplit("-", 1)[-1]
+    return name.strip()
+
+
+def _vpn_env() -> str:
+    # Env label of the connected pritunl CLI profile, or "" if none/unavailable.
+    # Wrapped defensively: a missing or hung client must never break the tab bar.
+    now = time.monotonic()
+    if now - _vpn_cache["ts"] < VPN_TTL:
+        return _vpn_cache["env"]
+    _vpn_cache["ts"] = now
+    env = ""
+    try:
+        result = subprocess.run(
+            [PRITUNL_BIN, "list", "-j"], capture_output=True, timeout=2
+        )
+        if result.returncode == 0 and result.stdout:
+            for p in json.loads(result.stdout.decode("utf-8")):
+                if p.get("connected") or p.get("status") == "Connected":
+                    env = _env_from_name(p.get("name", ""))
+                    break
+    except Exception:
+        env = ""
+    _vpn_cache["env"] = env
+    return env
 
 
 def _c(color) -> int:
@@ -48,6 +92,7 @@ def _theme():
         # badges: theme background as text on an ANSI accent block
         "prog_fg": bg, "prog_bg": _c(o.color4),     # blue accent
         "host_fg": _c(o.color6), "host_bg": bg,     # cyan on bar bg
+        "vpn_fg": bg, "vpn_bg": _c(o.color2),       # dark on green = VPN connected
         "pass_fg": bg, "pass_bg": _c(o.color1),     # loud red = shortcuts off
         "win_fg": bg, "win_bg": _c(o.color3),       # amber = leader mode
         # tabs: active tab is a saturated accent block (tmux current-window
@@ -116,8 +161,13 @@ def _draw_left_prefix(screen: Screen, index: int) -> int:
     screen.draw(" kitty ")
     screen.cursor.bold = False
 
-    screen.cursor.fg, screen.cursor.bg = t["host_fg"], t["host_bg"]
-    screen.draw(f"@{HOSTNAME} ")
+    vpn = _vpn_env()
+    if vpn:
+        screen.cursor.fg, screen.cursor.bg = t["vpn_fg"], t["vpn_bg"]
+        screen.draw(f"  {vpn} ")
+    else:
+        screen.cursor.fg, screen.cursor.bg = t["host_fg"], t["host_bg"]
+        screen.draw(f" @{HOSTNAME} ")
 
     mode = _keyboard_mode()
     if mode == "passthrough":
@@ -276,6 +326,14 @@ def _draw_right_status(screen: Screen, is_last: bool) -> int:
 #         tm.mark_tab_bar_dirty()
 
 
+def _redraw_tab_bar(_) -> None:
+    # Timer callback: mark the tab bar dirty so kitty repaints it even without a
+    # keyboard/focus event, keeping the clock and VPN badge current.
+    tm = get_boss().active_tab_manager
+    if tm is not None:
+        tm.mark_tab_bar_dirty()
+
+
 def draw_tab(
     draw_data: DrawData,
     screen: Screen,
@@ -286,6 +344,12 @@ def draw_tab(
     is_last: bool,
     extra_data: ExtraData,
 ) -> int:
+
+    # Register a repeating timer once so the bar refreshes on a cadence rather
+    # than only on input events — there's always live info (clock, VPN) to show.
+    global timer_id
+    if timer_id is None:
+        timer_id = add_timer(_redraw_tab_bar, REFRESH_TIME, True)
 
     # Left prefix replaces the old single-glyph icon: program name, hostname,
     # and (only when active) a keyboard-mode badge. Its width shifts where the

@@ -1,11 +1,14 @@
 # BEGIN_KITTY_THEME
-# Alien Blood
+# Arthur
 include current-theme.conf
 # END_KITTY_THEME
 map alt+left send_text all \x1b\x62
 map alt+right send_text all \x1b\x66
 
-enabled_layouts splits,stack,vertical,tall,fat
+# splits stays first so new tabs open splittable (directional -/| work there).
+# stack is last so `space` (next_layout) cycles the useful arrangements first
+# and only lands on zoom as the final stop before wrapping back to splits.
+enabled_layouts splits,tall,fat,vertical,stack
 macos_option_as_alt left
 
 # copy mouse selections straight to the system clipboard (macOS has no primary selection)
@@ -15,6 +18,19 @@ copy_on_select clipboard
 # windows/tabs/launches. listen_on adds a unix socket for out-of-band control.
 allow_remote_control yes
 listen_on unix:/tmp/kitty
+
+# shell integration powers prompt marks (jump-to-prompt, last-command-output)
+# which kitty-scrollback.nvim relies on. `enabled` is the full default; keep
+# `no-prompt-mark` OUT of this list or the scrollback command-output features break.
+shell_integration enabled
+
+# kitty-scrollback.nvim: kitty calls the plugin's kitten (Python that runs inside
+# kitty, grabs the scrollback, then launches nvim loading
+# nvim/lua/plugins/kitty-scrollback.lua). It is NOT the nvim binary, so it can't be
+# shortened to `nvim`; kitty must load this exact file. `~` is expanded by kitty's
+# kitten-path resolver, so this stays portable (points into nvim's plugin dir).
+# Defined here (before any map that uses it) because kitty resolves aliases top-to-bottom.
+action_alias kitty_scrollback_nvim kitten ~/.local/share/nvim/site/pack/core/opt/kitty-scrollback.nvim/python/kitty_scrollback_nvim.py
 
 # --- window mode (tmux-style leader: press ctrl+a to enter, esc to exit) ---
 
@@ -47,26 +63,36 @@ map --mode winmode space next_layout
 # create a new tab, then leave the mode
 map --mode winmode c combine : new_tab_with_cwd : pop_keyboard_mode
 
-# create splits, then leave the mode
+# changing these too much seems to keep crashing kitty
 map --mode winmode | combine : launch --location=vsplit --cwd=current : pop_keyboard_mode
 map --mode winmode - combine : launch --location=hsplit --cwd=current : pop_keyboard_mode
 
-# scratch overlay: floats over the current window (tmux popup analog), then
-# leave the mode. Ephemeral — exit with Ctrl-D to return underneath.
-map --mode winmode s combine : launch --type=overlay --cwd=current : pop_keyboard_mode
+# scratch overlay: floats over the current window (tmux popup analog).
+# Ephemeral — exit with Ctrl-D to return underneath. Global (no leader).
+map alt+s launch --type=overlay --cwd=current
 
 # open a plain window with NO kitty shortcuts active (passthrough mode), for
 # running tmux/ssh where ctrl+a must reach the program instead of entering
 # winmode. Leave passthrough — and re-enable kitty nav — with ctrl+shift+f12.
-map --mode winmode shift+s combine : launch --type=window --cwd=current : pop_keyboard_mode : push_keyboard_mode passthrough
+# Global (no leader).
+map alt+shift+s combine : launch --type=window --cwd=current : push_keyboard_mode passthrough
+
+# fuzzy-search tab titles across all OS windows and focus the choice (fzf).
+# Overlay runs tab-search.sh, then leaves the mode.
+map --mode winmode w combine : launch --type=overlay --cwd=current sh -c "exec $HOME/.config/kitty/tab-search.sh" : pop_keyboard_mode
+
+# fuzzy-pick a ~/code subdirectory and open it as a workspace tab: nvim on the
+# left, empty terminal on the right (vsplit). Launched through `$SHELL -lc` so the
+# login shell loads PATH (fzf/nvim/kitten) — the script needs no PATH shim.
+map --mode winmode s combine : launch --type=overlay --cwd=current $SHELL -lc "exec $HOME/.config/kitty/new-code-session.sh" : pop_keyboard_mode
 
 # suspend kitty shortcuts on the CURRENT window (no new window) — same
-# passthrough mode as shift+S. Leave it the same way, with ctrl+shift+f12.
+# passthrough mode as alt+shift+s. Leave it the same way, with ctrl+shift+f12.
 map --mode winmode t combine : pop_keyboard_mode : push_keyboard_mode passthrough
 
-# scrollback in nvim, then leave the mode
-map --mode winmode [ combine : show_scrollback : pop_keyboard_mode
-map --mode winmode e combine : show_last_command_output : pop_keyboard_mode
+# scrollback in nvim (kitty-scrollback.nvim), then leave the mode
+map --mode winmode [ combine : kitty_scrollback_nvim : pop_keyboard_mode
+map --mode winmode e combine : kitty_scrollback_nvim --config ksb_builtin_last_cmd_output : pop_keyboard_mode
 
 # open Neovim's LSP log locked (nomodifiable) in a new tab, then leave the mode (L = Log)
 map --mode winmode shift+l combine : launch --type=tab sh -c "exec vim -M $HOME/.local/state/nvim/lsp.log" : pop_keyboard_mode
@@ -90,24 +116,42 @@ map --mode winmode ctrl+a pop_keyboard_mode
 # ctrl+shift+f12 toggles it both ways. NOTE: kitty keymaps are global, so this
 # affects whichever window is focused, not just the one launched with shift+S —
 # toggle it back off when you return to a kitty-managed window.
-map --new-mode passthrough kitty_mod+f12
+map --new-mode passthrough --on-unknown passthrough kitty_mod+f12
 map --mode passthrough kitty_mod+f12 pop_keyboard_mode
 
-# --- scrollback in nvim ---
-scrollback_pager vim -u NONE -
-  \ -c 'w! /tmp/kitty_scrollback' 
-  \ -c 'term ++curwin cat /tmp/kitty_scrollback'
-  \ -c "set clipboard=unnamed | hi Normal ctermbg=235"
-  \ -c "autocmd ModeChanged *:[vV\x16]* setlocal nonumber norelativenumber | autocmd ModeChanged [vV\x16]*:* setlocal number relativenumber"
-  \ -c "nnoremap Y y$"
+# --- scrollback / command output in Neovim (kitty-scrollback.nvim) ---
+# Global bindings (the alias is defined near the top of this file). Replaces the
+# old hand-rolled scrollback_pager, which left the prompt shifted down a
+# screenful on exit.
+
+# browse the full scrollback buffer
+map kitty_mod+h kitty_scrollback_nvim
+# browse the output of the last command
+map kitty_mod+g kitty_scrollback_nvim --config ksb_builtin_last_cmd_output
+# ctrl+shift+right-click: open the clicked command's output
+mouse_map ctrl+shift+right press ungrabbed combine : mouse_select_command_output : kitty_scrollback_nvim --config ksb_builtin_last_visited_cmd_output
 
 
 font_size 14.0
 dynamic_background_opacity yes
 
+# Fade the text in inactive splits/windows so the focused one stands out
+# (1.0 = no fade, 0.0 = fully faded). Pairs with the splits-heavy winmode setup.
+inactive_text_alpha 0.3
+
+# Small, short-lived cursor trail. `cursor_trail` is the ms the cursor must be
+# still before the trail catches up (low = trail resolves almost immediately);
+# `cursor_trail_decay` is the fast/slow fade times in seconds (small = brief);
+# `cursor_trail_start_threshold` is the min cells moved before a trail is drawn.
+cursor_trail 1
+cursor_trail_decay 0.1 .4
+cursor_trail_start_threshold 1
+
 # Tab bar stuff
 tab_bar_edge top
-tab_bar_style powerline
+# custom bar: tab_bar.py draws a left prefix (program name + hostname +
+# keyboard-mode badge) ahead of the tabs, plus a clock on the right.
+tab_bar_style custom
 tab_title_template "{' #' if layout_name == 'stack' else '  '}{fmt.fg.red}{bell_symbol}{fmt.fg.tab}{title}  "
 active_tab_title_template "{index}: {title}*"
 # Inactive tabs: dark muted rose with light theme foreground for readable, recessed look

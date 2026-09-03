@@ -127,3 +127,120 @@ gbstack() {
 		echo "  $i: ${GIT_BRANCH_STACK[$i]}"
 	done
 }
+
+# Locate the pritunl-client binary (PATH first, then the app bundle). Echoes the
+# path on success; prints an error and returns 1 if it can't be found.
+_pritunl_cli() {
+	local cli
+	cli=$(command -v pritunl-client) \
+		|| cli="/Applications/Pritunl.app/Contents/Resources/pritunl-client"
+	if [[ ! -x "$cli" ]]; then
+		echo "pritunl: pritunl-client not found" >&2
+		return 1
+	fi
+	echo "$cli"
+}
+
+# Pritunl: remove every profile from the pritunl-client CLI store (inverse of
+# pritunl-sync). Leaves the GUI's own profiles untouched.
+pritunl-clear() {
+	local cli
+	cli=$(_pritunl_cli) || return 1
+	local ids
+	ids=($("$cli" list -j 2>/dev/null | grep -o '"id":"[^"]*"' | sed 's/"id":"//;s/"$//'))
+	if (( ${#ids} == 0 )); then
+		echo "pritunl-clear: no CLI profiles to remove"
+		return 0
+	fi
+	local id
+	for id in $ids; do
+		echo "pritunl-clear: removing CLI profile $id"
+		"$cli" remove "$id" >/dev/null
+	done
+}
+
+# Pritunl: mirror the GUI's profiles into the pritunl-client CLI (one-way).
+#
+# The Electron GUI keeps profiles in ~/Library/Application Support/pritunl/profiles
+# as <id>.ovpn + <id>.conf (the .conf holds the sync metadata). The CLI/service
+# keeps a separate store and won't see GUI profiles. `pritunl-sync` wipes every CLI
+# profile, then re-imports each GUI profile so the CLI mirrors the GUI — after which
+# `pritunl-client list/start/stop` work from the shell.
+#
+# The CLI's `add` only accepts a tar of .ovpn files whose sync conf is embedded as
+# #-prefixed lines wrapped in `#{` ... `#}`. So per profile we splice the .conf JSON
+# into the .ovpn, tar it, and add it. COPYFILE_DISABLE=1 stops macOS tar from adding
+# ._ AppleDouble members, which the importer rejects (aborting on the first member).
+pritunl-sync() {
+	setopt local_options null_glob   # unmatched globs vanish instead of erroring
+	local gui_dir="$HOME/Library/Application Support/pritunl/profiles"
+	local cli
+	cli=$(_pritunl_cli) || return 1
+	if [[ ! -d "$gui_dir" ]]; then
+		echo "pritunl-sync: GUI profile dir not found: $gui_dir" >&2
+		return 1
+	fi
+	local ovpns=("$gui_dir"/*.ovpn)
+	if (( ${#ovpns} == 0 )); then
+		echo "pritunl-sync: no GUI profiles (.ovpn) found in $gui_dir" >&2
+		return 1
+	fi
+
+	# Wipe existing CLI profiles so the CLI ends up mirroring the GUI exactly.
+	pritunl-clear
+
+	# Import each GUI profile (needs a matching .conf next to the .ovpn).
+	local ovpn base conf work combined tar inner
+	for ovpn in $ovpns; do
+		base="${ovpn:t:r}"        # filename without dir or .ovpn extension
+		conf="$gui_dir/$base.conf"
+		if [[ ! -f "$conf" ]]; then
+			echo "pritunl-sync: skipping $base (no matching .conf)" >&2
+			continue
+		fi
+		work=$(mktemp -d) || return 1
+		combined="$work/$base.ovpn"
+		inner=$(sed -e 's/^{//' -e 's/}$//' "$conf")   # conf JSON minus outer braces
+
+		# Tag the display name so CLI copies are distinguishable from the GUI's
+		# own profiles. Profiles differ in shape: synced ones have user/server but
+		# no "name", while plain-imported ones carry only a "name". Use the existing
+		# "name" if present, else derive the app's "<user-before-@> (<server>)", then
+		# append " cli". Strip any existing "name" key first so we don't end up with
+		# duplicate keys (Go keeps the last, which would drop our tag).
+		local existing uname sname pname
+		existing=$(grep -o '"name":"[^"]*"' "$conf" | head -1 | sed 's/.*:"//;s/"$//')
+		if [[ -n "$existing" ]]; then
+			pname="$existing"
+		else
+			uname=$(grep -o '"user":"[^"]*"' "$conf" | head -1 | sed 's/.*:"//;s/"$//')
+			sname=$(grep -o '"server":"[^"]*"' "$conf" | head -1 | sed 's/.*:"//;s/"$//')
+			pname="${uname%%@*}"
+			[[ -n "$sname" ]] && pname="$pname ($sname)"
+		fi
+		pname="$pname cli"
+		inner=$(printf '%s' "$inner" | sed -e 's/"name":"[^"]*"//' -e 's/^,//' -e 's/,$//' -e 's/,,/,/g')
+		if [[ -n "$inner" ]]; then
+			inner="\"name\":\"$pname\",$inner"
+		else
+			inner="\"name\":\"$pname\""
+		fi
+
+		printf '#{\n#%s\n#}\n' "$inner" > "$combined"
+		cat "$ovpn" >> "$combined"
+		tar="$work/$base.tar"
+		COPYFILE_DISABLE=1 tar -cf "$tar" -C "$work" "$base.ovpn"
+		echo "pritunl-sync: adding $base"
+		"$cli" add "$tar"
+		rm -rf "$work"
+	done
+
+	"$cli" list
+}
+
+# Pritunl: interactive VPN selector (fzf) — toggle a single tunnel. Thin wrapper
+# over the overlay script that kitty also binds (winmode → v), so the same picker
+# is available straight from the shell.
+vpn() {
+	"$HOME/.config/kitty/vpn.sh"
+}
