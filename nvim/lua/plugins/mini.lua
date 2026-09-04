@@ -49,6 +49,14 @@ local function statusline_active()
   local diagnostics  = MiniStatusline.section_diagnostics({ trunc_width = 75 })
   local lsp          = MiniStatusline.section_lsp({ trunc_width = 75 })
   local fileinfo     = MiniStatusline.section_fileinfo({ trunc_width = 120 })
+  -- Build the filename from the real buffer path (section_filename returns
+  -- statusline field codes like "%F%m%r", not a path, so it can't be gsub'd).
+  -- Strip the ~/code prefix, escape any '%' so the statusline won't interpret it,
+  -- and append a modified flag (readonly is shown by its own chip below).
+  local path = vim.fn.expand("%:p")
+  path = path:gsub("^" .. vim.pesc(vim.fn.expand("~/code")) .. "/?", "")
+  local filename = (path == "" and "%t" or path:gsub("%%", "%%%%"))
+    .. (vim.bo.modified and "[+]" or "")
   -- Force the short location form ('%l│%2v'): a huge trunc_width makes
   -- is_truncated() always true so it never expands to line|total│col.
   local location     = MiniStatusline.section_location({ trunc_width = math.huge })
@@ -57,16 +65,13 @@ local function statusline_active()
   -- non-modifiable/readonly buffer (help, etc.).
   local readonly     = (vim.bo.readonly or not vim.bo.modifiable) and "RO" or ""
 
-  local folder = vim.fn.expand("%:h")
-  folder = "root: " .. folder:gsub("/.*", "")
   return MiniStatusline.combine_groups({
     { hl = "MiniStatuslineNvim",     strings = { "nvim" } },
     { hl = mode_hl,                  strings = { mode } },
     { hl = "MiniStatuslineReadonly", strings = { readonly } },
     { hl = "MiniStatuslineDevinfo",  strings = { git, diff, diagnostics, lsp } },
-    "%<", -- Mark general truncate point
-    "%=", -- End left alignment
-    { hl = "MiniStatuslineFileinfo", strings = { folder, fileinfo } },
+    { hl = "MiniStatuslineFilename", strings = { filename } },
+    { hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
     { hl = mode_hl,                  strings = { search, location } },
   })
 end
