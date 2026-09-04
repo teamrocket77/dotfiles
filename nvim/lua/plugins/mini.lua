@@ -35,6 +35,7 @@ vim.api.nvim_create_autocmd("ColorScheme", { callback = set_pick_hl })
 
 require("mini.icons").setup()
 require("mini.files").setup({})
+require("mini.git").setup({})
 require("mini.extra").setup({})
 require("mini.sessions").setup({})
 -- Statusline with a fixed "nvim" chip as the leftmost item, so it's obvious at
@@ -56,6 +57,8 @@ local function statusline_active()
   -- non-modifiable/readonly buffer (help, etc.).
   local readonly     = (vim.bo.readonly or not vim.bo.modifiable) and "RO" or ""
 
+  local folder = vim.fn.expand("%:h")
+  folder = "root: " .. folder:gsub("/.*", "")
   return MiniStatusline.combine_groups({
     { hl = "MiniStatuslineNvim",     strings = { "nvim" } },
     { hl = mode_hl,                  strings = { mode } },
@@ -63,7 +66,7 @@ local function statusline_active()
     { hl = "MiniStatuslineDevinfo",  strings = { git, diff, diagnostics, lsp } },
     "%<", -- Mark general truncate point
     "%=", -- End left alignment
-    { hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
+    { hl = "MiniStatuslineFileinfo", strings = { folder, fileinfo } },
     { hl = mode_hl,                  strings = { search, location } },
   })
 end
