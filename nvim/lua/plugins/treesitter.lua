@@ -1,10 +1,28 @@
 vim.pack.add({
 	{
+		src = "https://github.com/nvim-treesitter/nvim-treesitter.git",
+		version = "main",
+	},
+	{
 		src = "https://github.com/nvim-treesitter/nvim-treesitter-context.git"
 	},
 	{
 		src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects.git",
 	}
+})
+
+require("nvim-treesitter").install({
+	"yaml", "helm", "gotmpl", "hcl", "terraform", "bash", "json", "dockerfile",
+})
+
+vim.treesitter.language.register("yaml", { "yaml.gitlab", "yaml.helm" })
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = {
+		"yaml", "yaml.gitlab", "yaml.helm", "helm", "gotmpl",
+		"hcl", "terraform", "sh", "bash", "json", "dockerfile",
+	},
+	callback = function() pcall(vim.treesitter.start) end,
 })
 require("treesitter-context").setup{
 	enable = true,

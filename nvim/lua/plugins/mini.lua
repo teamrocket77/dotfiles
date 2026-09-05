@@ -3,7 +3,51 @@ vim.pack.add({
   { src = "https://github.com/rachartier/tiny-code-action.nvim"}
 })
 
-require("mini.starter").setup()
+-- Forward declaration: the ~/code read-only repo browser. Defined further down
+-- alongside its keymap so the starter launchpad item and <Space>mic share one
+-- implementation. Declared here so the closure below captures it as an upvalue.
+local open_code_repo
+
+local starter = require("mini.starter")
+
+-- Recent-files label: the name of the file's repo root folder (nearest .git
+-- ancestor), e.g. " (dotfiles)". Falls back to the immediate parent dir name
+-- when the file isn't inside a git repo. Keeps entries short while still telling
+-- you which project a same-named file belongs to.
+local function repo_label(path)
+  local root = vim.fs.root(path, ".git")
+  local folder = root and vim.fn.fnamemodify(root, ":t") or vim.fn.fnamemodify(path, ":h:t")
+  return string.format(" (%s)", folder)
+end
+
+starter.setup({
+  items = {
+    -- Launchpad: jump straight into the pickers instead of just files.
+    { section = "Search", name = "Find files",        action = function() require("mini.pick").builtin.files() end },
+    { section = "Search", name = "Live grep",         action = function() require("mini.pick").builtin.grep_live() end },
+    { section = "Search", name = "Open buffers",      action = function() require("mini.pick").builtin.buffers() end },
+    { section = "Search", name = "Browse ~/code repo", action = function() open_code_repo() end },
+
+    -- Single recent-files section (was two overlapping ones), labelled with the
+    -- file's repo/root folder so same-named files stay distinguishable.
+    starter.sections.recent_files(10, false, repo_label),
+    starter.sections.sessions(5, true),
+    starter.sections.builtin_actions(),
+  },
+  content_hooks = {
+    starter.gen_hook.adding_bullet(),
+    starter.gen_hook.indexing("all", { "Builtin actions" }),
+    starter.gen_hook.aligning("center", "center"),
+  },
+  footer = function()
+    local v = vim.version()
+    return string.format(
+      "nvim v%d.%d.%d  •  cwd: %s",
+      v.major, v.minor, v.patch,
+      vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
+    )
+  end,
+})
 require("mini.pick").setup({
   -- Scroll with <C-d>/<C-u> (like normal-mode half-page scroll). <C-u> is
   -- default-bound to delete_left, so move that to <C-BS> to keep it available.
@@ -51,10 +95,13 @@ local function statusline_active()
   local fileinfo     = MiniStatusline.section_fileinfo({ trunc_width = 120 })
   -- Build the filename from the real buffer path (section_filename returns
   -- statusline field codes like "%F%m%r", not a path, so it can't be gsub'd).
-  -- Strip the ~/code prefix, escape any '%' so the statusline won't interpret it,
-  -- and append a modified flag (readonly is shown by its own chip below).
-  local path = vim.fn.expand("%:p")
-  path = path:gsub("^" .. vim.pesc(vim.fn.expand("~/code")) .. "/?", "")
+  -- ':~:.' keeps it short and cheap: relative to cwd when the file lives under
+  -- it (for <Space>mic tabs cwd is tcd'd to the repo root, so this is the
+  -- root-relative path), else home-relative with '~'. Pure string ops — no
+  -- git-root/filesystem walk — so it's fine to recompute on every redraw.
+  -- Escape any '%' so the statusline won't interpret it, and append a modified
+  -- flag (readonly is shown by its own chip below).
+  local path = vim.fn.expand("%:~:.")
   local filename = (path == "" and "%t" or path:gsub("%%", "%%%%"))
     .. (vim.bo.modified and "[+]" or "")
   -- Force the short location form ('%l│%2v'): a huge trunc_width makes
@@ -217,7 +264,9 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 	callback = function(args) mark_readonly_under_roots(args.buf) end,
 })
 
-maps.set({ "n" }, "<Space>mic", function()
+-- Assigns the forward-declared local (see top of file), so the starter
+-- launchpad item and the <Space>mic keymap below share this one implementation.
+open_code_repo = function()
 	local code = vim.fn.expand("~/code")
 	if vim.fn.isdirectory(code) == 0 then
 		vim.notify("~/code does not exist", vim.log.levels.WARN)
@@ -249,7 +298,9 @@ maps.set({ "n" }, "<Space>mic", function()
 			},
 		}
 	)
-end, { desc = "Open a ~/code repo read-only in a new tab" })
+end
+
+maps.set({ "n" }, "<Space>mic", open_code_repo, { desc = "Open a ~/code repo read-only in a new tab" })
 
 -- Determine the directory a grep/file picker should be scoped to, based on the
 -- CURRENT BUFFER rather than the tab. This is what lets side-by-side splits each

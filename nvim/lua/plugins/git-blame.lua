@@ -10,10 +10,12 @@ vim.pack.add({
 -- cursor step — cheaper in large projects. Must be set before setup().
 vim.g.gitblame_schedule_event = "CursorHold"
 vim.g.gitblame_clear_event = "CursorHoldI"
-vim.g.gitblame_enabled = 0
 
 require("gitblame").setup({
-	enabled = true,
+	-- Start disabled; toggle on with <leader>gbt. `setup()` writes vim.g from
+	-- these opts (opts win over any vim.g.gitblame_* set beforehand), so this is
+	-- the single source of truth for the initial state.
+	enabled = false,
 	message_template = " <author> • <date> • <summary>",
 	date_format = "%r (%Y-%m-%d)",
 	message_when_not_committed = " Not committed yet",

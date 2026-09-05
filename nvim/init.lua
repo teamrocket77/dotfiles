@@ -14,6 +14,7 @@ opts.softtabstop = 2
 opts.tabstop = 4
 opts.wildmenu = true
 opts.spell = false
+vim.opt.cursorline = true
 -- vim.opt.sessionoptions = "buffers,curdir,help,resize,tabpages,terminal, winsize,winpos"
 
 vim.cmd([[ set mouse=a ]])
@@ -124,10 +125,7 @@ end
 -- `ci/pipeline.yml`) as `yaml.gitlab` so both gitlab_ci_ls and yamlls attach.
 local function yaml_ft(path, _)
   local name = vim.fs.basename(path):lower()
-  -- Helm values overlays (values-prod.yaml, values-staging.yml, ...): tag as
-  -- `yaml.helm` so helm_ls attaches for values-schema completion while yamlls
-  -- still layers generic YAML validation on top (same trick as gitlab below).
-  if name:match("^values%-") then
+  if (name == "values.yaml" or name == "values.yml" or name:match("^values%-")) and in_helm_chart(path) then
     return "yaml.helm"
   end
   -- Helm chart templates (e.g. devops/**/templates/*.yaml): these embed Go
