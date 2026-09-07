@@ -5,13 +5,18 @@ version = "3543d000dafbc41cc7761d860cfdb24e82154f75",
 	}
 })
 
-require("conform").setup({
-	formatters_by_ft = {
-		yaml = { "yamlfmt" },
-		["yaml.gitlab"] = { "yamlfmt" },
-		["yaml.helm"] = { "yamlfmt" },
-	},
-})
+local formatters_by_ft = {
+	yaml = { "yamlfmt" },
+	["yaml.gitlab"] = { "yamlfmt" },
+	["yaml.helm"] = { "yamlfmt" },
+}
+
+-- Nix machine only (signalled by $NIX_PROFILES, same as shell/env.sh).
+if (vim.env.NIX_PROFILES or "") ~= "" then
+	formatters_by_ft.nix = { "nixfmt" }
+end
+
+require("conform").setup({ formatters_by_ft = formatters_by_ft })
 
 vim.api.nvim_create_user_command("Format", function(args)
 	local range

@@ -40,6 +40,7 @@ vim.g.python3_host_prog = home .. "/.pyenv/versions/pynvim/bin/python"
 -- log level setting
 
 vim.opt.list = true
+vim.opt.listchars = { tab = "→ ", trail = "·", nbsp = "␣", extends = "›", precedes = "‹" }
 
 -- :h option-list
 -- :h E355

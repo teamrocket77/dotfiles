@@ -23,8 +23,16 @@ s.servers = {
   "bashls",
 }
 
+-- Nix machine only (signalled by $NIX_PROFILES, same as shell/env.sh): pull in
+-- the nix LSP so mason installs/enables it there but never on the work box.
+if (vim.env.NIX_PROFILES or "") ~= "" then
+  table.insert(s.servers, "nixd")
+end
+
 require("plugins.cmp")
 require("plugins.mason").setup(s)
 require("plugins.undotree")
+
+vim.schedule(function() require("checks").notify() end)
 
 

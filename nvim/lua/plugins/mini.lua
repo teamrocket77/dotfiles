@@ -149,6 +149,16 @@ vim.api.nvim_create_autocmd("ColorScheme", { callback = set_statusline_nvim_hl }
 require("mini.snippets").setup({})
 -- require("mini.hues").setup({})
 
+require("mini.indentscope").setup({
+  symbol = "│",
+  draw = { animation = require("mini.indentscope").gen_animation.none() },
+  options = { try_as_border = true },
+})
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "starter", "help", "mason", "lazy", "man", "checkhealth" },
+  callback = function() vim.b.miniindentscope_disable = true end,
+})
+
 
 -- Tabpage-based tabline (one entry per tab, so splits/buffers are NOT shown as
 -- separate tabs). Like the built-in one (tab number + active buffer's filename +

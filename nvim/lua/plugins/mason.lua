@@ -294,6 +294,30 @@ M.gitlab_config = function()
 	})
 end
 
+M.helm_config = function()
+	-- helm_ls renders the chart and runs an embedded yaml-language-server on the
+	-- resolved output, mapping diagnostics back to the template source. Point that
+	-- yamlls at the kubernetes schema for templates/** so template files get k8s
+	-- schema completion/validation.
+	vim.lsp.config("helm_ls", {
+		settings = {
+			["helm-ls"] = {
+				yamlls = {
+					enabled = true,
+					path = "yaml-language-server",
+					config = {
+						schemas = {
+							kubernetes = "templates/**",
+						},
+						completion = true,
+						hover = true,
+					},
+				},
+			},
+		},
+	})
+end
+
 M.terragrunt_config = function()
 	-- Terragrunt language server. nvim-lspconfig doesn't ship a `terragrunt_ls`
 	-- config at the pinned rev, so register it here. Binary (`terragrunt-ls`) is
@@ -303,6 +327,21 @@ M.terragrunt_config = function()
 		cmd = { "terragrunt-ls" },
 		filetypes = { "hcl" },
 		root_markers = { "terragrunt.hcl", ".git" },
+	})
+end
+
+M.nix_config = function()
+	-- Only reached on a Nix machine (nixd is added to the server list gated on
+	-- $NIX_PROFILES). nixpkgs expr powers completion; format via nixfmt.
+	vim.lsp.config("nixd", {
+		cmd = { "nixd" },
+		root_markers = { "flake.nix", ".git" },
+		settings = {
+			nixd = {
+				nixpkgs = { expr = "import <nixpkgs> { }" },
+				formatting = { command = { "nixfmt" } },
+			},
+		},
 	})
 end
 
@@ -376,7 +415,11 @@ function M.setup(tbl)
   M.python_config()
   M.yaml_config()
   M.gitlab_config()
+  M.helm_config()
   M.terragrunt_config()
+  if vim.tbl_contains(tbl.servers, "nixd") then
+    M.nix_config()
+  end
 
 	for _, server in ipairs(tbl.servers) do
 		vim.lsp.enable(server)
