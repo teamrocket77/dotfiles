@@ -14,8 +14,16 @@ local starter = require("mini.starter")
 -- ancestor), e.g. " (dotfiles)". Falls back to the immediate parent dir name
 -- when the file isn't inside a git repo. Keeps entries short while still telling
 -- you which project a same-named file belongs to.
+--
+-- Files in the *current* project get no suffix: when the file's repo root equals
+-- the cwd's repo root, the label is redundant noise, so drop it.
 local function repo_label(path)
   local root = vim.fs.root(path, ".git")
+  local cwd = vim.fn.getcwd()
+  local cur_root = vim.fs.root(cwd, ".git") or cwd
+  if root and vim.fs.normalize(root) == vim.fs.normalize(cur_root) then
+    return ""
+  end
   local folder = root and vim.fn.fnamemodify(root, ":t") or vim.fn.fnamemodify(path, ":h:t")
   return string.format(" (%s)", folder)
 end
@@ -441,7 +449,20 @@ maps.set('n', '<leader>gep', function()
     }, scoped_opts())
   end)
 end, { desc = 'Live Grep by Filetype on Invocation' })
-maps.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { 
+
+-- Find TODO/FIXME/... comments across the current project (buffer's git root via
+-- scoped_opts, else cwd). Uses mini.extra's rg-backed grep, so it matches by
+-- content regardless of filetype (helm templates, etc.). Fuzzy-narrow in the
+-- picker prompt. Add :Todo! to search from cwd instead of the buffer's root.
+vim.api.nvim_create_user_command("Todo", function(a)
+	local opts = a.bang and {} or scoped_opts()
+	require("mini.extra").pickers.grep(
+		{ pattern = [[\b(TODO|FIXME|FIX|HACK|WARN|PERF|NOTE|BUG|XXX)\b]] },
+		opts
+	)
+end, { bang = true, desc = "Find TODO/FIXME/... in the current project" })
+
+maps.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, {
     buffer = 0, 
     desc = "See available code actions" 
 })
@@ -454,3 +475,30 @@ end, { desc = "LSP document symbols (current file)" })
 maps.set({ "n" }, "glS", function()
 	require("mini.extra").pickers.lsp({ scope = "workspace_symbol" })
 end, { desc = "LSP workspace symbols (project)" })
+
+-- Named sessions (mini.sessions). Global sessions live in stdpath("data")/session
+-- and show up in the starter's Sessions section.
+--   <leader>mks  write a session, name prefilled with the project folder (git
+--                root, else cwd) — so inside ~/code/infra it defaults to "infra".
+--   <leader>mkl  pick a session to load.
+--   <leader>mkd  pick a session to delete.
+maps.set("n", "<leader>mks", function()
+	local cwd = vim.fn.getcwd()
+	local root = vim.fs.root(cwd, ".git") or cwd
+	local default = vim.fn.fnamemodify(root, ":t")
+	vim.ui.input({ prompt = "Write session: ", default = default }, function(name)
+		if not name or name == "" then
+			return
+		end
+		require("mini.sessions").write(name)
+		vim.notify("Session written: " .. name)
+	end)
+end, { desc = "Write a named session (mks)" })
+
+maps.set("n", "<leader>mkl", function()
+	require("mini.sessions").select("read")
+end, { desc = "Load a session (pick)" })
+
+maps.set("n", "<leader>mkd", function()
+	require("mini.sessions").select("delete")
+end, { desc = "Delete a session (pick)" })

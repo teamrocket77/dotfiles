@@ -296,9 +296,21 @@ end
 
 M.helm_config = function()
 	-- helm_ls renders the chart and runs an embedded yaml-language-server on the
-	-- resolved output, mapping diagnostics back to the template source. Point that
-	-- yamlls at the kubernetes schema for templates/** so template files get k8s
-	-- schema completion/validation.
+	-- resolved output, mapping diagnostics back to the template source. Paths the
+	-- embedded yamlls sees are chart-root-relative (e.g. templates/foo.yaml).
+	--
+	-- yamlls applies EVERY schema whose glob matches a file, so a blanket
+	-- `kubernetes = templates/**` also lands on CRD templates and rejects them
+	-- ("kind is not a valid kubernetes kind"). Instead: point `kubernetes` at the
+	-- core-resource templates only, and map each CRD template to its cached
+	-- datreeio schema (populate/refresh with :YamlCrdsSync). CRD versions match
+	-- the charts' rendered apiVersion (ExternalSecret/SecretStore default to
+	-- v1beta1). Add a new resource by extending the right list below.
+	local crds = vim.fs.joinpath(vim.fn.stdpath("cache"), "yaml-crds")
+	local function crd(rel)
+		return "file://" .. vim.fs.joinpath(crds, rel)
+	end
+
 	vim.lsp.config("helm_ls", {
 		settings = {
 			["helm-ls"] = {
@@ -307,7 +319,31 @@ M.helm_config = function()
 					path = "yaml-language-server",
 					config = {
 						schemas = {
-							kubernetes = "templates/**",
+							-- Built-in kinds. Enumerated (not templates/**) so the
+							-- kubernetes schema never matches a CRD file.
+							kubernetes = {
+								"templates/deployment.yaml",
+								"templates/statefulset.yaml",
+								"templates/daemonset.yaml",
+								"templates/redis.yaml",
+								"templates/service.yaml",
+								"templates/serviceaccount.yaml",
+								"templates/configmap.yaml",
+								"templates/secret.yaml",
+								"templates/ingress.yaml",
+								"templates/hpa.yaml",
+								"templates/pdb.yaml",
+								"templates/poddisruptionbudget.yaml",
+								"templates/cronjob.yaml",
+								"templates/job.yaml",
+							},
+							-- CRDs: one cached schema per template file.
+							[crd("external-secrets.io/externalsecret_v1beta1.json")] = "templates/externalsecret.yaml",
+							[crd("external-secrets.io/secretstore_v1beta1.json")] = "templates/secretstore.yaml",
+							[crd("networking.istio.io/gateway_v1alpha3.json")] = "templates/gateway.yaml",
+							[crd("networking.istio.io/virtualservice_v1beta1.json")] = "templates/virtual-service.yaml",
+							[crd("opentelemetry.io/instrumentation_v1alpha1.json")] = "templates/instrumentation.yaml",
+							[crd("monitoring.coreos.com/servicemonitor_v1.json")] = "templates/servicemonitor.yaml",
 						},
 						completion = true,
 						hover = true,

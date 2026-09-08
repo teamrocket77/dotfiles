@@ -31,6 +31,7 @@ end
 
 require("plugins.cmp")
 require("plugins.mason").setup(s)
+require("plugins.yaml-crds")
 require("plugins.undotree")
 
 vim.schedule(function() require("checks").notify() end)

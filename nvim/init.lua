@@ -1,3 +1,14 @@
+-- kitty-scrollback.nvim launches plain `nvim` (no -u), so it would otherwise load
+-- this entire config — mason/LSP/treesitter/cmp and mini.starter — before it can
+-- attach. That's the slow start, and mini.starter's VimEnter races the plugin's
+-- own VimEnter, which is why you sometimes land on the dashboard instead of the
+-- scrollback. The kitten sets KITTY_SCROLLBACK_NVIM=true; in that mode load only
+-- the scrollback plugin (which registers its own launch) and skip everything else.
+if vim.env.KITTY_SCROLLBACK_NVIM == "true" then
+  require("plugins.kitty-scrollback")
+  return
+end
+
 local home = os.getenv("HOME")
 local opts = vim.o
 
