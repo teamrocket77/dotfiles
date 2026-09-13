@@ -5,6 +5,7 @@ require("plugins.conform")
 require("plugins.folke_utils")
 require("plugins.treesitter")
 require("plugins.markview")
+require("plugins.markdown")
 require("plugins.kitty-scrollback")
 require("plugins.git-blame")
 

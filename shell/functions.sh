@@ -244,3 +244,16 @@ pritunl-sync() {
 vpn() {
 	"$HOME/.config/kitty/vpn.sh"
 }
+
+# Open the clipboard contents in a scratch nvim buffer, with an optional
+# filetype for syntax/LSP. Usage: `neovimp json`, `neovimp yaml`, or bare `neovimp`.
+# Reads pbpaste via stdin (`nvim -`), so the buffer is unnamed and editable —
+# `:w some.file` to keep it. Filetype is set with -c after load.
+neovimp() {
+	if ! (( $+commands[nvim] )); then
+		echo "neovimp: nvim not found" >&2
+		return 1
+	fi
+	local ft="${1:-text}"
+	pbpaste | nvim -c "setfiletype ${ft}" -
+}

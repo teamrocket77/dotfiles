@@ -24,6 +24,7 @@ typeset -U path # This Zsh trick prevents duplicate entries in PATH automaticall
 [[ -d "/Applications/Docker.app/Contents/Resources/bin" ]] && path=("/Applications/Docker.app/Contents/Resources/bin" $path)
 [[ -d "/Applications/WezTerm.app/Contents/MacOS" ]] && path=($path "/Applications/WezTerm.app/Contents/MacOS")
 [[ -d "/Applications/Pritunl.app/Contents/Resources" ]] && path=($path "/Applications/Pritunl.app/Contents/Resources")
+[[ -d "/Applications/OpenVPN Connect.app/Contents/MacOS" ]] && path=($path "/Applications/OpenVPN Connect.app/Contents/MacOS")
 
 # 5. Plugin Manager (Self-healing)
 ZSH_PLUGIN_DIR="$HOME/zsh"

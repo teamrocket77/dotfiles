@@ -196,8 +196,20 @@ def _active_index() -> int:
         return -1
 
 
+def _in_scrollback() -> bool:
+    # True when the active window is scrolled up off the live prompt (i.e. the
+    # current pane is "in scrollback"). Defensive: a kitty API change should
+    # degrade to "no badge", never crash the tab bar.
+    try:
+        w = get_boss().active_window
+        return w is not None and w.screen.scrolled_by > 0
+    except Exception:
+        return False
+
+
 def _tab_flags(tab: TabBarData) -> str:
     # tmux-style #F flags: * current, Z zoomed, ! bell/attention, # activity.
+    # :S is appended on the active tab when its pane is scrolled back.
     flags = ""
     if getattr(tab, "layout_name", "") == "stack":
         flags += "Z"
@@ -207,6 +219,8 @@ def _tab_flags(tab: TabBarData) -> str:
         flags += "#"
     if tab.is_active:
         flags += "*"
+        if _in_scrollback():
+            flags += ":S"
     return flags
 
 

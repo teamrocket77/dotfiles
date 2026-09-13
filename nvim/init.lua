@@ -60,6 +60,23 @@ vim.o.directory = home .. "/.config/nvim/swapfiles/"
 vim.keymap.set('n', '+', '<C-a>', { desc = 'Increment number under cursor' })
 vim.keymap.set('n', '-', '<C-x>', { desc = 'Decrement number under cursor' })
 
+-- Window navigation: single-chord maps wrapping the native <C-w> motions, so you
+-- can hold Ctrl and tap h/j/k/l to walk across splits (repeatable), the way
+-- kitty's winmode hjkl works. Plain keymaps, no plugin.
+vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = 'Go to window left' })
+vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = 'Go to window down' })
+vim.keymap.set('n', '<C-k>', '<C-w>k', { desc = 'Go to window up' })
+vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = 'Go to window right' })
+
+-- Tab navigation: mirrors kitty's winmode n/p. Single-chord, so hold Ctrl and
+-- tap n / p to walk through tabs (repeatable). <leader>1..9 jump straight to a
+-- tab by number (like kitty's winmode 1-5); `{count}gt` also works natively.
+vim.keymap.set('n', '<C-n>', 'gt', { desc = 'Next tab' })
+vim.keymap.set('n', '<C-p>', 'gT', { desc = 'Previous tab' })
+for i = 1, 9 do
+  vim.keymap.set('n', '<leader>' .. i, i .. 'gt', { desc = 'Go to tab ' .. i })
+end
+
 vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, { desc = 'Show line diagnostics' })
 
 -- Move between diagnostic errors

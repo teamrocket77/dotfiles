@@ -473,13 +473,15 @@ vim.keymap.set("n", "]d", function()
 	vim.diagnostic.jump({ count = 1, float = 1 })
 end)
 
-vim.keymap.set("n", "<C-j>", function()
+-- Error-only jumps (all-severity jumps live on ]d / [d above). Moved off
+-- <C-j>/<C-k> so those chords can drive repeatable window navigation.
+vim.keymap.set("n", "]e", function()
 	vim.diagnostic.jump({ severity = { vim.diagnostic.severity.ERROR }, count = 1, float = 1 })
-end)
+end, { desc = "Next error" })
 
-vim.keymap.set("n", "<C-k>", function()
+vim.keymap.set("n", "[e", function()
 	vim.diagnostic.jump({ severity = { vim.diagnostic.severity.ERROR }, count = -1, float = 1 })
-end)
+end, { desc = "Prev error" })
 vim.keymap.set("n", "<leader>flt", vim.diagnostic.open_float)
 -- vim.keymap.set("n", "<leader>buf", functions.get_lsp)
 -- vim.keymap.set("n", "<leader>thi", functions.toggle_hints)

@@ -197,7 +197,7 @@ function _G.custom_tabline()
 		local prefix = flags ~= "" and ("[" .. flags .. "] ") or ""
 		local modified = vim.bo[bufnr].modified and " [+]" or ""
 
-		s = s .. " " .. prefix .. label .. modified .. " "
+		s = s .. " " .. i .. ": " .. prefix .. label .. modified .. " "
 	end
 	-- Fill the rest of the tabline and reset clickable region.
 	s = s .. "%#TabLineFill#%T"

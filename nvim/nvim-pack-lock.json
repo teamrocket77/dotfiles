@@ -74,6 +74,10 @@
       "src": "https://github.com/folke/lazydev.nvim",
       "version": "'01bc2aacd51cf9021eb19d048e70ce3dd09f7f93'"
     },
+    "markdown.nvim": {
+      "rev": "093be911d90de03877f3009de36081c1a6242d51",
+      "src": "https://github.com/tadmccorkle/markdown.nvim"
+    },
     "markview.nvim": {
       "rev": "3537eb2a9251cad5d7718253768f3772c62233fc",
       "src": "https://github.com/OXY2DEV/markview.nvim",

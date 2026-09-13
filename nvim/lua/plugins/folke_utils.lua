@@ -30,3 +30,8 @@ k.set( { "o", "x" }, "R",      function() require("flash").treesitter_search() e
 k.set({ "n", "x" }, "<leader>ca", function()
   require("tiny-code-action").code_action()
 end, { noremap = true, silent = true, desc = "Code action (tiny-code-action)" })
+
+-- Trouble: LSP/diagnostics list. <leader>xx toggles all-project diagnostics,
+-- <leader>xX just the current buffer.
+k.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics (Trouble)" })
+k.set("n", "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Buffer diagnostics (Trouble)" })
