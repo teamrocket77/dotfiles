@@ -86,10 +86,86 @@ set_pick_hl()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = set_pick_hl })
 
 require("mini.icons").setup()
+-- Show LSP kind icons in the native completion popup (parity with what cmp did).
+require("mini.icons").tweak_lsp_kind()
 require("mini.files").setup({})
 require("mini.git").setup({})
 require("mini.extra").setup({})
 require("mini.sessions").setup({})
+-- Centered notifications (middle of the screen, where noice's popups used to be).
+-- mini.notify defaults to the top-right corner; this window.config callback
+-- re-centers the popup on every refresh from its *current* contents — so as
+-- notifications stack and the window grows/shrinks, it stays centered. Width is
+-- content-fit but capped at 70% of the screen.
+require("mini.notify").setup({
+  window = {
+    config = function(buf_id)
+      local lines = vim.api.nvim_buf_get_lines(buf_id, 0, -1, false)
+      local height = math.max(#lines, 1)
+      local width = 1
+      for _, line in ipairs(lines) do
+        width = math.max(width, vim.fn.strdisplaywidth(line))
+      end
+      width = math.min(width, math.floor(vim.o.columns * 0.7))
+      return {
+        anchor = "NW",
+        row = math.max(0, math.floor((vim.o.lines - height) / 2)),
+        col = math.max(0, math.floor((vim.o.columns - width) / 2)),
+        width = width,
+        height = height,
+      }
+    end,
+  },
+})
+
+-- :NotifyHistory — open the full notification history in a scratch buffer.
+-- :NotifyGetAll  — pretty-print the raw notification records (id, msg, level, ts…).
+vim.api.nvim_create_user_command("NotifyHistory", function()
+  require("mini.notify").show_history()
+end, { desc = "Show mini.notify history" })
+vim.api.nvim_create_user_command("NotifyGetAll", function()
+  vim.print(require("mini.notify").get_all())
+end, { desc = "Print all mini.notify records" })
+
+-- Native (bottom) command line, enhanced: as-you-type autocomplete, autocorrect
+-- of commands/options, and a floating "autopeek" window previewing a command's
+-- target :range. Note mini.cmdline deliberately does NOT relocate the cmdline UI
+-- (its docs point to |vim._extui| for that) — the command line stays at the bottom.
+require("mini.cmdline").setup({})
+-- mini.cmdline renders autocomplete via the popup menu ('wildoptions=pum'); cap it
+-- to 5 rows so the menu stays small (extra matches scroll). Note: 'pumheight' is
+-- global, so it also caps insert-mode completion popups.
+vim.o.pumheight = 5
+-- Draw a border around the popup menu box. Same values as 'winborder'
+-- (single/double/rounded/solid/shadow/…); highlighted via PmenuBorder.
+vim.o.pumborder = "rounded"
+
+-- Insert-mode completion (replaces nvim-cmp): two-stage LSP + fallback, rendered
+-- in Neovim's native popup menu — so it inherits pumheight/pumborder above and
+-- looks identical to the :cmdline popup. Snippets from LSP items expand via
+-- mini.snippets (set up below).
+require("mini.completion").setup({})
+
+-- Advertise mini.completion's completion capabilities (snippetSupport,
+-- additionalTextEdits auto-import, resolve, etc.) to every LSP server, merged
+-- over Neovim's built-in client capabilities. Set here (mini loads before mason
+-- enables servers in default.lua), replacing cmp_nvim_lsp.default_capabilities().
+vim.lsp.config("*", {
+  capabilities = vim.tbl_deep_extend(
+    "force",
+    vim.lsp.protocol.make_client_capabilities(),
+    require("mini.completion").get_lsp_capabilities()
+  ),
+})
+
+-- Harmonious Tab/S-Tab/CR via mini.keymap: one key drives the native popup and
+-- jumps/expands LSP snippet tabstops (replaces the old cmp+LuaSnip Tab logic).
+-- map_multistep falls back to the literal key when no step fires, so <Tab>/<CR>
+-- still insert normally outside the popup/snippets.
+local ms = require("mini.keymap").map_multistep
+ms("i", "<Tab>", { "minisnippets_next", "minisnippets_expand", "pmenu_next" })
+ms("i", "<S-Tab>", { "minisnippets_prev", "pmenu_prev" })
+ms("i", "<CR>", { "pmenu_accept" })
 -- Statusline with a fixed "nvim" chip as the leftmost item, so it's obvious at
 -- a glance that this bar belongs to nvim (vs tmux's status bar). The rest mirrors
 -- mini.statusline's default active content.
@@ -100,6 +176,9 @@ local function statusline_active()
   local diff         = MiniStatusline.section_diff({ trunc_width = 75 })
   local diagnostics  = MiniStatusline.section_diagnostics({ trunc_width = 75 })
   local lsp          = MiniStatusline.section_lsp({ trunc_width = 75 })
+  -- CRD/schema chip: reads the decoupled buffer var set by yaml-crds.lua (no
+  -- require), so it only appears once a schema is actually attached to this buffer.
+  local schema       = vim.b.crd_schema and ("⎈ " .. vim.b.crd_schema) or ""
   local fileinfo     = MiniStatusline.section_fileinfo({ trunc_width = 120 })
   -- Build the filename from the real buffer path (section_filename returns
   -- statusline field codes like "%F%m%r", not a path, so it can't be gsub'd).
@@ -124,7 +203,7 @@ local function statusline_active()
     { hl = "MiniStatuslineNvim",     strings = { "nvim" } },
     { hl = mode_hl,                  strings = { mode } },
     { hl = "MiniStatuslineReadonly", strings = { readonly } },
-    { hl = "MiniStatuslineDevinfo",  strings = { git, diff, diagnostics, lsp } },
+    { hl = "MiniStatuslineDevinfo",  strings = { git, diff, diagnostics, lsp, schema } },
     { hl = "MiniStatuslineFilename", strings = { filename } },
     { hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
     { hl = mode_hl,                  strings = { search, location } },

@@ -138,35 +138,47 @@ function M.init(bufnr)
 
   -- Prefer a cached CRD schema; otherwise let the bundled kubernetes schema
   -- validate built-in kinds. Both scoped to this buffer's path.
-  local schema = crd_schema(api_version, kind) or "kubernetes"
-  map_schema(client, schema, bufpath)
+  local schema = crd_schema(api_version, kind)
+  -- Human-readable label for consumers (e.g. the statusline). Decoupled on
+  -- purpose: readers just read `vim.b.crd_schema`, no require of this module.
+  -- For a CRD it's the cached schema's filename sans extension
+  -- (e.g. `externalsecret_v1beta1`); for a built-in kind it's `kubernetes`.
+  vim.b[bufnr].crd_schema = schema and vim.fn.fnamemodify(schema, ":t:r") or "kubernetes"
+  map_schema(client, schema or "kubernetes", bufpath)
   vim.b[bufnr].crd_schema_attached = true
 end
 
 local group = vim.api.nvim_create_augroup("yaml_crds", { clear = true })
+
+-- Attach the content-based CRD schema to `bufnr`: if yamlls is already attached,
+-- run M.init now; otherwise defer to a one-shot LspAttach for this buffer only.
+-- Exported so :YamlCrdsAttach (and :HelmT via it) can drive the same path on
+-- demand, not only from the FileType autocmd below.
+function M.attach(bufnr)
+  if vim.lsp.get_clients({ name = "yamlls", bufnr = bufnr })[1] then
+    M.init(bufnr)
+  else
+    -- yamlls not attached yet: run once it does, for this buffer only.
+    vim.api.nvim_create_autocmd("LspAttach", {
+      group = group,
+      buffer = bufnr,
+      callback = function(a)
+        local c = vim.lsp.get_client_by_id(a.data.client_id)
+        if c and c.name == "yamlls" then
+          M.init(bufnr)
+          return true -- one-shot: delete this LspAttach autocmd
+        end
+      end,
+    })
+  end
+end
 
 -- Plain YAML k8s docs: attach the matching schema per buffer.
 vim.api.nvim_create_autocmd("FileType", {
   group = group,
   pattern = "yaml",
   callback = function(args)
-    local bufnr = args.buf
-    if vim.lsp.get_clients({ name = "yamlls", bufnr = bufnr })[1] then
-      M.init(bufnr)
-    else
-      -- yamlls not attached yet: run once it does, for this buffer only.
-      vim.api.nvim_create_autocmd("LspAttach", {
-        group = group,
-        buffer = bufnr,
-        callback = function(a)
-          local c = vim.lsp.get_client_by_id(a.data.client_id)
-          if c and c.name == "yamlls" then
-            M.init(bufnr)
-            return true -- one-shot: delete this LspAttach autocmd
-          end
-        end,
-      })
-    end
+    M.attach(args.buf)
   end,
 })
 
@@ -203,6 +215,28 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 vim.api.nvim_create_user_command("YamlCrdsSync", function()
   M.ensure_catalog(true)
 end, { desc = "Download/refresh the datreeio CRD schema cache" })
+
+-- Make the current buffer a validated k8s-yaml buffer, on demand and regardless
+-- of how it got here (piped stdin, :HelmT output, an already-open manifest):
+--   1. name it if unnamed — yamlls binds schemas by file:// URI, and M.init bails
+--      on an empty name, so give it a stable `buffer<n>.yaml` name;
+--   2. set ft=yaml — starts yamlls (via vim.lsp.enable's FileType autocmd) and
+--      fires the FileType-yaml -> M.attach path above;
+--   3. call M.attach directly too, so an already-`yaml` buffer (where re-setting
+--      the filetype won't re-fire FileType) still attaches. init/attach are
+--      idempotent, so the belt-and-suspenders double call is harmless.
+-- Handy for piped renders:
+--   helm template … --show-only templates/x.yaml | nvim - -c YamlCrdsAttach
+vim.api.nvim_create_user_command("YamlCrdsAttach", function()
+  local bufnr = vim.api.nvim_get_current_buf()
+  if vim.api.nvim_buf_get_name(bufnr) == "" then
+    vim.api.nvim_buf_set_name(bufnr, "buffer" .. bufnr .. ".yaml")
+  end
+  vim.bo[bufnr].filetype = "yaml"
+  M.attach(bufnr)
+end, { desc = "Name (if needed) + attach the CRD schema to the current buffer as yaml" })
+
+vim.keymap.set("n", "<leader>ya", "<cmd>YamlCrdsAttach<cr>", { desc = "YamlCrdsAttach: attach CRD schema to this buffer" })
 
 -- Browse the cached CRD schemas with mini.pick.
 local function cache_or_warn()

@@ -56,6 +56,12 @@ if [[ -z "$NIX_PROFILES" ]] && (( $+commands[git] )); then
 	load_plugin "zsh-syntax-highlighting" "https://github.com/zsh-users/zsh-syntax-highlighting.git" "zsh-syntax-highlighting.zsh"
 fi
 
+# zsh-vi-mode must be sourced last so it can override key bindings set by the
+# plugins above. Not managed by home-manager, so self-manage it on every machine.
+if (( $+commands[git] )); then
+	load_plugin "zsh-vi-mode" "https://github.com/jeffreytse/zsh-vi-mode.git" "zsh-vi-mode.plugin.zsh"
+fi
+
 if (( $+commands[direnv] )); then
     eval "$(direnv hook zsh)"
 fi

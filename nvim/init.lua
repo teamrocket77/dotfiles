@@ -26,6 +26,15 @@ opts.tabstop = 4
 opts.wildmenu = true
 opts.spell = false
 vim.opt.cursorline = true
+
+-- QoL: live :s preview in a split, keep the cursor off the screen edges,
+-- predictable split placement (matters for the split-scoped pickers in mini.lua),
+-- and a snappier updatetime for CursorHold / git-blame.
+opts.inccommand = "split"
+opts.scrolloff = 8
+opts.splitright = true
+opts.splitbelow = true
+opts.updatetime = 250
 -- vim.opt.sessionoptions = "buffers,curdir,help,resize,tabpages,terminal, winsize,winpos"
 
 vim.cmd([[ set mouse=a ]])

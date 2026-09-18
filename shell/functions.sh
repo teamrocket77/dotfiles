@@ -245,6 +245,14 @@ vpn() {
 	"$HOME/.config/kitty/vpn.sh"
 }
 
+# OpenVPN Connect: interactive VPN switcher (fzf) — disconnects the current tunnel
+# then connects the choice via the app's --connect-shortcut. Thin wrapper over the
+# overlay script kitty binds (winmode → shift+v), so the same picker is available
+# straight from the shell.
+vpn-ovpn() {
+	"$HOME/.config/kitty/vpn-ovpn.sh"
+}
+
 # Open the clipboard contents in a scratch nvim buffer, with an optional
 # filetype for syntax/LSP. Usage: `neovimp json`, `neovimp yaml`, or bare `neovimp`.
 # Reads pbpaste via stdin (`nvim -`), so the buffer is unnamed and editable —

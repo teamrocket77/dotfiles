@@ -8,6 +8,9 @@ require("plugins.markview")
 require("plugins.markdown")
 require("plugins.kitty-scrollback")
 require("plugins.git-blame")
+-- Registers the global :HelmPick command + <leader>hp at startup (so they work
+-- from the dashboard); ftplugin/helm.lua reuses this module for :HelmT.
+require("plugins.helm-render")
 
 local s = {}
 s.servers = {
@@ -30,7 +33,6 @@ if (vim.env.NIX_PROFILES or "") ~= "" then
   table.insert(s.servers, "nixd")
 end
 
-require("plugins.cmp")
 require("plugins.mason").setup(s)
 require("plugins.yaml-crds")
 require("plugins.undotree")
