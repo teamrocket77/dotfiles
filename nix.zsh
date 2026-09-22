@@ -24,8 +24,11 @@ set -E
 #   return 0
 # }
 
-if [[ -d "$HOME/dotfiles/shell" ]]; then
-    for F in ~/dotfiles/shell/*(.N); do
+# Interactive half only (shell/rc/*). Env vars, PATH, and functions (shell/env/*)
+# are sourced from .zshenv via home-manager's programs.zsh.envExtra (see zsh.nix),
+# so they are available to non-interactive shells (nvim :!, scripts) too.
+if [[ -d "$HOME/dotfiles/shell/rc" ]]; then
+    for F in ~/dotfiles/shell/rc/*(.N); do
 		source $F
     done
 fi

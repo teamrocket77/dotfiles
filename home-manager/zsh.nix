@@ -3,6 +3,16 @@
   enable = true;
   enableCompletion = true;
   syntaxHighlighting.enable = true;
+  # .zshenv: env vars, PATH, and functions (shell/env/*) for ALL zsh invocations,
+  # incl. non-interactive `zsh -c` (nvim :!, system(), scripts). Mirrors the
+  # ~/.zshenv snippet used on non-Nix machines (see zshenv.tmpl.sh).
+  envExtra = ''
+            if [[ -d "$HOME/dotfiles/shell/env" ]]; then
+                for f in "$HOME"/dotfiles/shell/env/*(.N); do source "$f"; done
+            fi
+  '';
+  # .zshrc: interactive-only setup (plugins, prompt, aliases, keybindings) via
+  # nix.zsh → shell/rc/*.
   initContent = ''
             if [ -f "$HOME/dotfiles/nix.zsh" ]; then
                 source "$HOME/dotfiles/nix.zsh"

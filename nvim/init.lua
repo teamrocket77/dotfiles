@@ -12,6 +12,15 @@ end
 local home = os.getenv("HOME")
 local opts = vim.o
 
+-- GUI/launchd/Spotlight launches don't source .zshenv, so ~/.cargo/bin (where
+-- rustup installs the tree-sitter CLI) is off PATH. Both checks.lua and
+-- nvim-treesitter's main-branch parser builds shell out to `tree-sitter`, so put
+-- it on PATH here — before any plugin loads — regardless of how nvim was started.
+local cargo_bin = home .. "/.cargo/bin"
+if vim.fn.isdirectory(cargo_bin) == 1 and not (":" .. vim.env.PATH .. ":"):find(":" .. cargo_bin .. ":", 1, true) then
+  vim.env.PATH = cargo_bin .. ":" .. vim.env.PATH
+end
+
 vim.g.mapleader = " "
 
 opts.autoindent = true
