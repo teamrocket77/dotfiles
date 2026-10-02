@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
-# Fuzzy-pick an immediate subdirectory of ~/code and open it as a new tab laid
-# out like a workspace: nvim on the left, an empty terminal on the right (vsplit).
-# Invoked from kitty.conf as an overlay: winmode (ctrl+a) then `o`.
+# Fuzzy-pick an immediate subdirectory of ~/code and open it as a new tab, then
+# ask what to run in it:
+#   <Enter> / t : just a terminal
+#   n           : nvim on the left, empty terminal on the right (vsplit)
+#   c           : claude on the left, empty terminal on the right (vsplit)
+#
+# Invoked from kitty.conf as an overlay: winmode (ctrl+a) then `s`.
 #
 # kitty.conf launches this through `$SHELL -lc`, so the login shell has already
 # sourced your normal environment (PATH etc.) — no PATH shim needed here, and
-# fzf/nvim/kitten resolve the same way they do at an interactive prompt.
+# fzf/nvim/kitten/jq resolve the same way they do at an interactive prompt.
 set -euo pipefail
 
 # Talk to kitty via the `kitten @` remote-control client (falls back to `kitty @`).
@@ -21,20 +25,45 @@ if ! selection=$(
 ); then
 	exit 0
 fi
-
-[ -n "${selection:-}" ] || exit 0
+[ -n "$selection" ] || exit 0
 
 name=${selection%%$'\t'*}
 dir=${selection#*$'\t'}
 
-# 1. New tab whose sole (original) window runs nvim — this window keeps the left
-#    half when we split. Capture its id so we can anchor the split to it.
-nvim_win=$(kitten @ launch --type=tab --tab-title "$name" --cwd "$dir" nvim)
+# Ask what to run. `ask --type=choices` prints a JSON object to stdout, e.g.
+# {"items": [], "response": "n"} — <Enter> yields --default, Esc yields "".
+if ! answer=$(
+	kitty +kitten ask \
+		--type=choices \
+		--title="Open $name" \
+		--default=t \
+		--choice="t:just a Terminal" \
+		--choice="n;green:Nvim" \
+		--choice="c;magenta:Claude"
+); then
+	exit 0
+fi
+program=$(printf '%s' "$answer" | jq -r '.response // empty')
+[ -n "$program" ] || exit 0
 
-# 2. vsplit an empty terminal beside nvim. kitty adds the NEW window in the freed
-#    half, so it lands on the right while nvim stays left. --match anchors the
-#    split to the nvim window rather than whatever happens to be active.
-term_win=$(kitten @ launch --location=vsplit --match "id:${nvim_win}" --cwd "$dir")
+# open_app <dir> <title> [program]
+# Opens a new tab in <dir>. With a program, runs it in the tab and adds an empty
+# terminal to its right via vsplit, then puts focus back on the program window.
+open_app() {
+	local dir=$1 title=$2 program=${3:-}
+	local app_win
+	if [ -n "$program" ]; then
+		app_win=$(kitten @ launch --type=tab --tab-title "$title" --cwd "$dir" "$program")
+		kitten @ launch --location=vsplit --next-to "id:${app_win}" --cwd "$dir" >/dev/null
+		kitten @ focus-window --match "id:${app_win}"
+	else
+		kitten @ launch --type=tab --tab-title "$title" --cwd "$dir" >/dev/null
+	fi
+}
 
-# 3. Land in the empty terminal on the right.
-kitten @ focus-window --match "id:${term_win}"
+case $program in
+	n) open_app "$dir" "$name" nvim ;;
+	c) open_app "$dir" "$name" claude ;;
+	t) open_app "$dir" "$name" ;;
+	*) exit 0 ;;
+esac

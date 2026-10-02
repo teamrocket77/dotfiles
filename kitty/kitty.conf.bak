@@ -1,5 +1,5 @@
 # BEGIN_KITTY_THEME
-# Arthur
+# Belafonte Day
 include current-theme.conf
 # END_KITTY_THEME
 map alt+left send_text all \x1b\x62
@@ -37,7 +37,7 @@ action_alias kitty_scrollback_nvim kitten ~/.local/share/nvim/site/pack/core/opt
 # ctrl+a enters a persistent keyboard mode. Because it does not use
 # `--on-action end`, the mode stays active after each action, so you can press
 # h/j/k/l repeatedly to jump across more than one window at a time.
-map --new-mode winmode --timeout 0.5 ctrl+a
+map --new-mode winmode --timeout 0.7 ctrl+a
 
 # move between splits (repeatable — stays in the mode)
 map --mode winmode h neighboring_window left
@@ -86,6 +86,15 @@ map --mode winmode w combine : launch --type=overlay --cwd=current sh -c "exec $
 # login shell loads PATH (fzf/nvim/kitten) — the script needs no PATH shim.
 map --mode winmode s combine : launch --type=overlay --cwd=current $SHELL -lc "exec $HOME/.config/kitty/new-code-session.sh" : pop_keyboard_mode
 
+# fuzzy-pick a Pritunl VPN profile and toggle it (single tunnel). Overlay runs
+# vpn.sh via the login shell (so PATH/fzf/jq resolve), then leaves the mode.
+map --mode winmode v combine : launch --type=overlay --cwd=current $SHELL -lc "exec $HOME/.config/kitty/vpn.sh" : pop_keyboard_mode
+
+# fuzzy-pick an OpenVPN Connect profile and switch to it (single tunnel):
+# disconnects the current tunnel first, then connects the choice via the app's
+# --connect-shortcut. Same overlay pattern as the Pritunl binding above.
+map --mode winmode shift+v combine : launch --type=overlay --cwd=current $SHELL -lc "exec $HOME/.config/kitty/vpn-ovpn.sh" : pop_keyboard_mode
+
 # suspend kitty shortcuts on the CURRENT window (no new window) — same
 # passthrough mode as alt+shift+s. Leave it the same way, with ctrl+shift+f12.
 map --mode winmode t combine : pop_keyboard_mode : push_keyboard_mode passthrough
@@ -94,8 +103,14 @@ map --mode winmode t combine : pop_keyboard_mode : push_keyboard_mode passthroug
 map --mode winmode [ combine : kitty_scrollback_nvim : pop_keyboard_mode
 map --mode winmode e combine : kitty_scrollback_nvim --config ksb_builtin_last_cmd_output : pop_keyboard_mode
 
-# open Neovim's LSP log locked (nomodifiable) in a new tab, then leave the mode (L = Log)
-map --mode winmode shift+l combine : launch --type=tab sh -c "exec vim -M $HOME/.local/state/nvim/lsp.log" : pop_keyboard_mode
+# resize the current split (repeatable — stays in the mode). Uppercase HJKL
+# mirrors the lowercase focus keys: h/l pull the vertical edge, k/j the
+# horizontal one; 0 resets to even. Only affects splits/tall/fat layouts.
+map --mode winmode shift+h resize_window narrower 2
+map --mode winmode shift+l resize_window wider 2
+map --mode winmode shift+k resize_window taller 2
+map --mode winmode shift+j resize_window shorter 2
+map --mode winmode 0 resize_window reset
 
 # rename the current tab (interactive prompt), then leave the mode
 map --mode winmode , combine : set_tab_title : pop_keyboard_mode

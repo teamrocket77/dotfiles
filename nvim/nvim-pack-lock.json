@@ -1,5 +1,10 @@
 {
   "plugins": {
+    "bg.nvim": {
+      "rev": "85da2c68409820466753b50c2e6f699517778a17",
+      "src": "https://github.com/typicode/bg.nvim",
+      "version": "'85da2c68409820466753b50c2e6f699517778a17'"
+    },
     "conform.nvim": {
       "rev": "3543d000dafbc41cc7761d860cfdb24e82154f75",
       "src": "https://github.com/stevearc/conform.nvim.git",
