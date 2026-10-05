@@ -131,7 +131,13 @@ end, { desc = "Print all mini.notify records" })
 -- of commands/options, and a floating "autopeek" window previewing a command's
 -- target :range. Note mini.cmdline deliberately does NOT relocate the cmdline UI
 -- (its docs point to |vim._extui| for that) — the command line stays at the bottom.
-require("mini.cmdline").setup({})
+-- autocorrect is disabled: it rewrites command-position words to the nearest
+-- valid command by edit distance, which makes non-commands like `:expand`
+-- un-typeable (it's not a real Ex command, so it gets replaced). Arguments
+-- (e.g. `:h expand`) were never affected. Keep autocomplete + autopeek.
+require("mini.cmdline").setup({
+  autocorrect = { enable = false },
+})
 -- mini.cmdline renders autocomplete via the popup menu ('wildoptions=pum'); cap it
 -- to 5 rows so the menu stays small (extra matches scroll). Note: 'pumheight' is
 -- global, so it also caps insert-mode completion popups.

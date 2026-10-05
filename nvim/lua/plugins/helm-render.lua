@@ -123,15 +123,28 @@ end
 -- it works from the dashboard / anywhere. Two-step picker: template -> values.
 -- Backs :HelmPick.
 function M.pick_and_render(dir)
-  dir = dir or vim.fn.getcwd()
+  dir = vim.fs.normalize(dir or vim.fn.getcwd())
   require("mini.pick").builtin.cli(
     {
+      -- Run find from within `dir` so results are relative (e.g.
+      -- chart/templates/foo.yaml) instead of absolute — the cwd prefix never
+      -- shows in the picker. choose re-joins `dir` to get the real path.
       command = {
-        "find", dir, "-type", "f",
+        "find", ".", "-type", "f",
         "-not", "-path", "*/.git/*",
         "-path", "*/templates/*",
         "(", "-name", "*.yaml", "-o", "-name", "*.yml", ")",
       },
+      spawn_opts = { cwd = dir },
+      postprocess = function(lines)
+        local out = {}
+        for _, l in ipairs(lines) do
+          if l ~= "" then
+            out[#out + 1] = (l:gsub("^%./", "")) -- drop find's leading "./"
+          end
+        end
+        return out
+      end,
     },
     {
       source = {
@@ -140,7 +153,7 @@ function M.pick_and_render(dir)
           if not item or item == "" then
             return
           end
-          local file = vim.fs.normalize(item)
+          local file = vim.fs.normalize(dir .. "/" .. item)
           local root = vim.fs.root(file, "Chart.yaml")
           if not root then
             vim.notify("HelmPick: " .. item .. " is not inside a Helm chart", vim.log.levels.WARN)

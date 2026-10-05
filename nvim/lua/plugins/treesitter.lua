@@ -13,7 +13,7 @@ vim.pack.add({
 
 require("nvim-treesitter").install({
 	"yaml", "helm", "gotmpl", "hcl", "terraform", "bash", "json", "dockerfile",
-	"markdown", "markdown_inline",
+	"markdown", "markdown_inline", "groovy",
 })
 
 vim.treesitter.language.register("yaml", { "yaml.gitlab", "yaml.helm" })
@@ -22,6 +22,7 @@ vim.api.nvim_create_autocmd("FileType", {
 	pattern = {
 		"yaml", "yaml.gitlab", "yaml.helm", "helm", "gotmpl",
 		"hcl", "terraform", "sh", "bash", "json", "dockerfile", "markdown",
+		"groovy",
 	},
 	callback = function() pcall(vim.treesitter.start) end,
 })

@@ -194,8 +194,10 @@ vim.filetype.add({
     envrc = "sh",
     Jenkinsfile = "groovy",
   },
+  pattern = {
+    [".*%.[jJ]enkinsfile$"] = "groovy",
+  },
   extension = {
-    ["*.Jenkinsfile"] = "groovy",
     ["*.envrc"] = "sh",
     yml = yaml_ft,
     yaml = yaml_ft,
