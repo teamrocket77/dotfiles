@@ -8,6 +8,7 @@ require("plugins.markview")
 require("plugins.markdown")
 require("plugins.kitty-scrollback")
 require("plugins.git-blame")
+require("plugins.tmux-navigation")
 require("plugins.bg")
 -- Registers the global :HelmPick command + <leader>hp at startup (so they work
 -- from the dashboard); ftplugin/helm.lua reuses this module for :HelmT.
