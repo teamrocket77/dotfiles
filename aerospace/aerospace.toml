@@ -206,3 +206,34 @@ on-mode-changed = []
 [[on-window-detected]]
     if.app-id = 'com.apple.finder'
     run = 'move-node-to-workspace u'
+
+[[on-window-detected]]
+	if.app-id = 'org.jkiss.dbeaver.core.product'
+	run = 'move-node-to-workspace i'
+
+[[on-window-detected]]
+	if.app-id = 'org.alacritty'
+	run = [
+		'layout h_accordion',
+		'move left',
+		'move left',
+		'move left',
+		'move right'
+	]
+
+[[on-window-detected]]
+	if.app-id = 'org.mozilla.firefox'
+	run = [
+		# Collapse any nested sub-trees so every window is one flat set of
+		# siblings (otherwise Firefox opens in its own branch and stays
+		# always-visible instead of joining the accordion).
+		'flatten-workspace-tree',
+		# Make that single container a left/right accordion.
+		'layout h_accordion',
+		# Push Firefox to the leftmost slot; 'stop' keeps it inside the
+		# workspace (no wrap, no monitor-hop), so extra moves are harmless.
+		'move left --boundaries workspace --boundaries-action stop',
+		'move left --boundaries workspace --boundaries-action stop',
+		'move left --boundaries workspace --boundaries-action stop',
+		'move left --boundaries workspace --boundaries-action stop'
+	]

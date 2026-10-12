@@ -490,33 +490,66 @@ maps.set({"n"}, "<Space>gup",
 function()
 	local MiniPick = require("mini.pick")
 	local root = buffer_root() or "."
+
+	-- Open an unrestricted (gitignored/hidden incl.) live grep. `cwd` is the
+	-- search root; `globs` optionally restricts it to a subset of subdirs.
+	-- rg's --no-ignore --hidden come from rg-all.conf via RIPGREP_CONFIG_PATH,
+	-- restored when the grep picker closes. Deferred so the dir picker finishes
+	-- tearing down (and fires its own MiniPickStop) before we touch env.
+	local function start_grep(cwd, globs)
+		vim.schedule(function()
+			local prev = vim.env.RIPGREP_CONFIG_PATH
+			vim.env.RIPGREP_CONFIG_PATH = vim.fn.stdpath("config") .. "/rg-all.conf"
+			vim.api.nvim_create_autocmd("User", {
+				pattern = "MiniPickStop",
+				once = true,
+				callback = function()
+					vim.env.RIPGREP_CONFIG_PATH = prev
+				end,
+			})
+			MiniPick.builtin.grep_live({ globs = globs or {} }, { source = { cwd = cwd } })
+		end)
+	end
+
+	-- Translate absolute dir paths (from `find`) into rg globs relative to
+	-- `base`, e.g. /repo/src -> "src/**". If `base` itself is among them,
+	-- return {} (no restriction = grep the whole root).
+	local function globs_under(base, items)
+		local b = vim.fs.normalize(vim.fn.fnamemodify(base, ":p")):gsub("/$", "")
+		local globs = {}
+		for _, it in ipairs(items) do
+			local abs = vim.fs.normalize(vim.fn.fnamemodify(it, ":p")):gsub("/$", "")
+			if abs == b then
+				return {}
+			elseif abs:sub(1, #b + 1) == b .. "/" then
+				globs[#globs + 1] = abs:sub(#b + 2) .. "/**"
+			else
+				globs[#globs + 1] = abs .. "/**"
+			end
+		end
+		return globs
+	end
+
 	MiniPick.builtin.cli(
 		{ command = { "find", root, "-name", ".git", "-prune", "-o", "-type", "d", "-print" } },
 		{
 			source = {
-				name = "Dir to grep (all)",
+				name = "Dir to grep (all) — <C-x> mark, <M-CR> grep all marked",
+				-- <CR>: grep a single chosen directory.
 				choose = function(item)
 					if not item or item == "" then return end
-					-- Defer: let this picker finish tearing down (and fire its own
-					-- MiniPickStop) before we set env + open the grep picker.
-					vim.schedule(function()
-						local prev = vim.env.RIPGREP_CONFIG_PATH
-						vim.env.RIPGREP_CONFIG_PATH = vim.fn.stdpath("config") .. "/rg-all.conf"
-						vim.api.nvim_create_autocmd("User", {
-							pattern = "MiniPickStop",
-							once = true,
-							callback = function()
-								vim.env.RIPGREP_CONFIG_PATH = prev
-							end,
-						})
-						MiniPick.builtin.grep_live({}, { source = { cwd = item } })
-					end)
+					start_grep(item, {})
+				end,
+				-- <M-CR>: grep across every marked directory at once.
+				choose_marked = function(items)
+					if not items or #items == 0 then return end
+					start_grep(root, globs_under(root, items))
 				end,
 			},
 		}
 	)
 end,
-{ desc = "Grep incl. gitignored (.venv etc.), pick dir first" }
+{ desc = "Grep incl. gitignored (.venv etc.), pick dir(s) first" }
 )
 
 maps.set('n', '<leader>gep', function()
