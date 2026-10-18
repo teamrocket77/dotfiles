@@ -5,8 +5,11 @@
 #
 # On Nix, home-manager's `enableCompletion = true` already runs compinit, so the
 # guard below skips this to avoid doing the work twice.
+
 if (( ! $+functions[compdef] )); then
 	# Static completion dirs must be on fpath BEFORE compinit scans it.
+  zstyle ':completion:*' use-cache on
+  zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/zcompcache"
 	(( $+commands[brew] )) && fpath+=("$(brew --prefix)/share/zsh/site-functions")
 
 	autoload -Uz compinit

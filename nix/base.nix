@@ -1,5 +1,21 @@
 { pkgs, ... }:
 {
+  nix = {
+    gc = {
+      automatic = true;
+      interval = { Day = 3; };
+      options = "--delete-older-than 30d";
+    };
+    optimise = {
+        automatic = true;
+        interval = { Day = 30; };
+    };
+    settings = {
+        substituters = [ "https://cache.nixos.org/" ];
+        min-free = 5 * 1024 * 1024 * 1024;
+        max-free = 10 * 1024 * 1024 * 1024; 
+    };
+  };
   documentation = {
       enable = true;
       man.enable = true;

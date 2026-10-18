@@ -19,7 +19,6 @@
             else
                 echo "Unable to source $HOME/dotfiles/nix.zsh"
             fi
-            autoload -Uz compinit
   '';
   shellAliases = {
     darwin-switch="sudo darwin-rebuild switch --flake ~/dotfiles";
