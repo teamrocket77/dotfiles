@@ -1,0 +1,122 @@
+onboarding = false
+
+[ui.sound]
+enabled = false
+
+[ui]
+status_indicators = "symbols"
+
+# Keybindings ported from ~/.config/tmux/tmux.conf so the tmux muscle memory
+# carries over. herdr is tmux-inspired, so most prefix+<key> actions already
+# match tmux defaults; the explicit entries below document the mapping and
+# cover the few deltas (C-a prefix, | / - splits, d detach).
+[keys]
+# tmux: set -g prefix C-a
+prefix = "ctrl+a"
+
+# tmux: bind | split-window -h  (side-by-side)  -> herdr "vertical" split
+# tmux: bind - split-window -v  (stacked)       -> herdr "horizontal" split
+split_vertical = "prefix+|"
+split_horizontal = "prefix+minus"
+
+# tmux: bind c new-window  (herdr tabs ~= tmux windows)
+new_tab = "prefix+c"
+# tmux: bind , rename-window  (tmux default)
+rename_tab = "prefix+comma"
+# tmux: bind -r n next-window / bind -r p previous-window
+next_tab = "prefix+n"
+previous_tab = "prefix+p"
+
+# tmux: bind -r h/j/k/l select-pane -L/-D/-U/-R
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+
+# tmux: bind X kill-pane  (also default bind x confirm-before kill)
+close_pane = "prefix+x"
+
+# tmux: resize-pane -Z default binding `z`
+zoom = "prefix+z"
+
+# tmux default: prefix d detaches (herdr default is prefix+q)
+detach = "prefix+d"
+
+# tmux: command-alias src reloads the config
+reload_config = "prefix+shift+r"
+
+# herdr default is prefix+w, surrendered to the fzf tab finder (tmux: bind w
+# choose-window) — the workspace picker lives on / instead
+workspace_picker = "prefix+/"
+
+# tmux: bind $ rename-session (workspaces ~= sessions)
+rename_workspace = "prefix+$"
+
+# tmux: bind v popup ... kitty/vpn.sh   (Pritunl)
+[[keys.command]]
+key = "prefix+v"
+type = "popup"
+command = "$HOME/.config/kitty/vpn.sh"
+width = "60%"
+height = "60%"
+
+# tmux: bind V popup ... kitty/vpn-ovpn.sh  (OpenVPN Connect)
+[[keys.command]]
+key = "prefix+shift+v"
+type = "popup"
+command = "$HOME/.config/kitty/vpn-ovpn.sh"
+width = "60%"
+height = "60%"
+
+# tmux: bind M-s scratch popup (ephemeral shell here; herdr popups don't persist
+# a named session the way the tmux scratch did)
+[[keys.command]]
+key = "prefix+alt+s"
+type = "popup"
+command = "$SHELL"
+width = "70%"
+height = "70%"
+
+# fzf project picker over ~/code: opens the chosen project as a new tab (no tmux
+# equivalent — this is a herdr addition)
+[[keys.command]]
+key = "prefix+shift+s"
+type = "popup"
+command = "$HOME/.config/herdr/code-picker.sh"
+width = "60%"
+height = "60%"
+
+# tmux: bind w choose-window -> fzf tab finder: matches on tab
+# number/label/pane titles, focuses the pick. prefix+w is herdr's default for
+# the workspace picker, so that moves to the freed prefix+/ below.
+[[keys.command]]
+key = "prefix+w"
+type = "popup"
+command = "$HOME/.config/herdr/tab-picker.sh"
+width = "60%"
+height = "60%"
+
+# tmux: root C-h/j/k/l + is_vim passthrough (vim-tmux-navigator) -> the
+# herdr-vim-navigator plugin (bojackduy/nvim-herdr-navigation): forwards the key
+# into nvim panes, focuses the adjacent pane otherwise. The nvim half lives in
+# nvim/lua/plugins/herdr-navigation.lua. prefix+h/j/k/l above stay as a plain
+# vim-unaware fallback.
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "local.vim-navigator.left"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "local.vim-navigator.down"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "local.vim-navigator.up"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "local.vim-navigator.right"

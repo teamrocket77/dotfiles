@@ -1,0 +1,140 @@
+{
+  "version": 3,
+  "workspaces": [
+    {
+      "id": "w1",
+      "custom_name": null,
+      "identity_cwd": "/Users/vincentcradler/.config",
+      "public_pane_numbers": {
+        "37": 27,
+        "33": 24,
+        "17": 15,
+        "1": 1,
+        "26": 22,
+        "21": 17,
+        "29": 23,
+        "11": 10
+      },
+      "next_public_pane_number": 28,
+      "public_tab_numbers": [
+        1,
+        6,
+        7,
+        8
+      ],
+      "next_public_tab_number": 9,
+      "tabs": [
+        {
+          "custom_name": "config",
+          "layout": {
+            "Split": {
+              "direction": "Vertical",
+              "ratio": 0.5,
+              "first": {
+                "Pane": 1
+              },
+              "second": {
+                "Pane": 29
+              }
+            }
+          },
+          "panes": {
+            "1": {
+              "cwd": "/Users/vincentcradler/.config"
+            },
+            "29": {
+              "cwd": "/Users/vincentcradler/.config"
+            }
+          },
+          "zoomed": false,
+          "focused": 29,
+          "root_pane": 1
+        },
+        {
+          "custom_name": "navy",
+          "layout": {
+            "Split": {
+              "direction": "Vertical",
+              "ratio": 0.5,
+              "first": {
+                "Split": {
+                  "direction": "Horizontal",
+                  "ratio": 0.5,
+                  "first": {
+                    "Pane": 11
+                  },
+                  "second": {
+                    "Pane": 26
+                  }
+                }
+              },
+              "second": {
+                "Pane": 17
+              }
+            }
+          },
+          "panes": {
+            "11": {
+              "cwd": "/Users/vincentcradler/.config"
+            },
+            "26": {
+              "cwd": "/Users/vincentcradler/code/infra"
+            },
+            "17": {
+              "cwd": "/Users/vincentcradler/code/infra"
+            }
+          },
+          "zoomed": false,
+          "focused": 11,
+          "root_pane": 11
+        },
+        {
+          "custom_name": "comm",
+          "layout": {
+            "Split": {
+              "direction": "Vertical",
+              "ratio": 0.5,
+              "first": {
+                "Pane": 33
+              },
+              "second": {
+                "Pane": 37
+              }
+            }
+          },
+          "panes": {
+            "37": {
+              "cwd": "/Users/vincentcradler/code/k8s"
+            },
+            "33": {
+              "cwd": "/Users/vincentcradler/code/k8s"
+            }
+          },
+          "zoomed": false,
+          "focused": 37,
+          "root_pane": 33
+        },
+        {
+          "custom_name": "ad-hoc",
+          "layout": {
+            "Pane": 21
+          },
+          "panes": {
+            "21": {
+              "cwd": "/Users/vincentcradler/code/ad-hoc-scripts/user-onboarding-okta-db"
+            }
+          },
+          "zoomed": false,
+          "focused": 21,
+          "root_pane": 21
+        }
+      ],
+      "active_tab": 0
+    }
+  ],
+  "active": 0,
+  "selected": 0,
+  "sidebar_width": null,
+  "sidebar_section_split": null,
+  "collapsed_space_keys": []
+}

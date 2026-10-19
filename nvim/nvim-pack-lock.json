@@ -72,6 +72,11 @@
       "src": "https://github.com/rcarriga/nvim-dap-ui.git",
       "version": "'f7d75cca202b52a60c520ec7b1ec3414d6e77b0f'"
     },
+    "nvim-herdr-navigation": {
+      "rev": "7798a2f027465698cb1a51695327e138319f61f3",
+      "src": "https://github.com/bojackduy/nvim-herdr-navigation",
+      "version": "'7798a2f027465698cb1a51695327e138319f61f3'"
+    },
     "nvim-lspconfig": {
       "rev": "229b79051b380377664edc4cbd534930154921a1",
       "src": "https://github.com/neovim/nvim-lspconfig",

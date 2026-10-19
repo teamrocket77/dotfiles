@@ -197,7 +197,7 @@ on-mode-changed = []
 
 [[on-window-detected]]
 	if.app-id = 'com.mitchellh.ghostty'
-	run = 'move-node-to-workspace i'
+	run = 'move-node-to-workspace u'
 
 [[on-window-detected]]
     if.app-id = 'com.apple.journal'

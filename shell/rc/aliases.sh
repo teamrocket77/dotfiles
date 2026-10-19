@@ -7,6 +7,9 @@ alias tnew='tmux new-session -s init'
 if [[ -f "/Applications/OpenVPN Connect.app/Contents/MacOS/OpenVPN Connect" ]]; then
 	alias openvpn='"/Applications/OpenVPN Connect.app/Contents/MacOS/OpenVPN Connect"'
 fi
+if [[ -d "/Applications/Ghostty.app" ]]; then
+	alias ttydr='open -na Ghostty --args --theme="3024 Night" --title=herder'
+fi
 if [ $+command[docker] ]; then
 	alias dcb='docker compose down && docker compose build'
 	alias dcu='docker compose up'

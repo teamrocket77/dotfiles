@@ -38,6 +38,23 @@ fi
 set-title(){
     echo -e "\033]0;$1\007"
 }
+
+# Ghostty: reload config via SIGUSR2 and confirm with a macOS notification.
+# Ghostty's native reload toast (app-notifications = config-reload) is GTK-only,
+# so on macOS cmd+shift+, reloads silently — use this instead when you want
+# confirmation that the reload actually happened.
+ghostty-reload() {
+	if pkill -USR2 -x -i ghostty 2>/dev/null; then
+		if (( $+commands[terminal-notifier] )); then
+			terminal-notifier -title "Ghostty" -message "Config reloaded"
+		else
+			osascript -e 'display notification "Config reloaded" with title "Ghostty"'
+		fi
+	else
+		echo "ghostty-reload: no running ghostty process" >&2
+		return 1
+	fi
+}
 source-help(){
 }
 
@@ -251,6 +268,24 @@ vpn() {
 # straight from the shell.
 vpn-ovpn() {
 	"$HOME/.config/kitty/vpn-ovpn.sh"
+}
+
+# herdr: new tab (≈ tmux window) in the running herdr from any shell — the CLI
+# talks to the server over its socket, so this works outside a herdr pane too.
+# Usage: htab [dir] [label] — dir defaults to $PWD, label optional.
+htab() {
+	if ! (( $+commands[herdr] )); then
+		echo "htab: herdr not found" >&2
+		return 1
+	fi
+	local dir="${1:-$PWD}"
+	if [[ ! -d "$dir" ]]; then
+		echo "htab: no such directory: $dir" >&2
+		return 1
+	fi
+	local args=(tab create --cwd "${dir:A}" --focus)
+	[[ -n "$2" ]] && args+=(--label "$2")
+	herdr "${args[@]}"
 }
 
 # Open the clipboard contents in a scratch nvim buffer, with an optional

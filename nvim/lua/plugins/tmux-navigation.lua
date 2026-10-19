@@ -1,5 +1,12 @@
 -- Seamless pane navigation between nvim splits and tmux panes with <C-h/j/k/l>.
 -- The matching tmux side lives in tmux/tmux.conf (is_vim detection + root C-hjkl).
+
+-- Inside herdr, plugins/herdr-navigation.lua owns <C-h/j/k/l>; skip the tmux half
+-- so the two plugins never fight over the same maps.
+if vim.env.HERDR_PANE_ID ~= nil then
+	return
+end
+
 vim.pack.add({
 	{
 		src = "https://github.com/alexghergh/nvim-tmux-navigation",
