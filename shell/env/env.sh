@@ -37,7 +37,17 @@ typeset -U path # zsh trick: keep PATH free of duplicate entries automatically
 [[ -d "/Applications/Pritunl.app/Contents/Resources" ]] && path=($path "/Applications/Pritunl.app/Contents/Resources")
 [[ -d "/Applications/OpenVPN Connect.app/Contents/MacOS" ]] && path=($path "/Applications/OpenVPN Connect.app/Contents/MacOS")
 
-# 5. ripgrep config (dotfiles path first, then ~/.config)
+# 5. herdr pseudo-global environment
+# herdr has no tmux `set-environment -g` equivalent, so broadcast_herdr
+# (shell/env/functions.sh) writes AWS_PROFILE/AWS_DEFAULT_REGION here and every
+# shell born inside a herdr pane ($HERDR_ENV set) sources it — future tabs and
+# panes inherit the broadcast values the way tmux panes inherit the server env.
+export HERDR_AWS_ENV_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/herdr/aws-env.sh"
+if [[ -n "$HERDR_ENV" && -f "$HERDR_AWS_ENV_FILE" ]]; then
+	source "$HERDR_AWS_ENV_FILE"
+fi
+
+# 6. ripgrep config (dotfiles path first, then ~/.config)
 RG_CONF="nvim/rg.conf"
 if [[ -f "$HOME/dotfiles/$RG_CONF" ]]; then
 	export RIPGREP_CONFIG_PATH="$HOME/dotfiles/$RG_CONF"
