@@ -256,6 +256,7 @@ vim.api.nvim_create_autocmd("FileType", {
 -- Tabpage-based tabline (one entry per tab, so splits/buffers are NOT shown as
 -- separate tabs). Like the built-in one (tab number + active buffer's filename +
 -- modified "[+]"), but prefixes the label to annotate that tab's active buffer:
+--   [G] fugitive git-object buffer (the "old" side of :Git difftool/:Gdiffsplit)
 --   [R] read-only / non-modifiable (e.g. repos opened via <Space>mic)
 --   [S] not saveable to disk (non-file buftype, e.g. :Scratch nofile buffers)
 function _G.custom_tabline()
@@ -273,16 +274,25 @@ function _G.custom_tabline()
 		local name = vim.fn.bufname(bufnr)
 		local label = name == "" and "[No Name]" or vim.fn.fnamemodify(name, ":t")
 
+		-- Fugitive object buffers (fugitive://…) show a historical/index version
+		-- of a file, i.e. the "old" side of a diff — not your working copy.
+		local fugitive = name:match("^fugitive://") ~= nil
 		local ro = vim.bo[bufnr].readonly or not vim.bo[bufnr].modifiable
 		-- A normal, saveable file buffer has an empty buftype; any other buftype
 		-- (nofile, nowrite, terminal, prompt, help, quickfix, ...) can't be :w'd.
+		-- Fugitive buffers always trip this (acwrite/nowrite), so suppress the
+		-- redundant S (and R) for them — [G] already says it all.
 		local unsaveable = vim.bo[bufnr].buftype ~= ""
-		-- Combine independent flags into one bracket group: [R], [S], or [RS].
-		local flags = (ro and "R" or "") .. (unsaveable and "S" or "")
+		-- Combine independent flags into one bracket group: [G], [R], [S], [RS], ...
+		local flags = fugitive and "G"
+			or (ro and "R" or "") .. (unsaveable and "S" or "")
 		local prefix = flags ~= "" and ("[" .. flags .. "] ") or ""
 		local modified = vim.bo[bufnr].modified and " [+]" or ""
 
-		s = s .. " " .. i .. ": " .. prefix .. label .. modified .. " "
+		-- Flags lead the whole entry (before the number) so they read as a
+		-- mandatory per-tab prefix and stay visible even when a long tabline
+		-- clips label text on the right.
+		s = s .. " " .. prefix .. i .. ": " .. label .. modified .. " "
 	end
 	-- Fill the rest of the tabline and reset clickable region.
 	s = s .. "%#TabLineFill#%T"

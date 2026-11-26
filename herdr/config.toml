@@ -6,10 +6,6 @@ enabled = false
 [ui]
 status_indicators = "symbols"
 
-# Agent panel entries without the workspace prefix (default first row is
-# ["state_icon", "machine", "workspace", "tab"]).
-[ui.sidebar.agents]
-rows = [["state_icon", "machine", "tab"], ["agent"]]
 
 # Keybindings ported from ~/.config/tmux/tmux.conf so the tmux muscle memory
 # carries over. herdr is tmux-inspired, so most prefix+<key> actions already
@@ -60,6 +56,9 @@ rename_workspace = "prefix+$"
 next_agent = "ctrl+shift+down"
 previous_agent = "ctrl+shift+up"
 
+[experimental]
+pane_history = true
+
 # tmux: bind v popup ... kitty/vpn.sh   (Pritunl)
 [[keys.command]]
 key = "prefix+v"
@@ -68,13 +67,13 @@ command = "$HOME/.config/kitty/vpn.sh"
 width = "60%"
 height = "60%"
 
-# tmux: bind V popup ... kitty/vpn-ovpn.sh  (OpenVPN Connect)
+# Open the OpenVPN Connect GUI (gopenvpn, shell/env/functions.sh). Detached, no
+# popup. The fzf picker (kitty/vpn-ovpn.sh, `vpn-ovpn`) is still there to run
+# by hand.
 [[keys.command]]
 key = "prefix+shift+v"
-type = "popup"
-command = "$HOME/.config/kitty/vpn-ovpn.sh"
-width = "60%"
-height = "60%"
+type = "shell"
+command = "zsh -c gopenvpn"
 
 # tmux: bind M-s scratch popup (ephemeral shell here; herdr popups don't persist
 # a named session the way the tmux scratch did)
@@ -85,17 +84,17 @@ command = "$SHELL"
 width = "70%"
 height = "70%"
 
-# fzf project picker over ~/code: opens the chosen project as a new tab (no tmux
-# equivalent — this is a herdr addition)
+# fzf over the full zoxide list (`zoxide query --list`): opens the chosen
+# directory as a new tab (no tmux equivalent — this is a herdr addition)
 [[keys.command]]
 key = "prefix+shift+s"
 type = "popup"
-command = "$HOME/.config/herdr/code-picker.sh"
+command = "$HOME/.config/herdr/zoxide-picker.sh"
 width = "60%"
 height = "60%"
 
-# tmux: bind w choose-window -> fzf tab finder: matches on tab
-# number/label/pane titles, focuses the pick. prefix+w is herdr's default for
+# tmux: bind w choose-window -> fzf tab finder: matches on the tab label,
+# shows workspace/number/pane titles alongside, focuses the pick. prefix+w is herdr's default for
 # the workspace picker, so that moves to the freed prefix+/ below.
 [[keys.command]]
 key = "prefix+w"
@@ -142,3 +141,7 @@ command = "local.vim-navigator.up"
 key = "ctrl+l"
 type = "plugin_action"
 command = "local.vim-navigator.right"
+
+[theme]
+name = "gruvbox"
+auto_switch = false

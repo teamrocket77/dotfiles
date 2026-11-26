@@ -26,7 +26,7 @@ in {
   home.packages = with pkgs; [
     wezterm
     wget
-    pyenv
+    uv
     k9s
     neovim
     kitty

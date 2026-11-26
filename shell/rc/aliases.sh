@@ -4,9 +4,6 @@ alias gitnoe='git commit --amend --no-edit'
 alias lsd='ls -d */'
 alias ll='ls -al'
 alias tnew='tmux new-session -s init'
-if [[ -f "/Applications/OpenVPN Connect.app/Contents/MacOS/OpenVPN Connect" ]]; then
-	alias openvpn='"/Applications/OpenVPN Connect.app/Contents/MacOS/OpenVPN Connect"'
-fi
 if [[ -d "/Applications/Ghostty.app" ]]; then
 	alias ttydr='open -na Ghostty --args --theme="3024 Night" --title=herder'
 fi

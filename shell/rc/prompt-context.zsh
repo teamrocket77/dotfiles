@@ -3,11 +3,11 @@
 # While you type a matching command, a small token is appended to Pure's
 # RPROMPT and removed again as soon as the command no longer matches:
 #   kubectl / k …  -> ⎈ [A] <cluster>   (cyan)   current kube cluster
-#   python / pip … -> [P] <version>      (yellow) pyenv version or active venv
+#   python / pip … -> [P] <version>      (yellow) active venv or .python-version
 #   aws …          -> [A] <profile>      (orange) $AWS_PROFILE
 #
 # All lookups are cheap file/env reads refreshed once per prompt (precmd);
-# nothing shells out to kubectl/pyenv/aws.
+# nothing shells out to kubectl/uv/aws.
 #
 # Self-contained on purpose: this file is sourced by work-init.sh before
 # ~/.zshrc autoloads these, so we autoload them here too (idempotent).
@@ -46,13 +46,7 @@ function _update_python_cache() {
     return
   fi
 
-  # A `pyenv shell` override.
-  if [[ -n "$PYENV_VERSION" ]]; then
-    _CACHED_PY_CTX="$PYENV_VERSION"
-    return
-  fi
-
-  # Walk up for a local .python-version, like pyenv does.
+  # Walk up for a local .python-version, the pin file uv reads.
   local dir="$PWD"
   while true; do
     if [[ -f "$dir/.python-version" ]]; then
@@ -63,12 +57,7 @@ function _update_python_cache() {
     dir="${dir:h}"
   done
 
-  # Fall back to the pyenv global version.
-  if [[ -f "$PYENV_ROOT/version" ]]; then
-    _CACHED_PY_CTX=$(head -n 1 "$PYENV_ROOT/version" 2>/dev/null)
-  else
-    _CACHED_PY_CTX=""
-  fi
+  _CACHED_PY_CTX=""
 }
 add-zsh-hook precmd _update_python_cache
 

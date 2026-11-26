@@ -15,11 +15,6 @@
       "src": "https://github.com/folke/flash.nvim",
       "version": "'ec0bf2842189f65f60fd40bf3557cac1029cc932'"
     },
-    "git-blame.nvim": {
-      "rev": "5c536e2d4134d064aa3f41575280bc8a2a0e03d7",
-      "src": "https://github.com/f-person/git-blame.nvim",
-      "version": "'5c536e2d4134d064aa3f41575280bc8a2a0e03d7'"
-    },
     "kitty-scrollback.nvim": {
       "rev": "5a163bfeb789c1a2bfa143b0e78b02caa233bc43",
       "src": "https://github.com/mikesmithgh/kitty-scrollback.nvim"
@@ -123,6 +118,11 @@
       "rev": "be23eacb2a63380bd79e207a738c728214ecc9d3",
       "src": "https://github.com/mbbill/undotree",
       "version": "'be23eacb2a63380bd79e207a738c728214ecc9d3'"
+    },
+    "vim-fugitive": {
+      "rev": "3b753cf8c6a4dcde6edee8827d464ba9b8c4a6f0",
+      "src": "https://github.com/tpope/vim-fugitive",
+      "version": "'3b753cf8c6a4dcde6edee8827d464ba9b8c4a6f0'"
     },
     "wezterm-types": {
       "rev": "bba4eacfdce545a9d5c29c69d20bbb9c90189224",

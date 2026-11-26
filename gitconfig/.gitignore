@@ -1,3 +1,4 @@
 !.envrc.tmpl
 .envrc*
 *.vim_session
+**/.claude/settings.local.json

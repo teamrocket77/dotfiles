@@ -12,12 +12,15 @@ export HISTSIZE=100000
 export SAVEHIST=100000
 
 # 2. Git Config Rendering
-# Render the git config once, when the source exists but the target doesn't.
+# Render the git config only when gitconfig.toml is missing or older than the
+# .erb template (`-nt` is also true when the right-hand file doesn't exist).
+# Changing NAME/EMAIL/SIGNINGKEY alone won't re-render: delete gitconfig.toml.
 # Guarded on ruby too, so non-interactive shells/scripts don't error if ruby is
 # absent (this file now runs for them as well).
 if [[ -d "$XDG_CONFIG_HOME/gitconfig" ]]; then
     if (( $+commands[ruby] )) \
-        && [[ -f "$XDG_CONFIG_HOME/gitconfig/render-config.rb" && ! -f "$XDG_CONFIG_HOME/gitconfig/gitconfig" ]]; then
+        && [[ -f "$XDG_CONFIG_HOME/gitconfig/render-config.rb" \
+        && "$XDG_CONFIG_HOME/gitconfig/config.toml.erb" -nt "$XDG_CONFIG_HOME/gitconfig/gitconfig.toml" ]]; then
         ruby "$XDG_CONFIG_HOME/gitconfig/render-config.rb"
     fi
 fi
@@ -37,17 +40,7 @@ typeset -U path # zsh trick: keep PATH free of duplicate entries automatically
 [[ -d "/Applications/Pritunl.app/Contents/Resources" ]] && path=($path "/Applications/Pritunl.app/Contents/Resources")
 [[ -d "/Applications/OpenVPN Connect.app/Contents/MacOS" ]] && path=($path "/Applications/OpenVPN Connect.app/Contents/MacOS")
 
-# 5. herdr pseudo-global environment
-# herdr has no tmux `set-environment -g` equivalent, so broadcast_herdr
-# (shell/env/functions.sh) writes AWS_PROFILE/AWS_DEFAULT_REGION here and every
-# shell born inside a herdr pane ($HERDR_ENV set) sources it — future tabs and
-# panes inherit the broadcast values the way tmux panes inherit the server env.
-export HERDR_AWS_ENV_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/herdr/aws-env.sh"
-if [[ -n "$HERDR_ENV" && -f "$HERDR_AWS_ENV_FILE" ]]; then
-	source "$HERDR_AWS_ENV_FILE"
-fi
-
-# 6. ripgrep config (dotfiles path first, then ~/.config)
+# 5. ripgrep config (dotfiles path first, then ~/.config)
 RG_CONF="nvim/rg.conf"
 if [[ -f "$HOME/dotfiles/$RG_CONF" ]]; then
 	export RIPGREP_CONFIG_PATH="$HOME/dotfiles/$RG_CONF"

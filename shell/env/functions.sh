@@ -270,6 +270,20 @@ vpn-ovpn() {
 	"$HOME/.config/kitty/vpn-ovpn.sh"
 }
 
+# OpenVPN Connect app (named so it doesn't shadow the community `openvpn`
+# binary). Bare `gopenvpn` opens/focuses the GUI (herdr prefix+shift+v calls
+# this); with args it passes them to the app's CLI (--list-profiles,
+# --connect-shortcut=<id>, --disconnect). A function, not an alias, so
+# non-interactive shells like herdr's keybinding can call it.
+gopenvpn() {
+	local app="/Applications/OpenVPN Connect.app"
+	if (( $# == 0 )); then
+		open -a "$app"
+	else
+		"$app/Contents/MacOS/OpenVPN Connect" "$@"
+	fi
+}
+
 # herdr: new tab (≈ tmux window) in the running herdr from any shell — the CLI
 # talks to the server over its socket, so this works outside a herdr pane too.
 # Usage: htab [dir] [label] — dir defaults to $PWD, label optional.
@@ -286,54 +300,6 @@ htab() {
 	local args=(tab create --cwd "${dir:A}" --focus)
 	[[ -n "$2" ]] && args+=(--label "$2")
 	herdr "${args[@]}"
-}
-
-# herdr: broadcast AWS_PROFILE/AWS_DEFAULT_REGION into the running herdr —
-# counterpart of broadcast_tmux (~/bin/broadcast-tmux.sh). herdr has no
-# tmux-style `set-environment -g` store (per API schema, env is only a
-# per-creation param), so the global half is emulated with a state file: this
-# writes the exports to $HERDR_AWS_ENV_FILE, which shell/env/env.sh sources on
-# startup in every herdr pane — future tabs/panes inherit like tmux. It also
-# exports into the current shell and types the export into every existing pane
-# sitting at a shell prompt (skipping agent panes, nvim, …).
-# Usage: broadcast_herdr <aws_profile> <aws_default_region>
-# ($HERDR_AWS_ENV_FILE is exported in shell/env/env.sh, which also sources it.)
-broadcast_herdr() {
-	local profile="$1" region="$2"
-
-	if [[ -z "$profile" || -z "$region" ]]; then
-		echo "Usage: broadcast_herdr <aws_profile> <aws_default_region>" >&2
-		return 1
-	fi
-
-	# 1. Current shell (works because this file is sourced).
-	export AWS_PROFILE="$profile"
-	export AWS_DEFAULT_REGION="$region"
-
-	# 2. Seed the pseudo-global store so future herdr panes inherit (sourced by
-	#    shell/env/env.sh when $HERDR_ENV is set).
-	mkdir -p "${HERDR_AWS_ENV_FILE:h}"
-	printf "export AWS_PROFILE='%s' AWS_DEFAULT_REGION='%s'\n" "$profile" "$region" > "$HERDR_AWS_ENV_FILE"
-
-	# 3. Only if a herdr server is actually running.
-	if ! (( $+commands[herdr] && $+commands[jq] )) || ! herdr tab list >/dev/null 2>&1; then
-		return 0
-	fi
-
-	echo "Broadcasting AWS_PROFILE to idle herdr panes"
-	# Skip panes running an AI agent (agent != null). For the rest, use
-	# process-info to target only panes sitting at a shell prompt (leaf
-	# foreground process is zsh/bash/sh/fish) so we never type into nvim, etc.
-	local pane cmd
-	herdr pane list | jq -r '.result.panes[] | select(.agent == null) | .pane_id' | while read -r pane; do
-		cmd=$(herdr pane process-info --pane "$pane" 2>/dev/null \
-			| jq -r '.result.process_info.foreground_processes[-1].name // empty')
-		case "$cmd" in
-			zsh|bash|sh|-zsh|-bash|fish)
-				herdr pane run "$pane" "export AWS_PROFILE='$profile' AWS_DEFAULT_REGION='$region'" >/dev/null 2>&1
-				;;
-		esac
-	done
 }
 
 # Open the clipboard contents in a scratch nvim buffer, with an optional

@@ -65,7 +65,10 @@ vim.opt.clipboard:append({ "unnamed" })
 
 vim.opt.hlsearch = true
 vim.g.doge_enable_mappings = 0
-vim.g.python3_host_prog = home .. "/.pyenv/versions/pynvim/bin/python"
+-- Dedicated uv venv for the Python provider:
+--   uv venv --python 3.12 ~/.local/share/nvim/pynvim-venv
+--   uv pip install --python ~/.local/share/nvim/pynvim-venv pynvim
+vim.g.python3_host_prog = home .. "/.local/share/nvim/pynvim-venv/bin/python"
 -- log level setting
 
 vim.opt.list = true

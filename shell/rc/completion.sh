@@ -1,5 +1,5 @@
 # Interactive completion init. Sorts before plugins.sh (c < p), so it runs BEFORE
-# anything that calls `compdef` — zoxide here, plus pyenv/mise later in .zshrc.
+# anything that calls `compdef` — zoxide here, plus mise later in .zshrc.
 # Without this, `compdef` is undefined and those inits return non-zero (that was
 # the "Error sourcing: plugins.sh" on non-Nix machines).
 #

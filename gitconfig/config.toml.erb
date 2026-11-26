@@ -8,7 +8,6 @@
     signingkey = <%= signing_key %>
     <% end %>
 [core]
-	symlinks = false
 	excludesfile = ~/.config/gitconfig/.gitignore
 [difftool]
 	prompt = false
@@ -16,7 +15,7 @@
 	tool = vimdiff
 	algorithm = histogram
 [alias]
-	a = a
+	a = add
 	au = add -u
 	s = status
 	d = diff
@@ -31,9 +30,10 @@
     lg = lg1
     lg1 = lg1-specific --all
     lg2 = lg2-specific --all
-    lg3 = lg3-specific --all
     lg1-specific = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'
     lg2-specific = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'
+    tag-auth = tag -l --format='%(refname:short) was tagged by: %(taggername)'
+    top-level = rev-parse --show-toplevel
 
 <% if signing_key  && !signing_key.strip.empty? %>
 [commit]

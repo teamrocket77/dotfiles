@@ -1,11 +1,14 @@
--- Helm template rendering helpers, shared by two entry points:
+-- Helm template rendering helpers, shared by three entry points:
 --   * :HelmT    (buffer-local, ftplugin/helm.lua, <leader>hr) — render the
 --     CURRENT template buffer.
 --   * :HelmPick (global, <leader>hp) — pick a template file first, then values;
 --     works from anywhere (e.g. the dashboard), not just inside a helm buffer.
--- Both end the same way: render ONE template to concrete YAML with
--- `helm template --show-only`, open it in a split as an acwrite buffer, and hand
--- it to :YamlCrdsAttach so the datreeio CRD schema validates it (something
+--   * :HelmAll  (buffer-local in repos with devops/helm/*chart/Chart.yaml,
+--     <leader>hr outside templates) — render the WHOLE chart, subcharts
+--     included, with the current values file (or a picked one).
+-- :HelmT and :HelmPick render ONE template with `helm template --show-only`;
+-- :HelmAll renders everything. All open the output in a split as an acwrite
+-- buffer and hand it to :YamlCrdsAttach so yamlls validates it (something
 -- helm_ls's embedded yamlls can't do here).
 
 local M = {}
@@ -54,6 +57,28 @@ local function open_rendered(root, chart, rel, stdout)
   vim.cmd("YamlCrdsAttach") -- buffer already named -> just sets ft=yaml + attaches
 end
 
+-- Values files at the chart root or one level down.
+local function values_files(root)
+  local out = {}
+  for _, g in ipairs({ "values*.yaml", "values*.yml", "*/values*.yaml", "*/values*.yml" }) do
+    vim.list_extend(out, vim.fn.glob(root .. "/" .. g, false, true))
+  end
+  return out
+end
+
+-- Run `cmd` (a `helm template ...` argv) and open its output via open_rendered.
+local function run_helm(cmd, root, chart, rel)
+  vim.system(cmd, { text = true }, function(res)
+    vim.schedule(function()
+      if res.code ~= 0 then
+        vim.notify("helm template failed\n" .. (res.stderr or ""), vim.log.levels.ERROR)
+        return
+      end
+      open_rendered(root, chart, rel, res.stdout)
+    end)
+  end)
+end
+
 -- Given a chart root and a chart-root-relative template path, pick a values file
 -- (mini.pick, with a synthetic default entry) and render that single template.
 function M.render(root, rel)
@@ -63,13 +88,11 @@ function M.render(root, rel)
   end
   local chart = vim.fn.fnamemodify(root, ":t")
 
-  -- Values files at the chart root or one level down, plus a synthetic "default"
-  -- entry (render with the chart's own values.yaml, no -f). Escaping cancels.
+  -- Values files plus a synthetic "default" entry (render with the chart's own
+  -- values.yaml, no -f). Escaping cancels.
   local DEFAULT = "<default values.yaml>"
   local items = { DEFAULT }
-  for _, g in ipairs({ "values*.yaml", "values*.yml", "*/values*.yaml", "*/values*.yml" }) do
-    vim.list_extend(items, vim.fn.glob(root .. "/" .. g, false, true))
-  end
+  vim.list_extend(items, values_files(root))
 
   require("mini.pick").start({
     source = {
@@ -86,15 +109,7 @@ function M.render(root, rel)
           if item ~= DEFAULT then
             vim.list_extend(cmd, { "-f", item })
           end
-          vim.system(cmd, { text = true }, function(res)
-            vim.schedule(function()
-              if res.code ~= 0 then
-                vim.notify("helm template failed\n" .. (res.stderr or ""), vim.log.levels.ERROR)
-                return
-              end
-              open_rendered(root, chart, rel, res.stdout)
-            end)
-          end)
+          run_helm(cmd, root, chart, rel)
         end)
       end,
     },
@@ -170,6 +185,92 @@ function M.pick_and_render(dir)
     }
   )
 end
+
+-- Render the whole chart at `root` with `values` layered over its values.yaml.
+-- Subcharts come from the vendored charts/*.tgz, so no `helm dependency build`.
+function M.render_all(root, values)
+  if vim.fn.executable("helm") ~= 1 then
+    vim.notify("helm not found on PATH", vim.log.levels.ERROR)
+    return
+  end
+  local chart = vim.fn.fnamemodify(root, ":t")
+  run_helm({ "helm", "template", chart, root, "-f", values }, root, chart, vim.fs.basename(values))
+end
+
+-- Charts this file's repo exposes under the devops/helm/*chart convention.
+local CHART_GLOB = "devops/helm/*chart/Chart.yaml"
+local function repo_charts(path)
+  local repo = vim.fs.root(path, ".git")
+  if not repo then
+    return nil, {}
+  end
+  local charts = vim.tbl_map(function(f)
+    return vim.fs.dirname(f)
+  end, vim.fn.glob(repo .. "/" .. CHART_GLOB, false, true))
+  return repo, charts
+end
+
+-- If the current buffer is a values file inside a chart, render the whole chart
+-- with it. Otherwise pick a values file from the repo's devops/helm charts.
+-- Backs :HelmAll.
+function M.render_all_current()
+  local path = vim.fs.normalize(vim.api.nvim_buf_get_name(0))
+  local root = path ~= "" and vim.fs.root(path, "Chart.yaml")
+  if root and vim.fs.basename(path):match("^values.*%.ya?ml$") then
+    M.render_all(vim.fs.normalize(root), path)
+    return
+  end
+
+  local repo, charts = repo_charts(path ~= "" and path or vim.fn.getcwd())
+  local items = {}
+  for _, c in ipairs(charts) do
+    for _, f in ipairs(values_files(c)) do
+      items[#items + 1] = vim.fs.normalize(f):sub(#repo + 2) -- e.g. devops/helm/x-chart/values-dev.yaml
+    end
+  end
+  if #items == 0 then
+    vim.notify("HelmAll: no " .. CHART_GLOB .. " values files in this repo", vim.log.levels.WARN)
+    return
+  end
+
+  require("mini.pick").start({
+    source = {
+      name = "values (render all)",
+      items = items,
+      choose = function(item)
+        if not item then
+          return
+        end
+        local file = repo .. "/" .. item
+        vim.schedule(function()
+          M.render_all(vim.fs.normalize(vim.fs.root(file, "Chart.yaml")), file)
+        end)
+      end,
+    },
+  })
+end
+
+-- Enable :HelmAll + <leader>hr in any file of a repo that follows the
+-- devops/helm/*chart convention. Template buffers (ft=helm) keep the
+-- single-template <leader>hr from ftplugin/helm.lua (which overwrites this one
+-- if filetype detection runs after us).
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+  group = vim.api.nvim_create_augroup("helm_render_all", { clear = true }),
+  callback = function(args)
+    local path = vim.api.nvim_buf_get_name(args.buf)
+    if path == "" or vim.bo[args.buf].buftype ~= "" or #select(2, repo_charts(path)) == 0 then
+      return
+    end
+    vim.api.nvim_buf_create_user_command(args.buf, "HelmAll", function()
+      M.render_all_current()
+    end, { desc = "Render the whole Helm chart with this (or a picked) values file" })
+    if vim.bo[args.buf].filetype ~= "helm" then
+      vim.keymap.set("n", "<leader>hr", function()
+        M.render_all_current()
+      end, { buffer = args.buf, desc = "HelmAll: render the whole chart with this/picked values" })
+    end
+  end,
+})
 
 vim.api.nvim_create_user_command("HelmPick", function()
   M.pick_and_render()

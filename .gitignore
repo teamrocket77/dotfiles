@@ -9,3 +9,5 @@ tmux/plugins
 **/__pycache__/
 **/*.swp
 **/*.swo
+**/session*
+**/*sock.agent*

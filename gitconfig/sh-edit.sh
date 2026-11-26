@@ -5,8 +5,8 @@ export GPG_TTY=$(tty)
 export NAME=""
 export EMAIL=""
 # export SIGNINGKEY=""
-if [ ! -f "$HOME/.config/gitconfig/gitconfig" ]; then
+if [ ! -f "$HOME/.config/gitconfig/gitconfig.toml" ]; then
 	ruby "$HOME/.config/gitconfig/render-config.rb"
 fi
-export GIT_CONFIG_SYSTEM="$HOME/.config/gitconfig/gitconfig"
+export GIT_CONFIG_SYSTEM="$HOME/.config/gitconfig/gitconfig.toml"
 
